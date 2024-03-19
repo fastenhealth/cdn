@@ -955,9 +955,6 @@ input:checked + .toggle-bg {
 .h-20 {
   height: 5rem;
 }
-.h-24 {
-  height: 6rem;
-}
 .h-4 {
   height: 1rem;
 }
@@ -999,9 +996,6 @@ input:checked + .toggle-bg {
 }
 .w-20 {
   width: 5rem;
-}
-.w-24 {
-  width: 6rem;
 }
 .w-4 {
   width: 1rem;
