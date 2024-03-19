@@ -59791,6 +59791,1990 @@ const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__.Version('14.3.0')
 
 /***/ }),
 
+/***/ 8103:
+/*!**************************************************!*\
+  !*** ./node_modules/oauth4webapi/build/index.js ***!
+  \**************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "OperationProcessingError": () => (/* binding */ OperationProcessingError),
+/* harmony export */   "UnsupportedOperationError": () => (/* binding */ UnsupportedOperationError),
+/* harmony export */   "authorizationCodeGrantRequest": () => (/* binding */ authorizationCodeGrantRequest),
+/* harmony export */   "calculateJwkThumbprint": () => (/* binding */ calculateJwkThumbprint),
+/* harmony export */   "calculatePKCECodeChallenge": () => (/* binding */ calculatePKCECodeChallenge),
+/* harmony export */   "clientCredentialsGrantRequest": () => (/* binding */ clientCredentialsGrantRequest),
+/* harmony export */   "deviceAuthorizationRequest": () => (/* binding */ deviceAuthorizationRequest),
+/* harmony export */   "deviceCodeGrantRequest": () => (/* binding */ deviceCodeGrantRequest),
+/* harmony export */   "discoveryRequest": () => (/* binding */ discoveryRequest),
+/* harmony export */   "expectNoNonce": () => (/* binding */ expectNoNonce),
+/* harmony export */   "expectNoState": () => (/* binding */ expectNoState),
+/* harmony export */   "generateKeyPair": () => (/* binding */ generateKeyPair),
+/* harmony export */   "generateRandomCodeVerifier": () => (/* binding */ generateRandomCodeVerifier),
+/* harmony export */   "generateRandomNonce": () => (/* binding */ generateRandomNonce),
+/* harmony export */   "generateRandomState": () => (/* binding */ generateRandomState),
+/* harmony export */   "getValidatedIdTokenClaims": () => (/* binding */ getValidatedIdTokenClaims),
+/* harmony export */   "introspectionRequest": () => (/* binding */ introspectionRequest),
+/* harmony export */   "isOAuth2Error": () => (/* binding */ isOAuth2Error),
+/* harmony export */   "issueRequestObject": () => (/* binding */ issueRequestObject),
+/* harmony export */   "jwksRequest": () => (/* binding */ jwksRequest),
+/* harmony export */   "parseWwwAuthenticateChallenges": () => (/* binding */ parseWwwAuthenticateChallenges),
+/* harmony export */   "processAuthorizationCodeOAuth2Response": () => (/* binding */ processAuthorizationCodeOAuth2Response),
+/* harmony export */   "processAuthorizationCodeOpenIDResponse": () => (/* binding */ processAuthorizationCodeOpenIDResponse),
+/* harmony export */   "processClientCredentialsResponse": () => (/* binding */ processClientCredentialsResponse),
+/* harmony export */   "processDeviceAuthorizationResponse": () => (/* binding */ processDeviceAuthorizationResponse),
+/* harmony export */   "processDeviceCodeResponse": () => (/* binding */ processDeviceCodeResponse),
+/* harmony export */   "processDiscoveryResponse": () => (/* binding */ processDiscoveryResponse),
+/* harmony export */   "processIntrospectionResponse": () => (/* binding */ processIntrospectionResponse),
+/* harmony export */   "processJwksResponse": () => (/* binding */ processJwksResponse),
+/* harmony export */   "processPushedAuthorizationResponse": () => (/* binding */ processPushedAuthorizationResponse),
+/* harmony export */   "processRefreshTokenResponse": () => (/* binding */ processRefreshTokenResponse),
+/* harmony export */   "processRevocationResponse": () => (/* binding */ processRevocationResponse),
+/* harmony export */   "processUserInfoResponse": () => (/* binding */ processUserInfoResponse),
+/* harmony export */   "protectedResourceRequest": () => (/* binding */ protectedResourceRequest),
+/* harmony export */   "pushedAuthorizationRequest": () => (/* binding */ pushedAuthorizationRequest),
+/* harmony export */   "refreshTokenGrantRequest": () => (/* binding */ refreshTokenGrantRequest),
+/* harmony export */   "revocationRequest": () => (/* binding */ revocationRequest),
+/* harmony export */   "skipAuthTimeCheck": () => (/* binding */ skipAuthTimeCheck),
+/* harmony export */   "skipStateCheck": () => (/* binding */ skipStateCheck),
+/* harmony export */   "skipSubjectCheck": () => (/* binding */ skipSubjectCheck),
+/* harmony export */   "userInfoRequest": () => (/* binding */ userInfoRequest),
+/* harmony export */   "validateAuthResponse": () => (/* binding */ validateAuthResponse),
+/* harmony export */   "validateJwtAuthResponse": () => (/* binding */ validateJwtAuthResponse)
+/* harmony export */ });
+/* harmony import */ var _home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js */ 1670);
+
+let USER_AGENT;
+if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')) {
+  const NAME = 'oauth4webapi';
+  const VERSION = 'v1.4.1';
+  USER_AGENT = `${NAME}/${VERSION}`;
+}
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+function buf(input) {
+  if (typeof input === 'string') {
+    return encoder.encode(input);
+  }
+  return decoder.decode(input);
+}
+const CHUNK_SIZE = 0x8000;
+function encodeBase64Url(input) {
+  if (input instanceof ArrayBuffer) {
+    input = new Uint8Array(input);
+  }
+  const arr = [];
+  for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
+    arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)));
+  }
+  return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+function decodeBase64Url(input) {
+  try {
+    const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''));
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  } catch {
+    throw new TypeError('The input to be decoded is not correctly encoded.');
+  }
+}
+function b64u(input) {
+  if (typeof input === 'string') {
+    return decodeBase64Url(input);
+  }
+  return encodeBase64Url(input);
+}
+class LRU {
+  constructor(maxSize) {
+    this.cache = new Map();
+    this._cache = new Map();
+    this.maxSize = maxSize;
+  }
+  get(key) {
+    let v = this.cache.get(key);
+    if (v) {
+      return v;
+    }
+    if (v = this._cache.get(key)) {
+      this.update(key, v);
+      return v;
+    }
+    return undefined;
+  }
+  has(key) {
+    return this.cache.has(key) || this._cache.has(key);
+  }
+  set(key, value) {
+    if (this.cache.has(key)) {
+      this.cache.set(key, value);
+    } else {
+      this.update(key, value);
+    }
+    return this;
+  }
+  delete(key) {
+    if (this.cache.has(key)) {
+      return this.cache.delete(key);
+    }
+    if (this._cache.has(key)) {
+      return this._cache.delete(key);
+    }
+    return false;
+  }
+  update(key, value) {
+    this.cache.set(key, value);
+    if (this.cache.size >= this.maxSize) {
+      this._cache = this.cache;
+      this.cache = new Map();
+    }
+  }
+}
+class UnsupportedOperationError extends Error {
+  constructor(message) {
+    super(message ?? 'operation not supported');
+    this.name = this.constructor.name;
+    Error.captureStackTrace?.(this, this.constructor);
+  }
+}
+class OperationProcessingError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace?.(this, this.constructor);
+  }
+}
+const OPE = OperationProcessingError;
+const dpopNonces = new LRU(100);
+function isCryptoKey(key) {
+  return key instanceof CryptoKey;
+}
+function isPrivateKey(key) {
+  return isCryptoKey(key) && key.type === 'private';
+}
+function isPublicKey(key) {
+  return isCryptoKey(key) && key.type === 'public';
+}
+const SUPPORTED_JWS_ALGS = ['PS256', 'ES256', 'RS256', 'EdDSA'];
+function preserveBodyStream(response) {
+  assertReadableResponse(response);
+  return response.clone();
+}
+function processDpopNonce(response) {
+  const url = new URL(response.url);
+  if (response.headers.has('dpop-nonce')) {
+    dpopNonces.set(url.origin, response.headers.get('dpop-nonce'));
+  }
+  return response;
+}
+function normalizeTyp(value) {
+  return value.toLowerCase().replace(/^application\//, '');
+}
+function isJsonObject(input) {
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    return false;
+  }
+  return true;
+}
+function prepareHeaders(input) {
+  if (input !== undefined && !(input instanceof Headers)) {
+    throw new TypeError('"options.headers" must be an instance of Headers');
+  }
+  const headers = new Headers(input);
+  if (USER_AGENT && !headers.has('user-agent')) {
+    headers.set('user-agent', USER_AGENT);
+  }
+  if (headers.has('authorization')) {
+    throw new TypeError('"options.headers" must not include the "authorization" header name');
+  }
+  if (headers.has('dpop')) {
+    throw new TypeError('"options.headers" must not include the "dpop" header name');
+  }
+  return headers;
+}
+function signal(value) {
+  if (typeof value === 'function') {
+    value = value();
+  }
+  if (!(value instanceof AbortSignal)) {
+    throw new TypeError('"options.signal" must return or be an instance of AbortSignal');
+  }
+  return value;
+}
+function discoveryRequest(_x, _x2) {
+  return _discoveryRequest.apply(this, arguments);
+}
+function _discoveryRequest() {
+  _discoveryRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (issuerIdentifier, options) {
+    if (!(issuerIdentifier instanceof URL)) {
+      throw new TypeError('"issuerIdentifier" must be an instance of URL');
+    }
+    if (issuerIdentifier.protocol !== 'https:' && issuerIdentifier.protocol !== 'http:') {
+      throw new TypeError('"issuer.protocol" must be "https:" or "http:"');
+    }
+    const url = new URL(issuerIdentifier.href);
+    switch (options?.algorithm) {
+      case undefined:
+      case 'oidc':
+        url.pathname = `${url.pathname}/.well-known/openid-configuration`.replace('//', '/');
+        break;
+      case 'oauth2':
+        if (url.pathname === '/') {
+          url.pathname = `.well-known/oauth-authorization-server`;
+        } else {
+          url.pathname = `.well-known/oauth-authorization-server/${url.pathname}`.replace('//', '/');
+        }
+        break;
+      default:
+        throw new TypeError('"options.algorithm" must be "oidc" (default), or "oauth2"');
+    }
+    const headers = prepareHeaders(options?.headers);
+    headers.set('accept', 'application/json');
+    return fetch(url.href, {
+      headers,
+      method: 'GET',
+      redirect: 'manual',
+      signal: options?.signal ? signal(options.signal) : null
+    }).then(processDpopNonce);
+  });
+  return _discoveryRequest.apply(this, arguments);
+}
+function validateString(input) {
+  return typeof input === 'string' && input.length !== 0;
+}
+function processDiscoveryResponse(_x3, _x4) {
+  return _processDiscoveryResponse.apply(this, arguments);
+}
+function _processDiscoveryResponse() {
+  _processDiscoveryResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (expectedIssuerIdentifier, response) {
+    if (!(expectedIssuerIdentifier instanceof URL)) {
+      throw new TypeError('"expectedIssuer" must be an instance of URL');
+    }
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      throw new OPE('"response" is not a conform Authorization Server Metadata response');
+    }
+    let json;
+    try {
+      json = yield preserveBodyStream(response).json();
+    } catch {
+      throw new OPE('failed to parse "response" body as JSON');
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!validateString(json.issuer)) {
+      throw new OPE('"response" body "issuer" property must be a non-empty string');
+    }
+    if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
+      throw new OPE('"response" body "issuer" does not match "expectedIssuer"');
+    }
+    return json;
+  });
+  return _processDiscoveryResponse.apply(this, arguments);
+}
+function randomBytes() {
+  return b64u(crypto.getRandomValues(new Uint8Array(32)));
+}
+function generateRandomCodeVerifier() {
+  return randomBytes();
+}
+function generateRandomState() {
+  return randomBytes();
+}
+function generateRandomNonce() {
+  return randomBytes();
+}
+function calculatePKCECodeChallenge(_x5) {
+  return _calculatePKCECodeChallenge.apply(this, arguments);
+}
+function _calculatePKCECodeChallenge() {
+  _calculatePKCECodeChallenge = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (codeVerifier) {
+    if (!validateString(codeVerifier)) {
+      throw new TypeError('"codeVerifier" must be a non-empty string');
+    }
+    return b64u(yield crypto.subtle.digest({
+      name: 'SHA-256'
+    }, buf(codeVerifier)));
+  });
+  return _calculatePKCECodeChallenge.apply(this, arguments);
+}
+function getKeyAndKid(input) {
+  if (input instanceof CryptoKey) {
+    return {
+      key: input
+    };
+  }
+  if (!(input?.key instanceof CryptoKey)) {
+    return {};
+  }
+  if (input.kid !== undefined && !validateString(input.kid)) {
+    throw new TypeError('"kid" must be a non-empty string');
+  }
+  return {
+    key: input.key,
+    kid: input.kid
+  };
+}
+function formUrlEncode(token) {
+  return encodeURIComponent(token).replace(/%20/g, '+');
+}
+function clientSecretBasic(clientId, clientSecret) {
+  const username = formUrlEncode(clientId);
+  const password = formUrlEncode(clientSecret);
+  const credentials = btoa(`${username}:${password}`);
+  return `Basic ${credentials}`;
+}
+function psAlg(key) {
+  switch (key.algorithm.hash.name) {
+    case 'SHA-256':
+      return 'PS256';
+    default:
+      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name');
+  }
+}
+function rsAlg(key) {
+  switch (key.algorithm.hash.name) {
+    case 'SHA-256':
+      return 'RS256';
+    default:
+      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name');
+  }
+}
+function esAlg(key) {
+  switch (key.algorithm.namedCurve) {
+    case 'P-256':
+      return 'ES256';
+    default:
+      throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve');
+  }
+}
+function determineJWSAlgorithm(key) {
+  switch (key.algorithm.name) {
+    case 'RSA-PSS':
+      return psAlg(key);
+    case 'RSASSA-PKCS1-v1_5':
+      return rsAlg(key);
+    case 'ECDSA':
+      return esAlg(key);
+    case 'Ed25519':
+      return 'EdDSA';
+    default:
+      throw new UnsupportedOperationError('unsupported CryptoKey algorithm name');
+  }
+}
+function epochTime() {
+  return Math.floor(Date.now() / 1000);
+}
+function clientAssertion(as, client) {
+  const now = epochTime();
+  return {
+    jti: randomBytes(),
+    aud: [as.issuer, as.token_endpoint],
+    exp: now + 60,
+    iat: now,
+    nbf: now,
+    iss: client.client_id,
+    sub: client.client_id
+  };
+}
+function privateKeyJwt(_x6, _x7, _x8, _x9) {
+  return _privateKeyJwt.apply(this, arguments);
+}
+function _privateKeyJwt() {
+  _privateKeyJwt = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, key, kid) {
+    return jwt({
+      alg: determineJWSAlgorithm(key),
+      kid
+    }, clientAssertion(as, client), key);
+  });
+  return _privateKeyJwt.apply(this, arguments);
+}
+function assertAs(as) {
+  if (typeof as !== 'object' || as === null) {
+    throw new TypeError('"as" must be an object');
+  }
+  if (!validateString(as.issuer)) {
+    throw new TypeError('"as.issuer" property must be a non-empty string');
+  }
+  return true;
+}
+function assertClient(client) {
+  if (typeof client !== 'object' || client === null) {
+    throw new TypeError('"client" must be an object');
+  }
+  if (!validateString(client.client_id)) {
+    throw new TypeError('"client.client_id" property must be a non-empty string');
+  }
+  return true;
+}
+function assertClientSecret(clientSecret) {
+  if (!validateString(clientSecret)) {
+    throw new TypeError('"client.client_secret" property must be a non-empty string');
+  }
+  return clientSecret;
+}
+function assertNoClientPrivateKey(clientAuthMethod, clientPrivateKey) {
+  if (clientPrivateKey !== undefined) {
+    throw new TypeError(`"options.clientPrivateKey" property must not be provided when ${clientAuthMethod} client authentication method is used.`);
+  }
+}
+function assertNoClientSecret(clientAuthMethod, clientSecret) {
+  if (clientSecret !== undefined) {
+    throw new TypeError(`"client.client_secret" property must not be provided when ${clientAuthMethod} client authentication method is used.`);
+  }
+}
+function clientAuthentication(_x10, _x11, _x12, _x13, _x14) {
+  return _clientAuthentication.apply(this, arguments);
+}
+function _clientAuthentication() {
+  _clientAuthentication = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, body, headers, clientPrivateKey) {
+    body.delete('client_secret');
+    body.delete('client_assertion_type');
+    body.delete('client_assertion');
+    switch (client.token_endpoint_auth_method) {
+      case undefined:
+      case 'client_secret_basic':
+        {
+          assertNoClientPrivateKey('client_secret_basic', clientPrivateKey);
+          headers.set('authorization', clientSecretBasic(client.client_id, assertClientSecret(client.client_secret)));
+          break;
+        }
+      case 'client_secret_post':
+        {
+          assertNoClientPrivateKey('client_secret_post', clientPrivateKey);
+          body.set('client_id', client.client_id);
+          body.set('client_secret', assertClientSecret(client.client_secret));
+          break;
+        }
+      case 'private_key_jwt':
+        {
+          assertNoClientSecret('private_key_jwt', client.client_secret);
+          if (clientPrivateKey === undefined) {
+            throw new TypeError('"options.clientPrivateKey" must be provided when "client.token_endpoint_auth_method" is "private_key_jwt"');
+          }
+          const {
+            key,
+            kid
+          } = getKeyAndKid(clientPrivateKey);
+          if (!isPrivateKey(key)) {
+            throw new TypeError('"options.clientPrivateKey.key" must be a private CryptoKey');
+          }
+          body.set('client_id', client.client_id);
+          body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
+          body.set('client_assertion', yield privateKeyJwt(as, client, key, kid));
+          break;
+        }
+      case 'none':
+        {
+          assertNoClientSecret('none', client.client_secret);
+          assertNoClientPrivateKey('none', clientPrivateKey);
+          body.set('client_id', client.client_id);
+          break;
+        }
+      default:
+        throw new UnsupportedOperationError('unsupported client token_endpoint_auth_method');
+    }
+  });
+  return _clientAuthentication.apply(this, arguments);
+}
+function jwt(_x15, _x16, _x17) {
+  return _jwt.apply(this, arguments);
+}
+function _jwt() {
+  _jwt = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (header, claimsSet, key) {
+    if (!key.usages.includes('sign')) {
+      throw new TypeError('CryptoKey instances used for signing assertions must include "sign" in their "usages"');
+    }
+    const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`;
+    const signature = b64u(yield crypto.subtle.sign(subtleAlgorithm(key), key, buf(input)));
+    return `${input}.${signature}`;
+  });
+  return _jwt.apply(this, arguments);
+}
+function issueRequestObject(_x18, _x19, _x20, _x21) {
+  return _issueRequestObject.apply(this, arguments);
+}
+function _issueRequestObject() {
+  _issueRequestObject = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, parameters, privateKey) {
+    assertAs(as);
+    assertClient(client);
+    if (!(parameters instanceof URLSearchParams)) {
+      throw new TypeError('"parameters" must be an instance of URLSearchParams');
+    }
+    parameters = new URLSearchParams(parameters);
+    const {
+      key,
+      kid
+    } = getKeyAndKid(privateKey);
+    if (!isPrivateKey(key)) {
+      throw new TypeError('"privateKey.key" must be a private CryptoKey');
+    }
+    parameters.set('client_id', client.client_id);
+    const now = epochTime();
+    const claims = {
+      ...Object.fromEntries(parameters.entries()),
+      jti: randomBytes(),
+      aud: as.issuer,
+      exp: now + 60,
+      iat: now,
+      nbf: now,
+      iss: client.client_id
+    };
+    let resource;
+    if (parameters.has('resource') && (resource = parameters.getAll('resource')) && resource.length > 1) {
+      claims.resource = resource;
+    }
+    return jwt({
+      alg: determineJWSAlgorithm(key),
+      typ: 'oauth-authz-req+jwt',
+      kid
+    }, claims, key);
+  });
+  return _issueRequestObject.apply(this, arguments);
+}
+function dpopProofJwt(_x22, _x23, _x24, _x25, _x26) {
+  return _dpopProofJwt.apply(this, arguments);
+}
+function _dpopProofJwt() {
+  _dpopProofJwt = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (headers, options, url, htm, accessToken) {
+    const {
+      privateKey,
+      publicKey,
+      nonce = dpopNonces.get(url.origin)
+    } = options;
+    if (!isPrivateKey(privateKey)) {
+      throw new TypeError('"DPoP.privateKey" must be a private CryptoKey');
+    }
+    if (!isPublicKey(publicKey)) {
+      throw new TypeError('"DPoP.publicKey" must be a public CryptoKey');
+    }
+    if (nonce !== undefined && !validateString(nonce)) {
+      throw new TypeError('"DPoP.nonce" must be a non-empty string or undefined');
+    }
+    if (!publicKey.extractable) {
+      throw new TypeError('"DPoP.publicKey.extractable" must be true');
+    }
+    const now = epochTime();
+    const proof = yield jwt({
+      alg: determineJWSAlgorithm(privateKey),
+      typ: 'dpop+jwt',
+      jwk: yield publicJwk(publicKey)
+    }, {
+      iat: now,
+      jti: randomBytes(),
+      htm,
+      nonce,
+      htu: `${url.origin}${url.pathname}`,
+      ath: accessToken ? b64u(yield crypto.subtle.digest({
+        name: 'SHA-256'
+      }, buf(accessToken))) : undefined
+    }, privateKey);
+    headers.set('dpop', proof);
+  });
+  return _dpopProofJwt.apply(this, arguments);
+}
+function publicJwk(_x27) {
+  return _publicJwk.apply(this, arguments);
+}
+function _publicJwk() {
+  _publicJwk = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (key) {
+    const {
+      kty,
+      e,
+      n,
+      x,
+      y,
+      crv
+    } = yield crypto.subtle.exportKey('jwk', key);
+    return {
+      kty,
+      crv,
+      e,
+      n,
+      x,
+      y
+    };
+  });
+  return _publicJwk.apply(this, arguments);
+}
+function pushedAuthorizationRequest(_x28, _x29, _x30, _x31) {
+  return _pushedAuthorizationRequest.apply(this, arguments);
+}
+function _pushedAuthorizationRequest() {
+  _pushedAuthorizationRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, parameters, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!(parameters instanceof URLSearchParams)) {
+      throw new TypeError('"parameters" must be an instance of URLSearchParams');
+    }
+    if (typeof as.pushed_authorization_request_endpoint !== 'string') {
+      throw new TypeError('"as.pushed_authorization_request_endpoint" must be a string');
+    }
+    const url = new URL(as.pushed_authorization_request_endpoint);
+    const body = new URLSearchParams(parameters);
+    body.set('client_id', client.client_id);
+    const headers = prepareHeaders(options?.headers);
+    headers.set('accept', 'application/json');
+    if (options?.DPoP !== undefined) {
+      yield dpopProofJwt(headers, options.DPoP, url, 'POST');
+      if (!body.has('dpop_jkt')) {
+        body.set('dpop_jkt', yield calculateJwkThumbprint(options.DPoP.publicKey));
+      }
+    }
+    return authenticatedRequest(as, client, 'POST', url, body, headers, options);
+  });
+  return _pushedAuthorizationRequest.apply(this, arguments);
+}
+function isOAuth2Error(input) {
+  const value = input;
+  if (typeof value !== 'object' || Array.isArray(value) || value === null) {
+    return false;
+  }
+  return value.error !== undefined;
+}
+function unquote(value) {
+  if (value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"') {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+const SPLIT_REGEXP = /((?:,|, )?[0-9a-zA-Z!#$%&'*+-.^_`|~]+=)/;
+const SCHEMES_REGEXP = /(?:^|, ?)([0-9a-zA-Z!#$%&'*+\-.^_`|~]+)(?=$|[ ,])/g;
+function wwwAuth(scheme, params) {
+  const arr = params.split(SPLIT_REGEXP).slice(1);
+  if (!arr.length) {
+    return {
+      scheme: scheme.toLowerCase(),
+      parameters: {}
+    };
+  }
+  arr[arr.length - 1] = arr[arr.length - 1].replace(/,$/, '');
+  const parameters = {};
+  for (let i = 1; i < arr.length; i += 2) {
+    const idx = i;
+    if (arr[idx][0] === '"') {
+      while (arr[idx].slice(-1) !== '"' && ++i < arr.length) {
+        arr[idx] += arr[i];
+      }
+    }
+    const key = arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase();
+    parameters[key] = unquote(arr[idx]);
+  }
+  return {
+    scheme: scheme.toLowerCase(),
+    parameters
+  };
+}
+function parseWwwAuthenticateChallenges(response) {
+  if (!(response instanceof Response)) {
+    throw new TypeError('"response" must be an instance of Response');
+  }
+  if (!response.headers.has('www-authenticate')) {
+    return undefined;
+  }
+  const header = response.headers.get('www-authenticate');
+  const result = [];
+  for (const {
+    1: scheme,
+    index
+  } of header.matchAll(SCHEMES_REGEXP)) {
+    result.push([scheme, index]);
+  }
+  if (!result.length) {
+    return undefined;
+  }
+  const challenges = result.map(([scheme, indexOf], i, others) => {
+    const next = others[i + 1];
+    let parameters;
+    if (next) {
+      parameters = header.slice(indexOf, next[1]);
+    } else {
+      parameters = header.slice(indexOf);
+    }
+    return wwwAuth(scheme, parameters);
+  });
+  return challenges;
+}
+function processPushedAuthorizationResponse(_x32, _x33, _x34) {
+  return _processPushedAuthorizationResponse.apply(this, arguments);
+}
+function _processPushedAuthorizationResponse() {
+  _processPushedAuthorizationResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response) {
+    assertAs(as);
+    assertClient(client);
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 201) {
+      let err;
+      if (err = yield handleOAuthBodyError(response)) {
+        return err;
+      }
+      throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response');
+    }
+    let json;
+    try {
+      json = yield preserveBodyStream(response).json();
+    } catch {
+      throw new OPE('failed to parse "response" body as JSON');
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!validateString(json.request_uri)) {
+      throw new OPE('"response" body "request_uri" property must be a non-empty string');
+    }
+    if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
+      throw new OPE('"response" body "expires_in" property must be a positive number');
+    }
+    return json;
+  });
+  return _processPushedAuthorizationResponse.apply(this, arguments);
+}
+function protectedResourceRequest(_x35, _x36, _x37, _x38, _x39, _x40) {
+  return _protectedResourceRequest.apply(this, arguments);
+}
+function _protectedResourceRequest() {
+  _protectedResourceRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (accessToken, method, url, headers, body, options) {
+    if (!validateString(accessToken)) {
+      throw new TypeError('"accessToken" must be a non-empty string');
+    }
+    if (!(url instanceof URL)) {
+      throw new TypeError('"url" must be an instance of URL');
+    }
+    headers = prepareHeaders(headers);
+    if (options?.DPoP === undefined) {
+      headers.set('authorization', `Bearer ${accessToken}`);
+    } else {
+      yield dpopProofJwt(headers, options.DPoP, url, 'GET', accessToken);
+      headers.set('authorization', `DPoP ${accessToken}`);
+    }
+    return fetch(url.href, {
+      body,
+      headers,
+      method,
+      redirect: 'manual',
+      signal: options?.signal ? signal(options.signal) : null
+    }).then(processDpopNonce);
+  });
+  return _protectedResourceRequest.apply(this, arguments);
+}
+function userInfoRequest(_x41, _x42, _x43, _x44) {
+  return _userInfoRequest.apply(this, arguments);
+}
+function _userInfoRequest() {
+  _userInfoRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, accessToken, options) {
+    assertAs(as);
+    assertClient(client);
+    if (typeof as.userinfo_endpoint !== 'string') {
+      throw new TypeError('"as.userinfo_endpoint" must be a string');
+    }
+    const url = new URL(as.userinfo_endpoint);
+    const headers = prepareHeaders(options?.headers);
+    if (client.userinfo_signed_response_alg) {
+      headers.set('accept', 'application/jwt');
+    } else {
+      headers.set('accept', 'application/json');
+      headers.append('accept', 'application/jwt');
+    }
+    return protectedResourceRequest(accessToken, 'GET', url, headers, null, options);
+  });
+  return _userInfoRequest.apply(this, arguments);
+}
+const jwksCache = new LRU(20);
+const cryptoKeyCaches = {};
+function getPublicSigKeyFromIssuerJwksUri(_x45, _x46, _x47) {
+  return _getPublicSigKeyFromIssuerJwksUri.apply(this, arguments);
+}
+function _getPublicSigKeyFromIssuerJwksUri() {
+  _getPublicSigKeyFromIssuerJwksUri = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, options, header) {
+    const {
+      alg,
+      kid
+    } = header;
+    checkSupportedJwsAlg(alg);
+    let jwks;
+    let age;
+    if (jwksCache.has(as.jwks_uri)) {
+      ;
+      ({
+        jwks,
+        age
+      } = jwksCache.get(as.jwks_uri));
+      if (age >= 300) {
+        jwksCache.delete(as.jwks_uri);
+        return getPublicSigKeyFromIssuerJwksUri(as, options, header);
+      }
+    } else {
+      jwks = yield jwksRequest(as, options).then(processJwksResponse);
+      age = 0;
+      jwksCache.set(as.jwks_uri, {
+        jwks,
+        iat: epochTime(),
+        get age() {
+          return epochTime() - this.iat;
+        }
+      });
+    }
+    let kty;
+    switch (alg.slice(0, 2)) {
+      case 'RS':
+      case 'PS':
+        kty = 'RSA';
+        break;
+      case 'ES':
+        kty = 'EC';
+        break;
+      case 'Ed':
+        kty = 'OKP';
+        break;
+      default:
+        throw new UnsupportedOperationError();
+    }
+    const candidates = jwks.keys.filter(jwk => {
+      if (jwk.kty !== kty) {
+        return false;
+      }
+      if (kid !== undefined && kid !== jwk.kid) {
+        return false;
+      }
+      if (jwk.alg !== undefined && alg !== jwk.alg) {
+        return false;
+      }
+      if (jwk.use !== undefined && jwk.use !== 'sig') {
+        return false;
+      }
+      if (jwk.key_ops?.includes('verify') === false) {
+        return false;
+      }
+      switch (true) {
+        case alg === 'ES256' && jwk.crv !== 'P-256':
+        case alg === 'EdDSA' && jwk.crv !== 'Ed25519':
+          return false;
+      }
+      return true;
+    });
+    const {
+      0: jwk,
+      length
+    } = candidates;
+    if (!length) {
+      if (age >= 60) {
+        jwksCache.delete(as.jwks_uri);
+        return getPublicSigKeyFromIssuerJwksUri(as, options, header);
+      }
+      throw new OPE('error when selecting a JWT verification key, no applicable keys found');
+    } else if (length !== 1) {
+      throw new OPE('error when selecting a JWT verification key, multiple applicable keys found, a "kid" JWT Header Parameter is required');
+    }
+    cryptoKeyCaches[alg] || (cryptoKeyCaches[alg] = new WeakMap());
+    let key = cryptoKeyCaches[alg].get(jwk);
+    if (!key) {
+      key = yield importJwk({
+        ...jwk,
+        alg
+      });
+      if (key.type !== 'public') {
+        throw new OPE('jwks_uri must only contain public keys');
+      }
+      cryptoKeyCaches[alg].set(jwk, key);
+    }
+    return key;
+  });
+  return _getPublicSigKeyFromIssuerJwksUri.apply(this, arguments);
+}
+const skipSubjectCheck = Symbol();
+function getContentType(response) {
+  return response.headers.get('content-type')?.split(';')[0];
+}
+function processUserInfoResponse(_x48, _x49, _x50, _x51, _x52) {
+  return _processUserInfoResponse.apply(this, arguments);
+}
+function _processUserInfoResponse() {
+  _processUserInfoResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, expectedSubject, response, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      throw new OPE('"response" is not a conform UserInfo Endpoint response');
+    }
+    let json;
+    if (getContentType(response) === 'application/jwt') {
+      const {
+        claims
+      } = yield validateJwt(yield preserveBodyStream(response).text(), checkSigningAlgorithm.bind(undefined, client.userinfo_signed_response_alg, as.userinfo_signing_alg_values_supported), options?.skipJwtSignatureCheck !== true ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options) : noSignatureCheck).then(validateOptionalAudience.bind(undefined, client.client_id)).then(validateOptionalIssuer.bind(undefined, as.issuer));
+      json = claims;
+    } else {
+      if (client.userinfo_signed_response_alg) {
+        throw new OPE('JWT UserInfo Response expected');
+      }
+      try {
+        json = yield preserveBodyStream(response).json();
+      } catch {
+        throw new OPE('failed to parse "response" body as JSON');
+      }
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!validateString(json.sub)) {
+      throw new OPE('"response" body "sub" property must be a non-empty string');
+    }
+    switch (expectedSubject) {
+      case skipSubjectCheck:
+        break;
+      default:
+        if (!validateString(expectedSubject)) {
+          throw new OPE('"expectedSubject" must be a non-empty string');
+        }
+        if (json.sub !== expectedSubject) {
+          throw new OPE('unexpected "response" body "sub" value');
+        }
+    }
+    return json;
+  });
+  return _processUserInfoResponse.apply(this, arguments);
+}
+function authenticatedRequest(_x53, _x54, _x55, _x56, _x57, _x58, _x59) {
+  return _authenticatedRequest.apply(this, arguments);
+}
+function _authenticatedRequest() {
+  _authenticatedRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, method, url, body, headers, options) {
+    yield clientAuthentication(as, client, body, headers, options?.clientPrivateKey);
+    headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    return fetch(url.href, {
+      body,
+      headers,
+      method,
+      redirect: 'manual',
+      signal: options?.signal ? signal(options.signal) : null
+    }).then(processDpopNonce);
+  });
+  return _authenticatedRequest.apply(this, arguments);
+}
+function tokenEndpointRequest(_x60, _x61, _x62, _x63, _x64) {
+  return _tokenEndpointRequest.apply(this, arguments);
+}
+function _tokenEndpointRequest() {
+  _tokenEndpointRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, grantType, parameters, options) {
+    if (typeof as.token_endpoint !== 'string') {
+      throw new TypeError('"as.token_endpoint" must be a string');
+    }
+    const url = new URL(as.token_endpoint);
+    parameters.set('grant_type', grantType);
+    const headers = prepareHeaders(options?.headers);
+    headers.set('accept', 'application/json');
+    if (options?.DPoP !== undefined) {
+      yield dpopProofJwt(headers, options.DPoP, url, 'POST');
+    }
+    return authenticatedRequest(as, client, 'POST', url, parameters, headers, options);
+  });
+  return _tokenEndpointRequest.apply(this, arguments);
+}
+function refreshTokenGrantRequest(_x65, _x66, _x67, _x68) {
+  return _refreshTokenGrantRequest.apply(this, arguments);
+}
+function _refreshTokenGrantRequest() {
+  _refreshTokenGrantRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, refreshToken, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!validateString(refreshToken)) {
+      throw new TypeError('"refreshToken" must be a non-empty string');
+    }
+    const parameters = new URLSearchParams(options?.additionalParameters);
+    parameters.set('refresh_token', refreshToken);
+    return tokenEndpointRequest(as, client, 'refresh_token', parameters, options);
+  });
+  return _refreshTokenGrantRequest.apply(this, arguments);
+}
+const idTokenClaims = new WeakMap();
+function getValidatedIdTokenClaims(ref) {
+  if (!idTokenClaims.has(ref)) {
+    throw new TypeError('"ref" was already garbage collected or did not resolve from the proper sources');
+  }
+  return idTokenClaims.get(ref);
+}
+function processGenericAccessTokenResponse(_x69, _x70, _x71, _x72) {
+  return _processGenericAccessTokenResponse.apply(this, arguments);
+}
+function _processGenericAccessTokenResponse() {
+  _processGenericAccessTokenResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response, options, ignoreIdToken = false, ignoreRefreshToken = false, skipSignatureCheck = false) {
+    assertAs(as);
+    assertClient(client);
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      let err;
+      if (err = yield handleOAuthBodyError(response)) {
+        return err;
+      }
+      throw new OPE('"response" is not a conform Token Endpoint response');
+    }
+    let json;
+    try {
+      json = yield preserveBodyStream(response).json();
+    } catch {
+      throw new OPE('failed to parse "response" body as JSON');
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!validateString(json.access_token)) {
+      throw new OPE('"response" body "access_token" property must be a non-empty string');
+    }
+    if (!validateString(json.token_type)) {
+      throw new OPE('"response" body "token_type" property must be a non-empty string');
+    }
+    json.token_type = json.token_type.toLowerCase();
+    if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
+      throw new UnsupportedOperationError('unsupported `token_type` value');
+    }
+    if (json.expires_in !== undefined && (typeof json.expires_in !== 'number' || json.expires_in <= 0)) {
+      throw new OPE('"response" body "expires_in" property must be a positive number');
+    }
+    if (!ignoreRefreshToken && json.refresh_token !== undefined && !validateString(json.refresh_token)) {
+      throw new OPE('"response" body "refresh_token" property must be a non-empty string');
+    }
+    if (json.scope !== undefined && typeof json.scope !== 'string') {
+      throw new OPE('"response" body "scope" property must be a string');
+    }
+    if (!ignoreIdToken) {
+      if (json.id_token !== undefined && !validateString(json.id_token)) {
+        throw new OPE('"response" body "id_token" property must be a non-empty string');
+      }
+      if (json.id_token) {
+        const {
+          claims
+        } = yield validateJwt(json.id_token, checkSigningAlgorithm.bind(undefined, client.id_token_signed_response_alg, as.id_token_signing_alg_values_supported), skipSignatureCheck !== true ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options) : noSignatureCheck).then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub'])).then(validateIssuer.bind(undefined, as.issuer)).then(validateAudience.bind(undefined, client.client_id));
+        if (Array.isArray(claims.aud) && claims.aud.length !== 1 && claims.azp !== client.client_id) {
+          throw new OPE('unexpected ID Token "azp" (authorized party) claim value');
+        }
+        if (client.require_auth_time && typeof claims.auth_time !== 'number') {
+          throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value');
+        }
+        idTokenClaims.set(json, claims);
+      }
+    }
+    return json;
+  });
+  return _processGenericAccessTokenResponse.apply(this, arguments);
+}
+function processRefreshTokenResponse(_x73, _x74, _x75, _x76) {
+  return _processRefreshTokenResponse.apply(this, arguments);
+}
+function _processRefreshTokenResponse() {
+  _processRefreshTokenResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response, options) {
+    return processGenericAccessTokenResponse(as, client, response, options, undefined, undefined, options?.skipJwtSignatureCheck === true);
+  });
+  return _processRefreshTokenResponse.apply(this, arguments);
+}
+function validateOptionalAudience(expected, result) {
+  if (result.claims.aud !== undefined) {
+    return validateAudience(expected, result);
+  }
+  return result;
+}
+function validateAudience(expected, result) {
+  if (Array.isArray(result.claims.aud)) {
+    if (!result.claims.aud.includes(expected)) {
+      throw new OPE('unexpected JWT "aud" (audience) claim value');
+    }
+  } else if (result.claims.aud !== expected) {
+    throw new OPE('unexpected JWT "aud" (audience) claim value');
+  }
+  return result;
+}
+function validateOptionalIssuer(expected, result) {
+  if (result.claims.iss !== undefined) {
+    return validateIssuer(expected, result);
+  }
+  return result;
+}
+function validateIssuer(expected, result) {
+  if (result.claims.iss !== expected) {
+    throw new OPE('unexpected JWT "iss" (issuer) claim value');
+  }
+  return result;
+}
+function authorizationCodeGrantRequest(_x77, _x78, _x79, _x80, _x81, _x82) {
+  return _authorizationCodeGrantRequest.apply(this, arguments);
+}
+function _authorizationCodeGrantRequest() {
+  _authorizationCodeGrantRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, callbackParameters, redirectUri, codeVerifier, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!(callbackParameters instanceof CallbackParameters)) {
+      throw new TypeError('"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()", or "validateJwtAuthResponse()');
+    }
+    if (!validateString(redirectUri)) {
+      throw new TypeError('"redirectUri" must be a non-empty string');
+    }
+    if (!validateString(codeVerifier)) {
+      throw new TypeError('"codeVerifier" must be a non-empty string');
+    }
+    const code = getURLSearchParameter(callbackParameters, 'code');
+    if (!code) {
+      throw new OPE('no authorization code in "callbackParameters"');
+    }
+    const parameters = new URLSearchParams(options?.additionalParameters);
+    parameters.set('redirect_uri', redirectUri);
+    parameters.set('code_verifier', codeVerifier);
+    parameters.set('code', code);
+    return tokenEndpointRequest(as, client, 'authorization_code', parameters, options);
+  });
+  return _authorizationCodeGrantRequest.apply(this, arguments);
+}
+const claimNames = {
+  aud: 'audience',
+  exp: 'expiration time',
+  iat: 'issued at',
+  iss: 'issuer',
+  sub: 'subject'
+};
+function validatePresence(required, result) {
+  for (const claim of required) {
+    if (result.claims[claim] === undefined) {
+      throw new OPE(`JWT "${claim}" (${claimNames[claim]}) claim missing`);
+    }
+  }
+  return result;
+}
+const expectNoNonce = Symbol();
+const skipAuthTimeCheck = Symbol();
+function processAuthorizationCodeOpenIDResponse(_x83, _x84, _x85, _x86, _x87, _x88) {
+  return _processAuthorizationCodeOpenIDResponse.apply(this, arguments);
+}
+function _processAuthorizationCodeOpenIDResponse() {
+  _processAuthorizationCodeOpenIDResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response, expectedNonce, maxAge, options) {
+    const result = yield processGenericAccessTokenResponse(as, client, response, options, undefined, undefined, options?.skipJwtSignatureCheck === true);
+    if (isOAuth2Error(result)) {
+      return result;
+    }
+    if (!validateString(result.id_token)) {
+      throw new OPE('"response" body "id_token" property must be a non-empty string');
+    }
+    maxAge ?? (maxAge = client.default_max_age ?? skipAuthTimeCheck);
+    const claims = getValidatedIdTokenClaims(result);
+    if ((client.require_auth_time || maxAge !== skipAuthTimeCheck) && claims.auth_time === undefined) {
+      throw new OPE('ID Token "auth_time" (authentication time) claim missing');
+    }
+    if (maxAge !== skipAuthTimeCheck) {
+      if (typeof maxAge !== 'number' || maxAge < 0) {
+        throw new TypeError('"options.max_age" must be a non-negative number');
+      }
+      const now = epochTime();
+      const tolerance = 30;
+      if (claims.auth_time + maxAge < now - tolerance) {
+        throw new OPE('too much time has elapsed since the last End-User authentication');
+      }
+    }
+    switch (expectedNonce) {
+      case undefined:
+      case expectNoNonce:
+        if (claims.nonce !== undefined) {
+          throw new OPE('unexpected ID Token "nonce" claim value');
+        }
+        break;
+      default:
+        if (!validateString(expectedNonce)) {
+          throw new TypeError('"expectedNonce" must be a non-empty string');
+        }
+        if (claims.nonce === undefined) {
+          throw new OPE('ID Token "nonce" claim missing');
+        }
+        if (claims.nonce !== expectedNonce) {
+          throw new OPE('unexpected ID Token "nonce" claim value');
+        }
+    }
+    return result;
+  });
+  return _processAuthorizationCodeOpenIDResponse.apply(this, arguments);
+}
+function processAuthorizationCodeOAuth2Response(_x89, _x90, _x91) {
+  return _processAuthorizationCodeOAuth2Response.apply(this, arguments);
+}
+function _processAuthorizationCodeOAuth2Response() {
+  _processAuthorizationCodeOAuth2Response = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response) {
+    const result = yield processGenericAccessTokenResponse(as, client, response, undefined, true);
+    if (isOAuth2Error(result)) {
+      return result;
+    }
+    if (result.id_token !== undefined) {
+      if (typeof result.id_token === 'string' && result.id_token.length) {
+        throw new OPE('Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing');
+      }
+      delete result.id_token;
+    }
+    return result;
+  });
+  return _processAuthorizationCodeOAuth2Response.apply(this, arguments);
+}
+function checkJwtType(expected, result) {
+  if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
+    throw new OPE('unexpected JWT "typ" header parameter value');
+  }
+  return result;
+}
+function clientCredentialsGrantRequest(_x92, _x93, _x94, _x95) {
+  return _clientCredentialsGrantRequest.apply(this, arguments);
+}
+function _clientCredentialsGrantRequest() {
+  _clientCredentialsGrantRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, parameters, options) {
+    assertAs(as);
+    assertClient(client);
+    return tokenEndpointRequest(as, client, 'client_credentials', new URLSearchParams(parameters), options);
+  });
+  return _clientCredentialsGrantRequest.apply(this, arguments);
+}
+function processClientCredentialsResponse(_x96, _x97, _x98) {
+  return _processClientCredentialsResponse.apply(this, arguments);
+}
+function _processClientCredentialsResponse() {
+  _processClientCredentialsResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response) {
+    const result = yield processGenericAccessTokenResponse(as, client, response, undefined, true, true);
+    if (isOAuth2Error(result)) {
+      return result;
+    }
+    return result;
+  });
+  return _processClientCredentialsResponse.apply(this, arguments);
+}
+function revocationRequest(_x99, _x100, _x101, _x102) {
+  return _revocationRequest.apply(this, arguments);
+}
+function _revocationRequest() {
+  _revocationRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, token, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!validateString(token)) {
+      throw new TypeError('"token" must be a non-empty string');
+    }
+    if (typeof as.revocation_endpoint !== 'string') {
+      throw new TypeError('"as.revocation_endpoint" must be a string');
+    }
+    const url = new URL(as.revocation_endpoint);
+    const body = new URLSearchParams(options?.additionalParameters);
+    body.set('token', token);
+    const headers = prepareHeaders(options?.headers);
+    headers.delete('accept');
+    return authenticatedRequest(as, client, 'POST', url, body, headers, options);
+  });
+  return _revocationRequest.apply(this, arguments);
+}
+function processRevocationResponse(_x103) {
+  return _processRevocationResponse.apply(this, arguments);
+}
+function _processRevocationResponse() {
+  _processRevocationResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (response) {
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      let err;
+      if (err = yield handleOAuthBodyError(response)) {
+        return err;
+      }
+      throw new OPE('"response" is not a conform Revocation Endpoint response');
+    }
+    return undefined;
+  });
+  return _processRevocationResponse.apply(this, arguments);
+}
+function assertReadableResponse(response) {
+  if (response.bodyUsed) {
+    throw new TypeError('"response" body has been used already');
+  }
+}
+function introspectionRequest(_x104, _x105, _x106, _x107) {
+  return _introspectionRequest.apply(this, arguments);
+}
+function _introspectionRequest() {
+  _introspectionRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, token, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!validateString(token)) {
+      throw new TypeError('"token" must be a non-empty string');
+    }
+    if (typeof as.introspection_endpoint !== 'string') {
+      throw new TypeError('"as.introspection_endpoint" must be a string');
+    }
+    const url = new URL(as.introspection_endpoint);
+    const body = new URLSearchParams(options?.additionalParameters);
+    body.set('token', token);
+    const headers = prepareHeaders(options?.headers);
+    if (options?.requestJwtResponse ?? client.introspection_signed_response_alg) {
+      headers.set('accept', 'application/token-introspection+jwt');
+    } else {
+      headers.set('accept', 'application/json');
+    }
+    return authenticatedRequest(as, client, 'POST', url, body, headers, options);
+  });
+  return _introspectionRequest.apply(this, arguments);
+}
+function processIntrospectionResponse(_x108, _x109, _x110, _x111) {
+  return _processIntrospectionResponse.apply(this, arguments);
+}
+function _processIntrospectionResponse() {
+  _processIntrospectionResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      let err;
+      if (err = yield handleOAuthBodyError(response)) {
+        return err;
+      }
+      throw new OPE('"response" is not a conform Introspection Endpoint response');
+    }
+    let json;
+    if (getContentType(response) === 'application/token-introspection+jwt') {
+      const {
+        claims
+      } = yield validateJwt(yield preserveBodyStream(response).text(), checkSigningAlgorithm.bind(undefined, client.introspection_signed_response_alg, as.introspection_signing_alg_values_supported), options?.skipJwtSignatureCheck !== true ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options) : noSignatureCheck).then(checkJwtType.bind(undefined, 'token-introspection+jwt')).then(validatePresence.bind(undefined, ['aud', 'iat', 'iss'])).then(validateIssuer.bind(undefined, as.issuer)).then(validateAudience.bind(undefined, client.client_id));
+      json = claims.token_introspection;
+      if (!isJsonObject(json)) {
+        throw new OPE('JWT "token_introspection" claim must be a JSON object');
+      }
+    } else {
+      try {
+        json = yield preserveBodyStream(response).json();
+      } catch {
+        throw new OPE('failed to parse "response" body as JSON');
+      }
+      if (!isJsonObject(json)) {
+        throw new OPE('"response" body must be a top level object');
+      }
+    }
+    if (typeof json.active !== 'boolean') {
+      throw new OPE('"response" body "active" property must be a boolean');
+    }
+    return json;
+  });
+  return _processIntrospectionResponse.apply(this, arguments);
+}
+function jwksRequest(_x112, _x113) {
+  return _jwksRequest.apply(this, arguments);
+}
+function _jwksRequest() {
+  _jwksRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, options) {
+    assertAs(as);
+    if (typeof as.jwks_uri !== 'string') {
+      throw new TypeError('"as.jwks_uri" must be a string');
+    }
+    const url = new URL(as.jwks_uri);
+    const headers = prepareHeaders(options?.headers);
+    headers.set('accept', 'application/json');
+    headers.append('accept', 'application/jwk-set+json');
+    return fetch(url.href, {
+      headers,
+      method: 'GET',
+      redirect: 'manual',
+      signal: options?.signal ? signal(options.signal) : null
+    }).then(processDpopNonce);
+  });
+  return _jwksRequest.apply(this, arguments);
+}
+function processJwksResponse(_x114) {
+  return _processJwksResponse.apply(this, arguments);
+}
+function _processJwksResponse() {
+  _processJwksResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (response) {
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      throw new OPE('"response" is not a conform JSON Web Key Set response');
+    }
+    let json;
+    try {
+      json = yield preserveBodyStream(response).json();
+    } catch {
+      throw new OPE('failed to parse "response" body as JSON');
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!Array.isArray(json.keys)) {
+      throw new OPE('"response" body "keys" property must be an array');
+    }
+    if (!Array.prototype.every.call(json.keys, isJsonObject)) {
+      throw new OPE('"response" body "keys" property members must be JWK formatted objects');
+    }
+    return json;
+  });
+  return _processJwksResponse.apply(this, arguments);
+}
+function handleOAuthBodyError(_x115) {
+  return _handleOAuthBodyError.apply(this, arguments);
+}
+function _handleOAuthBodyError() {
+  _handleOAuthBodyError = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (response) {
+    if (response.status > 399 && response.status < 500) {
+      try {
+        const json = yield preserveBodyStream(response).json();
+        if (isJsonObject(json) && typeof json.error === 'string' && json.error.length) {
+          if (json.error_description !== undefined && typeof json.error_description !== 'string') {
+            delete json.error_description;
+          }
+          if (json.error_uri !== undefined && typeof json.error_uri !== 'string') {
+            delete json.error_uri;
+          }
+          if (json.algs !== undefined && typeof json.algs !== 'string') {
+            delete json.algs;
+          }
+          if (json.scope !== undefined && typeof json.scope !== 'string') {
+            delete json.scope;
+          }
+          return json;
+        }
+      } catch {}
+    }
+    return undefined;
+  });
+  return _handleOAuthBodyError.apply(this, arguments);
+}
+function checkSupportedJwsAlg(alg) {
+  if (!SUPPORTED_JWS_ALGS.includes(alg)) {
+    throw new UnsupportedOperationError('unsupported JWS "alg" identifier');
+  }
+  return alg;
+}
+function checkRsaKeyAlgorithm(algorithm) {
+  if (typeof algorithm.modulusLength !== 'number' || algorithm.modulusLength < 2048) {
+    throw new OPE(`${algorithm.name} modulusLength must be at least 2048 bits`);
+  }
+}
+function subtleAlgorithm(key) {
+  switch (key.algorithm.name) {
+    case 'ECDSA':
+      return {
+        name: key.algorithm.name,
+        hash: {
+          name: 'SHA-256'
+        }
+      };
+    case 'RSA-PSS':
+      checkRsaKeyAlgorithm(key.algorithm);
+      return {
+        name: key.algorithm.name,
+        saltLength: 256 >> 3
+      };
+    case 'RSASSA-PKCS1-v1_5':
+      checkRsaKeyAlgorithm(key.algorithm);
+      return {
+        name: key.algorithm.name
+      };
+    case 'Ed25519':
+      return {
+        name: key.algorithm.name
+      };
+  }
+  throw new UnsupportedOperationError();
+}
+const noSignatureCheck = Symbol();
+function validateJwt(_x116, _x117, _x118) {
+  return _validateJwt.apply(this, arguments);
+}
+function _validateJwt() {
+  _validateJwt = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (jws, checkAlg, getKey) {
+    const {
+      0: protectedHeader,
+      1: payload,
+      2: encodedSignature,
+      length
+    } = jws.split('.');
+    if (length === 5) {
+      throw new UnsupportedOperationError('JWE structure JWTs are not supported');
+    }
+    if (length !== 3) {
+      throw new OPE('Invalid JWT');
+    }
+    let header;
+    try {
+      header = JSON.parse(buf(b64u(protectedHeader)));
+    } catch {
+      throw new OPE('failed to parse JWT Header body as base64url encoded JSON');
+    }
+    if (!isJsonObject(header)) {
+      throw new OPE('JWT Header must be a top level object');
+    }
+    checkAlg(header);
+    if (header.crit !== undefined) {
+      throw new OPE('unexpected JWT "crit" header parameter');
+    }
+    const signature = b64u(encodedSignature);
+    if (getKey !== noSignatureCheck) {
+      const key = yield getKey(header);
+      const input = `${protectedHeader}.${payload}`;
+      const verified = yield crypto.subtle.verify(subtleAlgorithm(key), key, signature, buf(input));
+      if (!verified) {
+        throw new OPE('JWT signature verification failed');
+      }
+    }
+    let claims;
+    try {
+      claims = JSON.parse(buf(b64u(payload)));
+    } catch {
+      throw new OPE('failed to parse JWT Payload body as base64url encoded JSON');
+    }
+    if (!isJsonObject(claims)) {
+      throw new OPE('JWT Payload must be a top level object');
+    }
+    const now = epochTime();
+    const tolerance = 30;
+    if (claims.exp !== undefined) {
+      if (typeof claims.exp !== 'number') {
+        throw new OPE('unexpected JWT "exp" (expiration time) claim type');
+      }
+      if (claims.exp <= now - tolerance) {
+        throw new OPE('unexpected JWT "exp" (expiration time) claim value, timestamp is <= now()');
+      }
+    }
+    if (claims.iat !== undefined) {
+      if (typeof claims.iat !== 'number') {
+        throw new OPE('unexpected JWT "iat" (issued at) claim type');
+      }
+    }
+    if (claims.iss !== undefined) {
+      if (typeof claims.iss !== 'string') {
+        throw new OPE('unexpected JWT "iss" (issuer) claim type');
+      }
+    }
+    if (claims.nbf !== undefined) {
+      if (typeof claims.nbf !== 'number') {
+        throw new OPE('unexpected JWT "nbf" (not before) claim type');
+      }
+      if (claims.nbf > now + tolerance) {
+        throw new OPE('unexpected JWT "nbf" (not before) claim value, timestamp is > now()');
+      }
+    }
+    if (claims.aud !== undefined) {
+      if (typeof claims.aud !== 'string' && !Array.isArray(claims.aud)) {
+        throw new OPE('unexpected JWT "aud" (audience) claim type');
+      }
+    }
+    return {
+      header,
+      claims,
+      signature
+    };
+  });
+  return _validateJwt.apply(this, arguments);
+}
+function validateJwtAuthResponse(_x119, _x120, _x121, _x122, _x123) {
+  return _validateJwtAuthResponse.apply(this, arguments);
+}
+function _validateJwtAuthResponse() {
+  _validateJwtAuthResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, parameters, expectedState, options) {
+    assertAs(as);
+    assertClient(client);
+    if (parameters instanceof URL) {
+      parameters = parameters.searchParams;
+    }
+    if (!(parameters instanceof URLSearchParams)) {
+      throw new TypeError('"parameters" must be an instance of URLSearchParams, or URL');
+    }
+    const response = getURLSearchParameter(parameters, 'response');
+    if (!response) {
+      throw new OPE('"parameters" does not contain a JARM response');
+    }
+    if (typeof as.jwks_uri !== 'string') {
+      throw new TypeError('"as.jwks_uri" must be a string');
+    }
+    const {
+      claims
+    } = yield validateJwt(response, checkSigningAlgorithm.bind(undefined, client.authorization_signed_response_alg, as.authorization_signing_alg_values_supported), getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)).then(validatePresence.bind(undefined, ['aud', 'exp', 'iss'])).then(validateIssuer.bind(undefined, as.issuer)).then(validateAudience.bind(undefined, client.client_id));
+    const result = new URLSearchParams();
+    for (const [key, value] of Object.entries(claims)) {
+      if (typeof value === 'string' && key !== 'aud') {
+        result.set(key, value);
+      }
+    }
+    return validateAuthResponse(as, client, result, expectedState);
+  });
+  return _validateJwtAuthResponse.apply(this, arguments);
+}
+function checkSigningAlgorithm(client, issuer, header) {
+  if (client !== undefined) {
+    if (header.alg !== client) {
+      throw new OPE('unexpected JWT "alg" header parameter');
+    }
+    return;
+  }
+  if (Array.isArray(issuer)) {
+    if (!issuer.includes(header.alg)) {
+      throw new OPE('unexpected JWT "alg" header parameter');
+    }
+    return;
+  }
+  if (header.alg !== 'RS256') {
+    throw new OPE('unexpected JWT "alg" header parameter');
+  }
+}
+function getURLSearchParameter(parameters, name) {
+  const {
+    0: value,
+    length
+  } = parameters.getAll(name);
+  if (length > 1) {
+    throw new OPE(`"${name}" parameter must be provided only once`);
+  }
+  return value;
+}
+const skipStateCheck = Symbol();
+const expectNoState = Symbol();
+class CallbackParameters extends URLSearchParams {}
+function validateAuthResponse(as, client, parameters, expectedState) {
+  assertAs(as);
+  assertClient(client);
+  if (parameters instanceof URL) {
+    parameters = parameters.searchParams;
+  }
+  if (!(parameters instanceof URLSearchParams)) {
+    throw new TypeError('"parameters" must be an instance of URLSearchParams, or URL');
+  }
+  if (getURLSearchParameter(parameters, 'response')) {
+    throw new OPE('"parameters" contains a JARM response, use validateJwtAuthResponse() instead of validateAuthResponse()');
+  }
+  const iss = getURLSearchParameter(parameters, 'iss');
+  const state = getURLSearchParameter(parameters, 'state');
+  if (!iss && as.authorization_response_iss_parameter_supported) {
+    throw new OPE('response parameter "iss" (issuer) missing');
+  }
+  if (iss && iss !== as.issuer) {
+    throw new OPE('unexpected "iss" (issuer) response parameter value');
+  }
+  switch (expectedState) {
+    case undefined:
+    case expectNoState:
+      if (state !== undefined) {
+        throw new OPE('unexpected "state" response parameter encountered');
+      }
+      break;
+    case skipStateCheck:
+      break;
+    default:
+      if (!validateString(expectedState)) {
+        throw new OPE('"expectedState" must be a non-empty string');
+      }
+      if (state === undefined) {
+        throw new OPE('response parameter "state" missing');
+      }
+      if (state !== expectedState) {
+        throw new OPE('unexpected "state" response parameter value');
+      }
+  }
+  const error = getURLSearchParameter(parameters, 'error');
+  if (error) {
+    return {
+      error,
+      error_description: getURLSearchParameter(parameters, 'error_description'),
+      error_uri: getURLSearchParameter(parameters, 'error_uri')
+    };
+  }
+  const id_token = getURLSearchParameter(parameters, 'id_token');
+  const token = getURLSearchParameter(parameters, 'token');
+  if (id_token !== undefined || token !== undefined) {
+    throw new UnsupportedOperationError('implicit and hybrid flows are not supported');
+  }
+  return new CallbackParameters(parameters);
+}
+function importJwk(_x124) {
+  return _importJwk.apply(this, arguments);
+}
+function _importJwk() {
+  _importJwk = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (jwk) {
+    const {
+      alg,
+      ext,
+      key_ops,
+      use,
+      ...key
+    } = jwk;
+    let algorithm;
+    switch (alg) {
+      case 'PS256':
+        algorithm = {
+          name: 'RSA-PSS',
+          hash: {
+            name: 'SHA-256'
+          }
+        };
+        break;
+      case 'RS256':
+        algorithm = {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: {
+            name: 'SHA-256'
+          }
+        };
+        break;
+      case 'ES256':
+        algorithm = {
+          name: 'ECDSA',
+          namedCurve: 'P-256'
+        };
+        break;
+      case 'EdDSA':
+        algorithm = {
+          name: 'Ed25519'
+        };
+        break;
+      default:
+        throw new UnsupportedOperationError();
+    }
+    return crypto.subtle.importKey('jwk', key, algorithm, true, ['verify']);
+  });
+  return _importJwk.apply(this, arguments);
+}
+function deviceAuthorizationRequest(_x125, _x126, _x127, _x128) {
+  return _deviceAuthorizationRequest.apply(this, arguments);
+}
+function _deviceAuthorizationRequest() {
+  _deviceAuthorizationRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, parameters, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!(parameters instanceof URLSearchParams)) {
+      throw new TypeError('"parameters" must be an instance of URLSearchParams');
+    }
+    if (typeof as.device_authorization_endpoint !== 'string') {
+      throw new TypeError('"as.device_authorization_endpoint" must be a string');
+    }
+    const url = new URL(as.device_authorization_endpoint);
+    const body = new URLSearchParams(parameters);
+    body.set('client_id', client.client_id);
+    const headers = prepareHeaders(options?.headers);
+    headers.set('accept', 'application/json');
+    return authenticatedRequest(as, client, 'POST', url, body, headers, options);
+  });
+  return _deviceAuthorizationRequest.apply(this, arguments);
+}
+function processDeviceAuthorizationResponse(_x129, _x130, _x131) {
+  return _processDeviceAuthorizationResponse.apply(this, arguments);
+}
+function _processDeviceAuthorizationResponse() {
+  _processDeviceAuthorizationResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response) {
+    assertAs(as);
+    assertClient(client);
+    if (!(response instanceof Response)) {
+      throw new TypeError('"response" must be an instance of Response');
+    }
+    if (response.status !== 200) {
+      let err;
+      if (err = yield handleOAuthBodyError(response)) {
+        return err;
+      }
+      throw new OPE('"response" is not a conform Device Authorization Endpoint response');
+    }
+    let json;
+    try {
+      json = yield preserveBodyStream(response).json();
+    } catch {
+      throw new OPE('failed to parse "response" body as JSON');
+    }
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object');
+    }
+    if (!validateString(json.device_code)) {
+      throw new OPE('"response" body "device_code" property must be a non-empty string');
+    }
+    if (!validateString(json.user_code)) {
+      throw new OPE('"response" body "user_code" property must be a non-empty string');
+    }
+    if (!validateString(json.verification_uri)) {
+      throw new OPE('"response" body "verification_uri" property must be a non-empty string');
+    }
+    if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
+      throw new OPE('"response" body "expires_in" property must be a positive number');
+    }
+    if (json.verification_uri_complete !== undefined && !validateString(json.verification_uri_complete)) {
+      throw new OPE('"response" body "verification_uri_complete" property must be a non-empty string');
+    }
+    if (json.interval !== undefined && (typeof json.interval !== 'number' || json.interval <= 0)) {
+      throw new OPE('"response" body "interval" property must be a positive number');
+    }
+    return json;
+  });
+  return _processDeviceAuthorizationResponse.apply(this, arguments);
+}
+function deviceCodeGrantRequest(_x132, _x133, _x134, _x135) {
+  return _deviceCodeGrantRequest.apply(this, arguments);
+}
+function _deviceCodeGrantRequest() {
+  _deviceCodeGrantRequest = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, deviceCode, options) {
+    assertAs(as);
+    assertClient(client);
+    if (!validateString(deviceCode)) {
+      throw new TypeError('"deviceCode" must be a non-empty string');
+    }
+    const parameters = new URLSearchParams(options?.additionalParameters);
+    parameters.set('device_code', deviceCode);
+    return tokenEndpointRequest(as, client, 'urn:ietf:params:oauth:grant-type:device_code', parameters, options);
+  });
+  return _deviceCodeGrantRequest.apply(this, arguments);
+}
+function processDeviceCodeResponse(_x136, _x137, _x138, _x139) {
+  return _processDeviceCodeResponse.apply(this, arguments);
+}
+function _processDeviceCodeResponse() {
+  _processDeviceCodeResponse = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (as, client, response, options) {
+    return processGenericAccessTokenResponse(as, client, response, options, undefined, undefined, options?.skipJwtSignatureCheck === true);
+  });
+  return _processDeviceCodeResponse.apply(this, arguments);
+}
+function generateKeyPair(_x140, _x141) {
+  return _generateKeyPair.apply(this, arguments);
+}
+function _generateKeyPair() {
+  _generateKeyPair = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (alg, options) {
+    let algorithm;
+    if (!validateString(alg)) {
+      throw new TypeError('"alg" must be a non-empty string');
+    }
+    switch (alg) {
+      case 'PS256':
+        algorithm = {
+          name: 'RSA-PSS',
+          hash: {
+            name: 'SHA-256'
+          },
+          modulusLength: options?.modulusLength ?? 2048,
+          publicExponent: new Uint8Array([0x01, 0x00, 0x01])
+        };
+        break;
+      case 'RS256':
+        algorithm = {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: {
+            name: 'SHA-256'
+          },
+          modulusLength: options?.modulusLength ?? 2048,
+          publicExponent: new Uint8Array([0x01, 0x00, 0x01])
+        };
+        break;
+      case 'ES256':
+        algorithm = {
+          name: 'ECDSA',
+          namedCurve: 'P-256'
+        };
+        break;
+      case 'EdDSA':
+        algorithm = {
+          name: 'Ed25519'
+        };
+        break;
+      default:
+        throw new UnsupportedOperationError();
+    }
+    return crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify']);
+  });
+  return _generateKeyPair.apply(this, arguments);
+}
+function calculateJwkThumbprint(_x142) {
+  return _calculateJwkThumbprint.apply(this, arguments);
+}
+function _calculateJwkThumbprint() {
+  _calculateJwkThumbprint = (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* (key) {
+    if (!isPublicKey(key) || !key.extractable) {
+      throw new TypeError('"key" must be an extractable public CryptoKey');
+    }
+    determineJWSAlgorithm(key);
+    const jwk = yield crypto.subtle.exportKey('jwk', key);
+    let components;
+    switch (jwk.kty) {
+      case 'EC':
+        components = {
+          crv: jwk.crv,
+          kty: jwk.kty,
+          x: jwk.x,
+          y: jwk.y
+        };
+        break;
+      case 'OKP':
+        components = {
+          crv: jwk.crv,
+          kty: jwk.kty,
+          x: jwk.x
+        };
+        break;
+      case 'RSA':
+        components = {
+          e: jwk.e,
+          kty: jwk.kty,
+          n: jwk.n
+        };
+        break;
+      default:
+        throw new UnsupportedOperationError();
+    }
+    return b64u(yield crypto.subtle.digest({
+      name: 'SHA-256'
+    }, buf(JSON.stringify(components))));
+  });
+  return _calculateJwkThumbprint.apply(this, arguments);
+}
+
+/***/ }),
+
+/***/ 1670:
+/*!*********************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ _asyncToGenerator)
+/* harmony export */ });
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+/***/ }),
+
 /***/ 2321:
 /*!******************************************!*\
   !*** ./node_modules/tslib/tslib.es6.mjs ***!
