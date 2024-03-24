@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "e": "AQAB",
+      "use": "sig",
+      "kid": "local-1",
+      "alg": "RS512",
+      "n": "hAEhCu3dgsm2MLwNhoSpGVpZC1_umoGpKYtK-oojZ83LKp1gu3xfZPoR_tOR4AaTIx60UQVUSfrCqYfAqXB8KzR81ZVcgTIUVkYvcLmVnI641Ps4FFvXn_doXYnvBGmQOk2IqODwrjr9iU8gj6SjLwF_KXslh3htTCQg-2zEQU16pMQRp2pljSGMHbu65WIFPm2iS49Iqgf9NumKIyK0pgv5vUgtldmk2y4S4fmsxG152e-nohLUbrTesFA3esrpL6bmI1DLD9WNUiEMHTyFo2s1rN_9GHgh9900g-14809ibUUA7f1yQUmmc81kf2NJkEmdBjqcQRkkHG6QNAPyhSJ7wyMVI5_zOtYtMjv7B41AsLlge9F4SegWlUqtXsyR7Kfl2SoSW5jFoAwALNQw7wymB7Dr_ToplDi85Bo-2myOYACEWn87RJBJPPQQUUjIKbq0eDYK0FisBopEOrV7N_nXZGoQ9eaWJRf1DA3kR91lgm4LsfGqjPUyA_sGxNc4PgbqHcL0YESAAvXV4vzFfq6gw_-9gBPkpvN6Ry1gdoSquObjtOiZY2r0-UJgf4rEctcWMiXmKtiyadv4plYv_c6G-aem-Oge0sEAQGOefXfwhctNDCxnFLKTZjzm5Lp3mRjuhcN5akGDt3DT20p-xz9GNXuuUwfBggSFfJp-FKs"
+    }
+  ]
+}
