@@ -864,9 +864,6 @@ input:checked + .toggle-bg {
 .inset-0 {
   inset: 0px;
 }
-.-left-1 {
-  left: -0.25rem;
-}
 .bottom-0 {
   bottom: 0px;
 }
