@@ -6336,6 +6336,50 @@ events.init();
 
 /***/ }),
 
+/***/ 6317:
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm/internal/BehaviorSubject.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "BehaviorSubject": () => (/* binding */ BehaviorSubject)
+/* harmony export */ });
+/* harmony import */ var _Subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subject */ 228);
+
+class BehaviorSubject extends _Subject__WEBPACK_IMPORTED_MODULE_0__.Subject {
+  constructor(_value) {
+    super();
+    this._value = _value;
+  }
+  get value() {
+    return this.getValue();
+  }
+  _subscribe(subscriber) {
+    const subscription = super._subscribe(subscriber);
+    !subscription.closed && subscriber.next(this._value);
+    return subscription;
+  }
+  getValue() {
+    const {
+      hasError,
+      thrownError,
+      _value
+    } = this;
+    if (hasError) {
+      throw thrownError;
+    }
+    this._throwIfClosed();
+    return _value;
+  }
+  next(value) {
+    super.next(this._value = value);
+  }
+}
+
+/***/ }),
+
 /***/ 3279:
 /*!**********************************************************************!*\
   !*** ./node_modules/rxjs/dist/esm/internal/NotificationFactories.js ***!

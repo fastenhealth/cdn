@@ -12,5 +12,11 @@
   <p>
     <fasten-stitch public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" connect-mode="popup"></fasten-stitch>
   </p>
+
+<script type="application/javascript">
+  const el = document.querySelector('fasten-stitch');
+  el.addEventListener('orgConnectionCallback', (event) => console.log(event.detail));
+</script>
+
 <script src="runtime.js" type="module"></script><script src="polyfills.js" type="module"></script><script src="vendor.js" type="module"></script><script src="main.js" type="module"></script></body>
 </html>
