@@ -292,14 +292,24 @@ class PortalConnectComponent {
     this.lighthouseApi = lighthouseApi;
     this.connectApi = connectApi;
     this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Test;
+    this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_0__.ConnectMode.Redirect;
+    this.reconnectOrgConnectionId = null;
   }
   ngOnInit() {}
   connectHandler($event, brandId, portalId, endpointId) {
     $event.currentTarget.disabled = true;
-    this.connectApi.connectWithRedirect(this.publicId, brandId, portalId, endpointId).subscribe(response => {
-      console.log(response);
-      //this should never happen
-      //TODO: this will only happen if we're in a connectMode = popup
+    this.connectApi.connectWithRedirect(this.publicId, brandId, portalId, endpointId, this.reconnectOrgConnectionId, this.connectMode).subscribe(orgConnectionCallbackData => {
+      console.log(orgConnectionCallbackData);
+      if (!orgConnectionCallbackData) {
+        return; //wait for redirect
+      }
+      //Note: this code will only run when this.connectMode == popup
+      //when connectMode == 'redirect', the user is redirected in the same window, and this code is never executed.
+      // close the modal after sending an event to the parent with this payload
+      // this.modalService.dismissAll()
+      //
+      // //redirect the browser back to this page with the code in the query string parameters
+      // this.lighthouseApi.redirectWithDesktopCode(desktopRedirectData.state, desktopRedirectData.codeData)
     });
     // this.lighthouseApi.getLighthouseSource(this.apiMode, endpointId)
     //   .then(async (sourceMetadata: LighthouseSourceMetadata) => {
@@ -329,7 +339,9 @@ PortalConnectComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODU
     brand: "brand",
     apiMode: "apiMode",
     org: "org",
-    publicId: "publicId"
+    publicId: "publicId",
+    connectMode: "connectMode",
+    reconnectOrgConnectionId: "reconnectOrgConnectionId"
   },
   decls: 40,
   vars: 4,
@@ -404,13 +416,21 @@ PortalConnectComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODU
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ApiMode": () => (/* binding */ ApiMode)
+/* harmony export */   "ApiMode": () => (/* binding */ ApiMode),
+/* harmony export */   "ConnectMode": () => (/* binding */ ConnectMode),
+/* harmony export */   "ConnectWindowTimeout": () => (/* binding */ ConnectWindowTimeout)
 /* harmony export */ });
 var ApiMode;
 (function (ApiMode) {
     ApiMode["Live"] = "live";
     ApiMode["Test"] = "test";
 })(ApiMode || (ApiMode = {}));
+var ConnectMode;
+(function (ConnectMode) {
+    ConnectMode["Redirect"] = "redirect";
+    ConnectMode["Popup"] = "popup";
+})(ConnectMode || (ConnectMode = {}));
+const ConnectWindowTimeout = 24 * 5000; //wait 2 minutes (5 * 24 = 120)
 
 
 /***/ }),
@@ -518,7 +538,7 @@ function FastenStitchComponent_ng_template_18_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelement"](0, "app-portal-connect", 20);
 } if (rf & 2) {
     const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("org", ctx_r7.org)("publicId", ctx_r7.publicId)("brand", ctx_r7.selectedBrand)("apiMode", ctx_r7.apiMode);
+    _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵproperty"]("org", ctx_r7.org)("publicId", ctx_r7.publicId)("brand", ctx_r7.selectedBrand)("apiMode", ctx_r7.apiMode)("connectMode", ctx_r7.connectMode)("reconnectOrgConnectionId", ctx_r7.reconnectOrgConnectionId);
 } }
 const _c0 = ["*"];
 class SourceListItem {
@@ -527,6 +547,8 @@ class FastenStitchComponent {
     constructor(connectApi) {
         this.connectApi = connectApi;
         this.publicId = ''; //validate
+        this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ConnectMode.Redirect;
+        this.reconnectOrgConnectionId = null;
         this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ApiMode.Test;
         this.selectedBrand = undefined;
     }
@@ -543,7 +565,7 @@ class FastenStitchComponent {
     }
 }
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) { return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_2__.ConnectService)); };
-FastenStitchComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({ type: FastenStitchComponent, selectors: [["fasten-stitch"]], inputs: { publicId: ["public-id", "publicId"] }, ngContentSelectors: _c0, decls: 20, vars: 5, consts: [["data-modal-target", "defaultModal", "data-modal-toggle", "defaultModal", "type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800"], ["ref", ""], [4, "ngIf"], ["id", "defaultModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", "data-modal-toggle", "defaultModal", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "brand", "apiMode", "brandChange", 4, "ngIf", "ngIfElse"], ["portalConnect", ""], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], [3, "brand", "apiMode", "brandChange"], [3, "org", "publicId", "brand", "apiMode"]], template: function FastenStitchComponent_Template(rf, ctx) { if (rf & 1) {
+FastenStitchComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({ type: FastenStitchComponent, selectors: [["fasten-stitch"]], inputs: { publicId: ["public-id", "publicId"], connectMode: ["connect-mode", "connectMode"], reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"] }, ngContentSelectors: _c0, decls: 20, vars: 5, consts: [["data-modal-target", "defaultModal", "data-modal-toggle", "defaultModal", "type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800"], ["ref", ""], [4, "ngIf"], ["id", "defaultModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", "data-modal-toggle", "defaultModal", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "brand", "apiMode", "brandChange", 4, "ngIf", "ngIfElse"], ["portalConnect", ""], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], [3, "brand", "apiMode", "brandChange"], [3, "org", "publicId", "brand", "apiMode", "connectMode", "reconnectOrgConnectionId"]], template: function FastenStitchComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵprojectionDef"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](0, "button", 0)(1, "div", null, 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵprojection"](3);
@@ -563,7 +585,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODU
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](16, "Close modal");
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]()()();
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](17, FastenStitchComponent_app_brand_search_17_Template, 1, 2, "app-brand-search", 13);
-        _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](18, FastenStitchComponent_ng_template_18_Template, 1, 4, "ng-template", null, 14, _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplateRefExtractor"]);
+        _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplate"](18, FastenStitchComponent_ng_template_18_Template, 1, 6, "ng-template", null, 14, _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtemplateRefExtractor"]);
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]()()();
     } if (rf & 2) {
         const _r0 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵreference"](2);
@@ -633,11 +655,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "ConnectService": () => (/* binding */ ConnectService)
 /* harmony export */ });
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ 635);
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 745);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 635);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 745);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ 3280);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ 7580);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ 116);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs */ 155);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! rxjs */ 3158);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! rxjs */ 5474);
 /* harmony import */ var _environments_environment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../environments/environment */ 2340);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 2560);
-/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common/http */ 8987);
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../constants */ 4854);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @angular/common/http */ 8987);
 
 
 
@@ -651,7 +680,7 @@ class ConnectService {
         let queryParams = {};
         queryParams['public_id'] = publicId;
         return this._httpClient.get(`${_environments_environment__WEBPACK_IMPORTED_MODULE_0__.environment.connect_api_endpoint_base}/bridge/org`, { params: queryParams })
-            .pipe((0,rxjs__WEBPACK_IMPORTED_MODULE_1__.map)((response) => {
+            .pipe((0,rxjs__WEBPACK_IMPORTED_MODULE_2__.map)((response) => {
             console.log("Organization", response);
             return response.data;
         }));
@@ -671,13 +700,43 @@ class ConnectService {
         }
         redirectUrlParts.search = redirectParams.toString();
         console.log(redirectUrlParts.toString());
-        //redirect to the url in the same window
-        window.location.href = redirectUrlParts.toString();
-        return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(null); //should never happen
+        //if we're in popup mode, we can open a new window, rather than redirecting the current window (which is an app frame)
+        if (connectMode == _constants__WEBPACK_IMPORTED_MODULE_1__.ConnectMode.Popup) {
+            //open a external url in a new window
+            let openedWindow = window.open(redirectUrlParts.toString(), "_blank");
+            return this.waitForOrgConnectionOrTimeout(openedWindow);
+        }
+        else {
+            //redirect to the url in the same window
+            window.location.href = redirectUrlParts.toString();
+            return (0,rxjs__WEBPACK_IMPORTED_MODULE_3__.of)(null); //should never happen
+        }
+    }
+    waitForOrgConnectionOrTimeout(openedWindow) {
+        console.log(`waiting for postMessage notification from popup window`);
+        //new code to listen to post message
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_4__.fromEvent)(window, 'message')
+            .pipe(
+        //throw an error if we wait more than 2 minutes (this will close the window)
+        (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.timeout)(_constants__WEBPACK_IMPORTED_MODULE_1__.ConnectWindowTimeout), 
+        //make sure we're only listening to events from the "opened" window.
+        (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.filter)((event) => event.source == openedWindow), 
+        //after filtering, we should only have one event to handle.
+        (0,rxjs__WEBPACK_IMPORTED_MODULE_7__.first)(), (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.map)((event) => {
+            console.log(`received postMessage notification from popup window & sending acknowledgment`);
+            // @ts-ignore
+            event.source.postMessage(JSON.stringify({ close: true }), event.origin);
+            console.log("postmessage data", event.data);
+            return JSON.parse(event.data);
+        }), (0,rxjs__WEBPACK_IMPORTED_MODULE_8__.catchError)((err) => {
+            console.warn(`timed out waiting for notification from popup (${_constants__WEBPACK_IMPORTED_MODULE_1__.ConnectWindowTimeout / 1000}s), closing window`);
+            openedWindow.self.close();
+            return (0,rxjs__WEBPACK_IMPORTED_MODULE_9__.throwError)(err);
+        }));
     }
 }
-ConnectService.ɵfac = function ConnectService_Factory(t) { return new (t || ConnectService)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_4__.HttpClient)); };
-ConnectService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineInjectable"]({ token: ConnectService, factory: ConnectService.ɵfac, providedIn: 'root' });
+ConnectService.ɵfac = function ConnectService_Factory(t) { return new (t || ConnectService)(_angular_core__WEBPACK_IMPORTED_MODULE_10__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_11__.HttpClient)); };
+ConnectService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_10__["ɵɵdefineInjectable"]({ token: ConnectService, factory: ConnectService.ɵfac, providedIn: 'root' });
 
 
 /***/ }),
