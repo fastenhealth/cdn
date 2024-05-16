@@ -643,6 +643,10 @@ class FastenStitchComponent {
     this.reconnectOrgConnectionId = null;
     this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_4__.EventEmitter();
     this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ApiMode.Test;
+    this.flowbitStitchModal = null;
+  }
+  ngAfterViewInit() {
+    this.flowbitStitchModal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement);
   }
   ngOnInit() {
     (0,flowbite__WEBPACK_IMPORTED_MODULE_0__.initFlowbite)();
@@ -668,12 +672,10 @@ class FastenStitchComponent {
     });
   }
   showStitchModal(el) {
-    const modal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement);
-    modal.show();
+    this.flowbitStitchModal.show();
   }
   hideStitchModal(el) {
-    const modal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement);
-    modal.hide();
+    this.flowbitStitchModal.hide();
     this.messageBus.reset();
   }
 }
