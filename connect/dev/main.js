@@ -306,7 +306,7 @@ class PortalConnectComponent {
       }
       //Note: this code will only run when this.connectMode == popup
       //when connectMode == 'redirect', the user is redirected in the same window, and this code is never executed.
-      this.messageBus.orgConnectionCallbackbackSubject.next(orgConnectionCallbackData);
+      this.messageBus.orgConnectionCallbackSubject.next(orgConnectionCallbackData);
       // close the modal after sending an event to the parent with this payload
       // this.modalService.dismissAll()
       //
@@ -662,7 +662,7 @@ class FastenStitchComponent {
       this.errorMessage = 'Could not register Fasten Connect installation using id. Please contact the developer of this app.';
       console.log("Invalid Fasten Connect registration", err);
     });
-    this.messageBus.orgConnectionCallbackbackSubject.subscribe(orgConnectionCallbackData => {
+    this.messageBus.orgConnectionCallbackSubject.subscribe(orgConnectionCallbackData => {
       console.log("bubbling up event", orgConnectionCallbackData);
       this.orgConnectionCallback.emit(orgConnectionCallbackData);
     });
@@ -890,7 +890,7 @@ __webpack_require__.r(__webpack_exports__);
 class MessageBusService {
     constructor() {
         this.selectedBrandSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
-        this.orgConnectionCallbackbackSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
+        this.orgConnectionCallbackSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
     }
 }
 MessageBusService.ɵfac = function MessageBusService_Factory(t) { return new (t || MessageBusService)(); };
