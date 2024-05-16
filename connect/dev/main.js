@@ -674,6 +674,7 @@ class FastenStitchComponent {
   hideStitchModal(el) {
     const modal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement);
     modal.hide();
+    this.messageBus.reset();
   }
 }
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) {
@@ -889,8 +890,14 @@ __webpack_require__.r(__webpack_exports__);
 
 class MessageBusService {
     constructor() {
+        //this subject is populated when a Brand is selected. It will trigger the display of the PortalConnectComponent
         this.selectedBrandSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
+        //this subject is populated when a Portal/Endpoint is selected. It is used to display endpoint information when doing popup mode.
         this.orgConnectionCallbackSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
+    }
+    reset() {
+        this.selectedBrandSubject.next(null);
+        this.orgConnectionCallbackSubject.next(null);
     }
 }
 MessageBusService.ɵfac = function MessageBusService_Factory(t) { return new (t || MessageBusService)(); };
