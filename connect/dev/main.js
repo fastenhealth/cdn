@@ -646,7 +646,11 @@ class FastenStitchComponent {
     this.flowbitStitchModal = null;
   }
   ngAfterViewInit() {
-    this.flowbitStitchModal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement);
+    this.flowbitStitchModal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement, {
+      onHide: () => {
+        this.messageBus.reset();
+      }
+    });
   }
   ngOnInit() {
     (0,flowbite__WEBPACK_IMPORTED_MODULE_0__.initFlowbite)();
@@ -676,7 +680,6 @@ class FastenStitchComponent {
   }
   hideStitchModal(el) {
     this.flowbitStitchModal.hide();
-    this.messageBus.reset();
   }
 }
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) {
