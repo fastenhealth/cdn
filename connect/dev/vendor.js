@@ -7518,6 +7518,54 @@ function throwError(errorOrErrorFactory, scheduler) {
 
 /***/ }),
 
+/***/ 8947:
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm/internal/observable/timer.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "timer": () => (/* binding */ timer)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Observable */ 833);
+/* harmony import */ var _scheduler_async__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/async */ 6936);
+/* harmony import */ var _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/isScheduler */ 9867);
+/* harmony import */ var _util_isDate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/isDate */ 7885);
+
+
+
+
+function timer(dueTime = 0, intervalOrScheduler, scheduler = _scheduler_async__WEBPACK_IMPORTED_MODULE_0__.async) {
+  let intervalDuration = -1;
+  if (intervalOrScheduler != null) {
+    if ((0,_util_isScheduler__WEBPACK_IMPORTED_MODULE_1__.isScheduler)(intervalOrScheduler)) {
+      scheduler = intervalOrScheduler;
+    } else {
+      intervalDuration = intervalOrScheduler;
+    }
+  }
+  return new _Observable__WEBPACK_IMPORTED_MODULE_2__.Observable(subscriber => {
+    let due = (0,_util_isDate__WEBPACK_IMPORTED_MODULE_3__.isValidDate)(dueTime) ? +dueTime - scheduler.now() : dueTime;
+    if (due < 0) {
+      due = 0;
+    }
+    let n = 0;
+    return scheduler.schedule(function () {
+      if (!subscriber.closed) {
+        subscriber.next(n++);
+        if (0 <= intervalDuration) {
+          this.schedule(undefined, intervalDuration);
+        } else {
+          subscriber.complete();
+        }
+      }
+    }, due);
+  });
+}
+
+/***/ }),
+
 /***/ 3945:
 /*!*****************************************************************************!*\
   !*** ./node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js ***!
@@ -8079,6 +8127,149 @@ function take(count) {
       }
     }));
   });
+}
+
+/***/ }),
+
+/***/ 9337:
+/*!**************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm/internal/operators/tap.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "tap": () => (/* binding */ tap)
+/* harmony export */ });
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isFunction */ 2971);
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ 1944);
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OperatorSubscriber */ 3945);
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/identity */ 9173);
+
+
+
+
+function tap(observerOrNext, error, complete) {
+  const tapObserver = (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(observerOrNext) || error || complete ? {
+    next: observerOrNext,
+    error,
+    complete
+  } : observerOrNext;
+  return tapObserver ? (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)((source, subscriber) => {
+    var _a;
+    (_a = tapObserver.subscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+    let isUnsub = true;
+    source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, value => {
+      var _a;
+      (_a = tapObserver.next) === null || _a === void 0 ? void 0 : _a.call(tapObserver, value);
+      subscriber.next(value);
+    }, () => {
+      var _a;
+      isUnsub = false;
+      (_a = tapObserver.complete) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+      subscriber.complete();
+    }, err => {
+      var _a;
+      isUnsub = false;
+      (_a = tapObserver.error) === null || _a === void 0 ? void 0 : _a.call(tapObserver, err);
+      subscriber.error(err);
+    }, () => {
+      var _a, _b;
+      if (isUnsub) {
+        (_a = tapObserver.unsubscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+      }
+      (_b = tapObserver.finalize) === null || _b === void 0 ? void 0 : _b.call(tapObserver);
+    }));
+  }) : _util_identity__WEBPACK_IMPORTED_MODULE_3__.identity;
+}
+
+/***/ }),
+
+/***/ 9156:
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm/internal/operators/throttle.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "defaultThrottleConfig": () => (/* binding */ defaultThrottleConfig),
+/* harmony export */   "throttle": () => (/* binding */ throttle)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ 1944);
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OperatorSubscriber */ 3945);
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../observable/innerFrom */ 3828);
+
+
+
+const defaultThrottleConfig = {
+  leading: true,
+  trailing: false
+};
+function throttle(durationSelector, config = defaultThrottleConfig) {
+  return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)((source, subscriber) => {
+    const {
+      leading,
+      trailing
+    } = config;
+    let hasValue = false;
+    let sendValue = null;
+    let throttled = null;
+    let isComplete = false;
+    const endThrottling = () => {
+      throttled === null || throttled === void 0 ? void 0 : throttled.unsubscribe();
+      throttled = null;
+      if (trailing) {
+        send();
+        isComplete && subscriber.complete();
+      }
+    };
+    const cleanupThrottling = () => {
+      throttled = null;
+      isComplete && subscriber.complete();
+    };
+    const startThrottle = value => throttled = (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_1__.innerFrom)(durationSelector(value)).subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, endThrottling, cleanupThrottling));
+    const send = () => {
+      if (hasValue) {
+        hasValue = false;
+        const value = sendValue;
+        sendValue = null;
+        subscriber.next(value);
+        !isComplete && startThrottle(value);
+      }
+    };
+    source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, value => {
+      hasValue = true;
+      sendValue = value;
+      !(throttled && !throttled.closed) && (leading ? send() : startThrottle(value));
+    }, () => {
+      isComplete = true;
+      !(trailing && hasValue && throttled && !throttled.closed) && subscriber.complete();
+    }));
+  });
+}
+
+/***/ }),
+
+/***/ 5004:
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm/internal/operators/throttleTime.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "throttleTime": () => (/* binding */ throttleTime)
+/* harmony export */ });
+/* harmony import */ var _scheduler_async__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/async */ 6936);
+/* harmony import */ var _throttle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./throttle */ 9156);
+/* harmony import */ var _observable_timer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/timer */ 8947);
+
+
+
+function throttleTime(duration, scheduler = _scheduler_async__WEBPACK_IMPORTED_MODULE_0__.asyncScheduler, config = _throttle__WEBPACK_IMPORTED_MODULE_1__.defaultThrottleConfig) {
+  const duration$ = (0,_observable_timer__WEBPACK_IMPORTED_MODULE_2__.timer)(duration, scheduler);
+  return (0,_throttle__WEBPACK_IMPORTED_MODULE_1__.throttle)(() => duration$, config);
 }
 
 /***/ }),
@@ -60439,6 +60630,605 @@ const VERSION = new _angular_core__WEBPACK_IMPORTED_MODULE_1__.Version('14.3.0')
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
+ */
+
+/**
+ * Generated bundle index. Do not edit.
+ */
+
+
+
+/***/ }),
+
+/***/ 7364:
+/*!***************************************************************************!*\
+  !*** ./node_modules/ngx-infinite-scroll/fesm2020/ngx-infinite-scroll.mjs ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "InfiniteScrollDirective": () => (/* binding */ InfiniteScrollDirective),
+/* harmony export */   "InfiniteScrollModule": () => (/* binding */ InfiniteScrollModule),
+/* harmony export */   "NgxInfiniteScrollService": () => (/* binding */ NgxInfiniteScrollService)
+/* harmony export */ });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 745);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ 3280);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ 1353);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ 635);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ 9337);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ 116);
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ 5004);
+
+
+
+
+class NgxInfiniteScrollService {
+  constructor() {}
+}
+NgxInfiniteScrollService.ɵfac = function NgxInfiniteScrollService_Factory(t) {
+  return new (t || NgxInfiniteScrollService)();
+};
+NgxInfiniteScrollService.ɵprov = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjectable"]({
+  token: NgxInfiniteScrollService,
+  factory: NgxInfiniteScrollService.ɵfac,
+  providedIn: 'root'
+});
+(function () {
+  (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](NgxInfiniteScrollService, [{
+    type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Injectable,
+    args: [{
+      providedIn: 'root'
+    }]
+  }], function () {
+    return [];
+  }, null);
+})();
+function resolveContainerElement(selector, scrollWindow, defaultElement, fromRoot) {
+  const hasWindow = window && !!window.document && window.document.documentElement;
+  let container = hasWindow && scrollWindow ? window : defaultElement;
+  if (selector) {
+    const containerIsString = selector && hasWindow && typeof selector === 'string';
+    container = containerIsString ? findElement(selector, defaultElement.nativeElement, fromRoot) : selector;
+    if (!container) {
+      throw new Error('ngx-infinite-scroll {resolveContainerElement()}: selector for');
+    }
+  }
+  return container;
+}
+function findElement(selector, customRoot, fromRoot) {
+  const rootEl = fromRoot ? window.document : customRoot;
+  return rootEl.querySelector(selector);
+}
+function inputPropChanged(prop) {
+  return prop && !prop.firstChange;
+}
+function hasWindowDefined() {
+  return typeof window !== 'undefined';
+}
+const VerticalProps = {
+  clientHeight: "clientHeight",
+  offsetHeight: "offsetHeight",
+  scrollHeight: "scrollHeight",
+  pageYOffset: "pageYOffset",
+  offsetTop: "offsetTop",
+  scrollTop: "scrollTop",
+  top: "top"
+};
+const HorizontalProps = {
+  clientHeight: "clientWidth",
+  offsetHeight: "offsetWidth",
+  scrollHeight: "scrollWidth",
+  pageYOffset: "pageXOffset",
+  offsetTop: "offsetLeft",
+  scrollTop: "scrollLeft",
+  top: "left"
+};
+class AxisResolver {
+  constructor(vertical = true) {
+    this.vertical = vertical;
+    this.propsMap = vertical ? VerticalProps : HorizontalProps;
+  }
+  clientHeightKey() {
+    return this.propsMap.clientHeight;
+  }
+  offsetHeightKey() {
+    return this.propsMap.offsetHeight;
+  }
+  scrollHeightKey() {
+    return this.propsMap.scrollHeight;
+  }
+  pageYOffsetKey() {
+    return this.propsMap.pageYOffset;
+  }
+  offsetTopKey() {
+    return this.propsMap.offsetTop;
+  }
+  scrollTopKey() {
+    return this.propsMap.scrollTop;
+  }
+  topKey() {
+    return this.propsMap.top;
+  }
+}
+function shouldTriggerEvents(alwaysCallback, shouldFireScrollEvent, isTriggeredCurrentTotal) {
+  if (alwaysCallback && shouldFireScrollEvent) {
+    return true;
+  }
+  if (!isTriggeredCurrentTotal && shouldFireScrollEvent) {
+    return true;
+  }
+  return false;
+}
+function createResolver({
+  windowElement,
+  axis
+}) {
+  return createResolverWithContainer({
+    axis,
+    isWindow: isElementWindow(windowElement)
+  }, windowElement);
+}
+function createResolverWithContainer(resolver, windowElement) {
+  const container = resolver.isWindow || windowElement && !windowElement.nativeElement ? windowElement : windowElement.nativeElement;
+  return {
+    ...resolver,
+    container
+  };
+}
+function isElementWindow(windowElement) {
+  const isWindow = ['Window', 'global'].some(obj => Object.prototype.toString.call(windowElement).includes(obj));
+  return isWindow;
+}
+function getDocumentElement(isContainerWindow, windowElement) {
+  return isContainerWindow ? windowElement.document.documentElement : null;
+}
+function calculatePoints(element, resolver) {
+  const height = extractHeightForElement(resolver);
+  return resolver.isWindow ? calculatePointsForWindow(height, element, resolver) : calculatePointsForElement(height, element, resolver);
+}
+function calculatePointsForWindow(height, element, resolver) {
+  const {
+    axis,
+    container,
+    isWindow
+  } = resolver;
+  const {
+    offsetHeightKey,
+    clientHeightKey
+  } = extractHeightPropKeys(axis);
+  // scrolled until now / current y point
+  const scrolled = height + getElementPageYOffset(getDocumentElement(isWindow, container), axis, isWindow);
+  // total height / most bottom y point
+  const nativeElementHeight = getElementHeight(element.nativeElement, isWindow, offsetHeightKey, clientHeightKey);
+  const totalToScroll = getElementOffsetTop(element.nativeElement, axis, isWindow) + nativeElementHeight;
+  return {
+    height,
+    scrolled,
+    totalToScroll,
+    isWindow
+  };
+}
+function calculatePointsForElement(height, element, resolver) {
+  const {
+    axis,
+    container
+  } = resolver;
+  // perhaps use container.offsetTop instead of 'scrollTop'
+  const scrolled = container[axis.scrollTopKey()];
+  const totalToScroll = container[axis.scrollHeightKey()];
+  return {
+    height,
+    scrolled,
+    totalToScroll,
+    isWindow: false
+  };
+}
+function extractHeightPropKeys(axis) {
+  return {
+    offsetHeightKey: axis.offsetHeightKey(),
+    clientHeightKey: axis.clientHeightKey()
+  };
+}
+function extractHeightForElement({
+  container,
+  isWindow,
+  axis
+}) {
+  const {
+    offsetHeightKey,
+    clientHeightKey
+  } = extractHeightPropKeys(axis);
+  return getElementHeight(container, isWindow, offsetHeightKey, clientHeightKey);
+}
+function getElementHeight(elem, isWindow, offsetHeightKey, clientHeightKey) {
+  if (isNaN(elem[offsetHeightKey])) {
+    const docElem = getDocumentElement(isWindow, elem);
+    return docElem ? docElem[clientHeightKey] : 0;
+  } else {
+    return elem[offsetHeightKey];
+  }
+}
+function getElementOffsetTop(elem, axis, isWindow) {
+  const topKey = axis.topKey();
+  // elem = elem.nativeElement;
+  if (!elem.getBoundingClientRect) {
+    // || elem.css('none')) {
+    return;
+  }
+  return elem.getBoundingClientRect()[topKey] + getElementPageYOffset(elem, axis, isWindow);
+}
+function getElementPageYOffset(elem, axis, isWindow) {
+  const pageYOffset = axis.pageYOffsetKey();
+  const scrollTop = axis.scrollTopKey();
+  const offsetTop = axis.offsetTopKey();
+  if (isNaN(window.pageYOffset)) {
+    return getDocumentElement(isWindow, elem)[scrollTop];
+  } else if (elem.ownerDocument) {
+    return elem.ownerDocument.defaultView[pageYOffset];
+  } else {
+    return elem[offsetTop];
+  }
+}
+function shouldFireScrollEvent(container, distance = {
+  down: 0,
+  up: 0
+}, scrollingDown) {
+  let remaining;
+  let containerBreakpoint;
+  if (container.totalToScroll <= 0) {
+    return false;
+  }
+  const scrolledUntilNow = container.isWindow ? container.scrolled : container.height + container.scrolled;
+  if (scrollingDown) {
+    remaining = (container.totalToScroll - scrolledUntilNow) / container.totalToScroll;
+    const distanceDown = distance?.down ? distance.down : 0;
+    containerBreakpoint = distanceDown / 10;
+  } else {
+    const totalHiddenContentHeight = container.scrolled + (container.totalToScroll - scrolledUntilNow);
+    remaining = container.scrolled / totalHiddenContentHeight;
+    const distanceUp = distance?.up ? distance.up : 0;
+    containerBreakpoint = distanceUp / 10;
+  }
+  const shouldFireEvent = remaining <= containerBreakpoint;
+  return shouldFireEvent;
+}
+function isScrollingDownwards(lastScrollPosition, container) {
+  return lastScrollPosition < container.scrolled;
+}
+function getScrollStats(lastScrollPosition, container, distance) {
+  const scrollDown = isScrollingDownwards(lastScrollPosition, container);
+  return {
+    fire: shouldFireScrollEvent(container, distance, scrollDown),
+    scrollDown
+  };
+}
+function updateScrollPosition(position, scrollState) {
+  return scrollState.lastScrollPosition = position;
+}
+function updateTotalToScroll(totalToScroll, scrollState) {
+  if (scrollState.lastTotalToScroll !== totalToScroll) {
+    scrollState.lastTotalToScroll = scrollState.totalToScroll;
+    scrollState.totalToScroll = totalToScroll;
+  }
+}
+function isSameTotalToScroll(scrollState) {
+  return scrollState.totalToScroll === scrollState.lastTotalToScroll;
+}
+function updateTriggeredFlag(scroll, scrollState, triggered, isScrollingDown) {
+  if (isScrollingDown) {
+    scrollState.triggered.down = scroll;
+  } else {
+    scrollState.triggered.up = scroll;
+  }
+}
+function isTriggeredScroll(totalToScroll, scrollState, isScrollingDown) {
+  return isScrollingDown ? scrollState.triggered.down === totalToScroll : scrollState.triggered.up === totalToScroll;
+}
+function updateScrollState(scrollState, scrolledUntilNow, totalToScroll) {
+  updateScrollPosition(scrolledUntilNow, scrollState);
+  updateTotalToScroll(totalToScroll, scrollState);
+  // const isSameTotal = isSameTotalToScroll(scrollState);
+  // if (!isSameTotal) {
+  //   updateTriggeredFlag(scrollState, false, isScrollingDown);
+  // }
+}
+class ScrollState {
+  constructor({
+    totalToScroll
+  }) {
+    this.lastScrollPosition = 0;
+    this.lastTotalToScroll = 0;
+    this.totalToScroll = 0;
+    this.triggered = {
+      down: 0,
+      up: 0
+    };
+    this.totalToScroll = totalToScroll;
+  }
+  updateScrollPosition(position) {
+    return this.lastScrollPosition = position;
+  }
+  updateTotalToScroll(totalToScroll) {
+    if (this.lastTotalToScroll !== totalToScroll) {
+      this.lastTotalToScroll = this.totalToScroll;
+      this.totalToScroll = totalToScroll;
+    }
+  }
+  updateScroll(scrolledUntilNow, totalToScroll) {
+    this.updateScrollPosition(scrolledUntilNow);
+    this.updateTotalToScroll(totalToScroll);
+  }
+  updateTriggeredFlag(scroll, isScrollingDown) {
+    if (isScrollingDown) {
+      this.triggered.down = scroll;
+    } else {
+      this.triggered.up = scroll;
+    }
+  }
+  isTriggeredScroll(totalToScroll, isScrollingDown) {
+    return isScrollingDown ? this.triggered.down === totalToScroll : this.triggered.up === totalToScroll;
+  }
+}
+function createScroller(config) {
+  const {
+    scrollContainer,
+    scrollWindow,
+    element,
+    fromRoot
+  } = config;
+  const resolver = createResolver({
+    axis: new AxisResolver(!config.horizontal),
+    windowElement: resolveContainerElement(scrollContainer, scrollWindow, element, fromRoot)
+  });
+  const scrollState = new ScrollState({
+    totalToScroll: calculatePoints(element, resolver)
+  });
+  const options = {
+    container: resolver.container,
+    throttle: config.throttle
+  };
+  const distance = {
+    up: config.upDistance,
+    down: config.downDistance
+  };
+  return attachScrollEvent(options).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.mergeMap)(() => (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(calculatePoints(element, resolver))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(positionStats => toInfiniteScrollParams(scrollState.lastScrollPosition, positionStats, distance)), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.tap)(({
+    stats
+  }) => scrollState.updateScroll(stats.scrolled, stats.totalToScroll)), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_5__.filter)(({
+    fire,
+    scrollDown,
+    stats: {
+      totalToScroll
+    }
+  }) => shouldTriggerEvents(config.alwaysCallback, fire, scrollState.isTriggeredScroll(totalToScroll, scrollDown))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_4__.tap)(({
+    scrollDown,
+    stats: {
+      totalToScroll
+    }
+  }) => {
+    scrollState.updateTriggeredFlag(totalToScroll, scrollDown);
+  }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.map)(toInfiniteScrollAction));
+}
+function attachScrollEvent(options) {
+  let obs = (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.fromEvent)(options.container, 'scroll');
+  // For an unknown reason calling `sampleTime()` causes trouble for many users, even with `options.throttle = 0`.
+  // Let's avoid calling the function unless needed.
+  // Replacing with throttleTime seems to solve the problem
+  // See https://github.com/orizens/ngx-infinite-scroll/issues/198
+  if (options.throttle) {
+    obs = obs.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.throttleTime)(options.throttle, undefined, {
+      leading: true,
+      trailing: true
+    }));
+  }
+  return obs;
+}
+function toInfiniteScrollParams(lastScrollPosition, stats, distance) {
+  const {
+    scrollDown,
+    fire
+  } = getScrollStats(lastScrollPosition, stats, distance);
+  return {
+    scrollDown,
+    fire,
+    stats
+  };
+}
+const InfiniteScrollActions = {
+  DOWN: '[NGX_ISE] DOWN',
+  UP: '[NGX_ISE] UP'
+};
+function toInfiniteScrollAction(response) {
+  const {
+    scrollDown,
+    stats: {
+      scrolled: currentScrollPosition
+    }
+  } = response;
+  return {
+    type: scrollDown ? InfiniteScrollActions.DOWN : InfiniteScrollActions.UP,
+    payload: {
+      currentScrollPosition
+    }
+  };
+}
+class InfiniteScrollDirective {
+  constructor(element, zone) {
+    this.element = element;
+    this.zone = zone;
+    this.scrolled = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.EventEmitter();
+    this.scrolledUp = new _angular_core__WEBPACK_IMPORTED_MODULE_0__.EventEmitter();
+    this.infiniteScrollDistance = 2;
+    this.infiniteScrollUpDistance = 1.5;
+    this.infiniteScrollThrottle = 150;
+    this.infiniteScrollDisabled = false;
+    this.infiniteScrollContainer = null;
+    this.scrollWindow = true;
+    this.immediateCheck = false;
+    this.horizontal = false;
+    this.alwaysCallback = false;
+    this.fromRoot = false;
+  }
+  ngAfterViewInit() {
+    if (!this.infiniteScrollDisabled) {
+      this.setup();
+    }
+  }
+  ngOnChanges({
+    infiniteScrollContainer,
+    infiniteScrollDisabled,
+    infiniteScrollDistance
+  }) {
+    const containerChanged = inputPropChanged(infiniteScrollContainer);
+    const disabledChanged = inputPropChanged(infiniteScrollDisabled);
+    const distanceChanged = inputPropChanged(infiniteScrollDistance);
+    const shouldSetup = !disabledChanged && !this.infiniteScrollDisabled || disabledChanged && !infiniteScrollDisabled.currentValue || distanceChanged;
+    if (containerChanged || disabledChanged || distanceChanged) {
+      this.destroyScroller();
+      if (shouldSetup) {
+        this.setup();
+      }
+    }
+  }
+  setup() {
+    if (hasWindowDefined()) {
+      this.zone.runOutsideAngular(() => {
+        this.disposeScroller = createScroller({
+          fromRoot: this.fromRoot,
+          alwaysCallback: this.alwaysCallback,
+          disable: this.infiniteScrollDisabled,
+          downDistance: this.infiniteScrollDistance,
+          element: this.element,
+          horizontal: this.horizontal,
+          scrollContainer: this.infiniteScrollContainer,
+          scrollWindow: this.scrollWindow,
+          throttle: this.infiniteScrollThrottle,
+          upDistance: this.infiniteScrollUpDistance
+        }).subscribe(payload => this.handleOnScroll(payload));
+      });
+    }
+  }
+  handleOnScroll({
+    type,
+    payload
+  }) {
+    const emitter = type === InfiniteScrollActions.DOWN ? this.scrolled : this.scrolledUp;
+    if (hasObservers(emitter)) {
+      this.zone.run(() => emitter.emit(payload));
+    }
+  }
+  ngOnDestroy() {
+    this.destroyScroller();
+  }
+  destroyScroller() {
+    if (this.disposeScroller) {
+      this.disposeScroller.unsubscribe();
+    }
+  }
+}
+InfiniteScrollDirective.ɵfac = function InfiniteScrollDirective_Factory(t) {
+  return new (t || InfiniteScrollDirective)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone));
+};
+InfiniteScrollDirective.ɵdir = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineDirective"]({
+  type: InfiniteScrollDirective,
+  selectors: [["", "infiniteScroll", ""], ["", "infinite-scroll", ""], ["", "data-infinite-scroll", ""]],
+  inputs: {
+    infiniteScrollDistance: "infiniteScrollDistance",
+    infiniteScrollUpDistance: "infiniteScrollUpDistance",
+    infiniteScrollThrottle: "infiniteScrollThrottle",
+    infiniteScrollDisabled: "infiniteScrollDisabled",
+    infiniteScrollContainer: "infiniteScrollContainer",
+    scrollWindow: "scrollWindow",
+    immediateCheck: "immediateCheck",
+    horizontal: "horizontal",
+    alwaysCallback: "alwaysCallback",
+    fromRoot: "fromRoot"
+  },
+  outputs: {
+    scrolled: "scrolled",
+    scrolledUp: "scrolledUp"
+  },
+  features: [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵNgOnChangesFeature"]]
+});
+(function () {
+  (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](InfiniteScrollDirective, [{
+    type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Directive,
+    args: [{
+      selector: '[infiniteScroll], [infinite-scroll], [data-infinite-scroll]'
+    }]
+  }], function () {
+    return [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.ElementRef
+    }, {
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgZone
+    }];
+  }, {
+    scrolled: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Output
+    }],
+    scrolledUp: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Output
+    }],
+    infiniteScrollDistance: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    infiniteScrollUpDistance: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    infiniteScrollThrottle: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    infiniteScrollDisabled: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    infiniteScrollContainer: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    scrollWindow: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    immediateCheck: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    horizontal: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    alwaysCallback: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }],
+    fromRoot: [{
+      type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.Input
+    }]
+  });
+})();
+function hasObservers(emitter) {
+  // Note: The `observed` property is available only in RxJS@7.2.0, which means it's
+  // not available for users running the lower version.
+  return emitter.observed ?? emitter.observers.length > 0;
+}
+class InfiniteScrollModule {}
+InfiniteScrollModule.ɵfac = function InfiniteScrollModule_Factory(t) {
+  return new (t || InfiniteScrollModule)();
+};
+InfiniteScrollModule.ɵmod = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineNgModule"]({
+  type: InfiniteScrollModule
+});
+InfiniteScrollModule.ɵinj = /* @__PURE__ */_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineInjector"]({});
+(function () {
+  (typeof ngDevMode === "undefined" || ngDevMode) && _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵsetClassMetadata"](InfiniteScrollModule, [{
+    type: _angular_core__WEBPACK_IMPORTED_MODULE_0__.NgModule,
+    args: [{
+      declarations: [InfiniteScrollDirective],
+      exports: [InfiniteScrollDirective],
+      imports: [],
+      providers: []
+    }]
+  }], null, null);
+})();
+
+/*
+ * Public API Surface of ngx-infinite-scroll
  */
 
 /**
