@@ -654,6 +654,7 @@ class PortalConnectComponent {
     this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Test;
     this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_0__.ConnectMode.Redirect;
     this.reconnectOrgConnectionId = null;
+    this.externalId = null; //optional opaque id to pass to the callback
   }
   ngOnInit() {}
   markForCheck() {
@@ -661,7 +662,7 @@ class PortalConnectComponent {
   }
   connectHandler($event, brandId, portalId, endpointId) {
     $event.currentTarget.disabled = true;
-    this.connectApi.connectWithRedirect(this.publicId, brandId, portalId, endpointId, this.reconnectOrgConnectionId, this.connectMode).subscribe(orgConnectionCallbackData => {
+    this.connectApi.connectWithRedirect(this.publicId, brandId, portalId, endpointId, this.reconnectOrgConnectionId, this.connectMode, this.externalId).subscribe(orgConnectionCallbackData => {
       console.log(orgConnectionCallbackData);
       if (!orgConnectionCallbackData) {
         return; //wait for redirect
@@ -705,7 +706,8 @@ PortalConnectComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODU
     org: "org",
     publicId: "publicId",
     connectMode: "connectMode",
-    reconnectOrgConnectionId: "reconnectOrgConnectionId"
+    reconnectOrgConnectionId: "reconnectOrgConnectionId",
+    externalId: "externalId"
   },
   decls: 40,
   vars: 4,
@@ -944,9 +946,9 @@ function FastenStitchComponent_div_7_Template(rf, ctx) {
     const ctx_r3 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnextContext"]();
     let tmp_0_0;
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("ngIf", !((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipeBind1"](4, 7, ctx_r3.messageBus.componentNavigationSubject)) == null ? null : tmp_0_0.title))("ngIfElse", _r7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("ngIf", !((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipeBind1"](4, 8, ctx_r3.messageBus.componentNavigationSubject)) == null ? null : tmp_0_0.title))("ngIfElse", _r7);
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("org", ctx_r3.org)("publicId", ctx_r3.publicId)("apiMode", ctx_r3.apiMode)("connectMode", ctx_r3.connectMode)("reconnectOrgConnectionId", ctx_r3.reconnectOrgConnectionId);
+    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("org", ctx_r3.org)("publicId", ctx_r3.publicId)("apiMode", ctx_r3.apiMode)("connectMode", ctx_r3.connectMode)("reconnectOrgConnectionId", ctx_r3.reconnectOrgConnectionId)("externalId", ctx_r3.externalId);
   }
 }
 function FastenStitchComponent_ng_template_8_Template(rf, ctx) {
@@ -985,15 +987,20 @@ function FastenStitchComponent_ng_template_8_Template(rf, ctx) {
 const _c1 = ["*"];
 class SourceListItem {}
 class FastenStitchComponent {
-  constructor(connectApi, messageBus) {
+  constructor(host, connectApi, messageBus) {
+    this.host = host;
     this.connectApi = connectApi;
     this.messageBus = messageBus;
     this.publicId = ''; //validate
     this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ConnectMode.Redirect;
     this.reconnectOrgConnectionId = null;
+    this.externalId = null; //optional opaque id to pass to the callback
     this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_4__.EventEmitter();
     this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ApiMode.Test;
     this.flowbitStitchModal = null;
+    //https://stackoverflow.com/a/69173549/1157633
+    this.host.nativeElement.show = this.showStitchModal.bind(this);
+    this.host.nativeElement.hide = this.hideStitchModal.bind(this);
   }
   ngAfterViewInit() {
     this.flowbitStitchModal = new flowbite__WEBPACK_IMPORTED_MODULE_0__.Modal(this.stitchModal.nativeElement, {
@@ -1033,7 +1040,7 @@ class FastenStitchComponent {
   }
 }
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) {
-  return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_2__.ConnectService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_3__.MessageBusService));
+  return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_4__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_2__.ConnectService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_3__.MessageBusService));
 };
 FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdefineComponent"]({
   type: FastenStitchComponent,
@@ -1050,7 +1057,10 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   inputs: {
     publicId: ["public-id", "publicId"],
     connectMode: ["connect-mode", "connectMode"],
-    reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"]
+    reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"],
+    externalId: ["external-id", "externalId"],
+    showStitchModal: "showStitchModal",
+    hideStitchModal: "hideStitchModal"
   },
   outputs: {
     orgConnectionCallback: "orgConnectionCallback"
@@ -1058,7 +1068,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   ngContentSelectors: _c1,
   decls: 10,
   vars: 3,
-  consts: [["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], ["ref", ""], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], ["stitchModal", ""], ["class", "relative p-4 w-full max-w-2xl h-full md:h-auto", 4, "ngIf", "ngIfElse"], ["errorMessagePanel", ""], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "org", "publicId", "apiMode", "connectMode", "reconnectOrgConnectionId"], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], ["id", "alert-additional-content-2", "role", "alert", 1, "p-4", "mb-4", "text-red-800", "border", "border-red-300", "rounded-lg", "bg-red-50", "dark:bg-gray-800", "dark:text-red-400", "dark:border-red-800"], [1, "flex", "items-center"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "width", "22", "height", "22", "fill", "currentColor", "viewBox", "0 0 24 24", 1, "flex-shrink-0", "w-4", "h-4", "me-2"], ["fill-rule", "evenodd", "d", "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z", "clip-rule", "evenodd"], [1, "text-lg", "font-medium"], [1, "mt-2", "mb-4", "text-sm"], [1, "flex"], ["type", "button", 1, "text-red-800", "bg-transparent", "border", "border-red-800", "hover:bg-red-900", "hover:text-white", "focus:ring-4", "focus:outline-none", "focus:ring-red-300", "font-medium", "rounded-lg", "text-xs", "px-3", "py-1.5", "text-center", "dark:hover:bg-red-600", "dark:border-red-600", "dark:text-red-500", "dark:hover:text-white", "dark:focus:ring-red-800", 3, "click"]],
+  consts: [["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], ["ref", ""], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], ["stitchModal", ""], ["class", "relative p-4 w-full max-w-2xl h-full md:h-auto", 4, "ngIf", "ngIfElse"], ["errorMessagePanel", ""], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "org", "publicId", "apiMode", "connectMode", "reconnectOrgConnectionId", "externalId"], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], ["id", "alert-additional-content-2", "role", "alert", 1, "p-4", "mb-4", "text-red-800", "border", "border-red-300", "rounded-lg", "bg-red-50", "dark:bg-gray-800", "dark:text-red-400", "dark:border-red-800"], [1, "flex", "items-center"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "width", "22", "height", "22", "fill", "currentColor", "viewBox", "0 0 24 24", 1, "flex-shrink-0", "w-4", "h-4", "me-2"], ["fill-rule", "evenodd", "d", "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z", "clip-rule", "evenodd"], [1, "text-lg", "font-medium"], [1, "mt-2", "mb-4", "text-sm"], [1, "flex"], ["type", "button", 1, "text-red-800", "bg-transparent", "border", "border-red-800", "hover:bg-red-900", "hover:text-white", "focus:ring-4", "focus:outline-none", "focus:ring-red-300", "font-medium", "rounded-lg", "text-xs", "px-3", "py-1.5", "text-center", "dark:hover:bg-red-600", "dark:border-red-600", "dark:text-red-500", "dark:hover:text-white", "dark:focus:ring-red-800", 3, "click"]],
   template: function FastenStitchComponent_Template(rf, ctx) {
     if (rf & 1) {
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵprojectionDef"]();
@@ -1072,7 +1082,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](4, FastenStitchComponent_span_4_Template, 2, 0, "span", 2);
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](5, "div", 3, 4);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](7, FastenStitchComponent_div_7_Template, 13, 9, "div", 5);
+      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](7, FastenStitchComponent_div_7_Template, 13, 10, "div", 5);
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](8, FastenStitchComponent_ng_template_8_Template, 14, 1, "ng-template", null, 6, _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplateRefExtractor"]);
     }
@@ -1166,6 +1176,7 @@ class NavOutletComponent {
     constructor(messageBus) {
         this.messageBus = messageBus;
         this.reconnectOrgConnectionId = null;
+        this.externalId = null; //optional opaque id to pass to the callback
     }
     ngOnInit() {
         this.loadComponent();
@@ -1194,6 +1205,7 @@ class NavOutletComponent {
             componentRef.instance.publicId = this.publicId;
             componentRef.instance.connectMode = this.connectMode;
             componentRef.instance.reconnectOrgConnectionId = this.reconnectOrgConnectionId;
+            componentRef.instance.externalId = this.externalId;
             componentRef.instance.brand = componentNavEvent.data;
             componentRef.instance.markForCheck();
         }
@@ -1214,7 +1226,7 @@ NavOutletComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_
     } if (rf & 2) {
         let _t;
         _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵloadQuery"]()) && (ctx.navOutlet = _t.first);
-    } }, inputs: { apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵNgOnChangesFeature"]], decls: 1, vars: 0, consts: [["navOutletDirective", ""]], template: function NavOutletComponent_Template(rf, ctx) { if (rf & 1) {
+    } }, inputs: { apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId", externalId: "externalId" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵNgOnChangesFeature"]], decls: 1, vars: 0, consts: [["navOutletDirective", ""]], template: function NavOutletComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtemplate"](0, NavOutletComponent_ng_template_0_Template, 0, 0, "ng-template", 0);
     } }, dependencies: [_nav_outlet_directive__WEBPACK_IMPORTED_MODULE_0__.NavOutletDirective], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJuYXYtb3V0bGV0LmNvbXBvbmVudC5jc3MifQ== */"] });
 
@@ -1317,7 +1329,7 @@ class ConnectService {
             return {};
         }));
     }
-    connectWithRedirect(publicId, brandId, portalId, endpointId, reconnectOrgConnectionId, connectMode) {
+    connectWithRedirect(publicId, brandId, portalId, endpointId, reconnectOrgConnectionId, connectMode, externalId) {
         const redirectUrlParts = new URL(`${_environments_environment__WEBPACK_IMPORTED_MODULE_0__.environment.connect_api_endpoint_base}/bridge/connect`);
         const redirectParams = new URLSearchParams();
         redirectParams.set("public_id", publicId);
@@ -1329,6 +1341,9 @@ class ConnectService {
         }
         if (connectMode) {
             redirectParams.set("connect_mode", connectMode);
+        }
+        if (externalId) {
+            redirectParams.set("external_id", externalId);
         }
         redirectUrlParts.search = redirectParams.toString();
         console.log(redirectUrlParts.toString());
