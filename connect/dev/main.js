@@ -667,6 +667,7 @@ class PortalConnectComponent {
         this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_0__.ConnectMode.Redirect;
         this.reconnectOrgConnectionId = null;
         this.externalId = null; //optional opaque id to pass to the callback
+        this.externalState = null; //optional opaque state to pass to the callback
     }
     ngOnInit() {
     }
@@ -682,6 +683,7 @@ class PortalConnectComponent {
             catalog_endpoint_id: endpointId,
             org_connection_id: this.reconnectOrgConnectionId,
             external_id: this.externalId,
+            external_state: this.externalState,
             connect_mode: this.connectMode,
         });
         // this.connectApi.connectWithRedirect(this.publicId, brandId, portalId, endpointId, this.reconnectOrgConnection?.id, this.connectMode, this.externalId).subscribe((orgConnectionCallbackData) => {
@@ -704,7 +706,7 @@ class PortalConnectComponent {
     }
 }
 PortalConnectComponent.ɵfac = function PortalConnectComponent_Factory(t) { return new (t || PortalConnectComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_5__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_2__.ConnectService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_3__.MessageBusService)); };
-PortalConnectComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({ type: PortalConnectComponent, selectors: [["app-portal-connect"]], inputs: { brand: "brand", apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId", externalId: "externalId" }, decls: 42, vars: 4, consts: [["action", "#"], [1, "grid", "gap-4", "mb-4", "sm:grid-cols-8"], [1, "flex", "justify-between", "sm:col-span-6", "sm:col-start-2"], [1, "relative", "w-20", "h-20", "overflow-hidden", "bg-gray-100", "rounded-full", "dark:bg-gray-600"], ["imageFallback", "", 1, "w-20", "max-h-20", "inline-block", "align-middle", 3, "src"], [1, "flex", "items-center", "overflow-hidden", "bg-gray-100", "rounded-full", "dark:bg-gray-600"], ["src", "https://cdn.fastenhealth.com/logos/sources/fasten.png", 1, "w-20", "h-20", "p-1", "rounded-full", "ring-2", "ring-gray-300", "dark:ring-gray-500"], [1, "sm:col-span-6", "sm:col-start-2"], [1, "text-lg", "font-light", "text-center", "text-gray-900", "dark:text-white"], [1, "text-sm", "font-medium", "text-gray-900", "bg-white", "border", "border-gray-200", "rounded-lg", "dark:bg-gray-700", "dark:border-gray-600", "dark:text-white"], [1, "w-full", "px-4", "py-2", "border-b", "border-gray-200", "rounded-t-lg", "dark:border-gray-600"], [1, "flex", "items-center", "space-x-4", "rtl:space-x-reverse"], [1, "flex-shrink-0"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", 1, "w-6", "h-6", "text-gray-800", "dark:text-white"], ["stroke", "currentColor", "stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M9.5 11.5 11 13l4-3.5M12 20A16.4 16.4 0 0 1 5 6.7L12 4l7 2.7A16.7 16.7 0 0 1 12 20Z"], [1, "flex-1", "min-w-0"], [1, "text-sm", "font-light", "text-gray-900", "dark:text-white"], [1, "w-full", "px-4", "py-2", "border-b", "border-gray-200", "dark:border-gray-600"], ["stroke", "currentColor", "stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M12 14v3m-3-6V7a3 3 0 1 1 6 0v4m-8 0h10c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1H7a1 1 0 0 1-1-1v-7c0-.6.4-1 1-1Z"], [1, "sm:col-span-8"], [1, "text-sm", "font-light", "text-center", "text-gray-900", "dark:text-white"], [1, "my-4", "space-y-3"], [4, "ngFor", "ngForOf"], [1, "flex", "justify-end", "space-x-4"], [1, "font-light", "text-xs"], ["target", "_blank", "href", "https://www.fastenhealth.com/connect", 1, "underline"], [1, "grid", "cursor-pointer", "items-center", "p-3", "text-base", "font-bold", "text-gray-900", "rounded-lg", "border", "border-gray-500", "bg-gray-50", "hover:bg-gray-100", "group", "hover:shadow", "dark:bg-gray-600", "dark:hover:bg-gray-500", "dark:text-white", 3, "click"], [1, "row-auto", "flex"], ["hidden", "", "role", "status"], ["loadingEndpoint", ""], ["aria-hidden", "true", "viewBox", "0 0 100 101", "fill", "none", "xmlns", "http://www.w3.org/2000/svg", 1, "inline", "w-6", "h-6", "text-gray-200", "animate-spin", "dark:text-gray-600", "fill-blue-600"], ["d", "M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z", "fill", "currentColor"], ["d", "M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z", "fill", "currentFill"], [1, "sr-only"], [1, "flex-1", "ms-3", "whitespace-nowrap"], [1, "inline-flex", "items-center", "justify-center", "px-2", "py-0.5", "ms-3", "text-xs", "font-medium", "text-gray-500", "bg-gray-200", "rounded", "dark:bg-gray-700", "dark:text-gray-400"], ["class", "row-auto flex-1 ms-3 text-xs font-light text-gray-500 dark:text-gray-400", 4, "ngIf"], [1, "row-auto", "flex-1", "ms-3", "text-xs", "font-light", "text-gray-500", "dark:text-gray-400"]], template: function PortalConnectComponent_Template(rf, ctx) { if (rf & 1) {
+PortalConnectComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({ type: PortalConnectComponent, selectors: [["app-portal-connect"]], inputs: { brand: "brand", apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId", externalId: "externalId", externalState: "externalState" }, decls: 42, vars: 4, consts: [["action", "#"], [1, "grid", "gap-4", "mb-4", "sm:grid-cols-8"], [1, "flex", "justify-between", "sm:col-span-6", "sm:col-start-2"], [1, "relative", "w-20", "h-20", "overflow-hidden", "bg-gray-100", "rounded-full", "dark:bg-gray-600"], ["imageFallback", "", 1, "w-20", "max-h-20", "inline-block", "align-middle", 3, "src"], [1, "flex", "items-center", "overflow-hidden", "bg-gray-100", "rounded-full", "dark:bg-gray-600"], ["src", "https://cdn.fastenhealth.com/logos/sources/fasten.png", 1, "w-20", "h-20", "p-1", "rounded-full", "ring-2", "ring-gray-300", "dark:ring-gray-500"], [1, "sm:col-span-6", "sm:col-start-2"], [1, "text-lg", "font-light", "text-center", "text-gray-900", "dark:text-white"], [1, "text-sm", "font-medium", "text-gray-900", "bg-white", "border", "border-gray-200", "rounded-lg", "dark:bg-gray-700", "dark:border-gray-600", "dark:text-white"], [1, "w-full", "px-4", "py-2", "border-b", "border-gray-200", "rounded-t-lg", "dark:border-gray-600"], [1, "flex", "items-center", "space-x-4", "rtl:space-x-reverse"], [1, "flex-shrink-0"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", 1, "w-6", "h-6", "text-gray-800", "dark:text-white"], ["stroke", "currentColor", "stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M9.5 11.5 11 13l4-3.5M12 20A16.4 16.4 0 0 1 5 6.7L12 4l7 2.7A16.7 16.7 0 0 1 12 20Z"], [1, "flex-1", "min-w-0"], [1, "text-sm", "font-light", "text-gray-900", "dark:text-white"], [1, "w-full", "px-4", "py-2", "border-b", "border-gray-200", "dark:border-gray-600"], ["stroke", "currentColor", "stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M12 14v3m-3-6V7a3 3 0 1 1 6 0v4m-8 0h10c.6 0 1 .4 1 1v7c0 .6-.4 1-1 1H7a1 1 0 0 1-1-1v-7c0-.6.4-1 1-1Z"], [1, "sm:col-span-8"], [1, "text-sm", "font-light", "text-center", "text-gray-900", "dark:text-white"], [1, "my-4", "space-y-3"], [4, "ngFor", "ngForOf"], [1, "flex", "justify-end", "space-x-4"], [1, "font-light", "text-xs"], ["target", "_blank", "href", "https://www.fastenhealth.com/connect", 1, "underline"], [1, "grid", "cursor-pointer", "items-center", "p-3", "text-base", "font-bold", "text-gray-900", "rounded-lg", "border", "border-gray-500", "bg-gray-50", "hover:bg-gray-100", "group", "hover:shadow", "dark:bg-gray-600", "dark:hover:bg-gray-500", "dark:text-white", 3, "click"], [1, "row-auto", "flex"], ["hidden", "", "role", "status"], ["loadingEndpoint", ""], ["aria-hidden", "true", "viewBox", "0 0 100 101", "fill", "none", "xmlns", "http://www.w3.org/2000/svg", 1, "inline", "w-6", "h-6", "text-gray-200", "animate-spin", "dark:text-gray-600", "fill-blue-600"], ["d", "M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z", "fill", "currentColor"], ["d", "M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z", "fill", "currentFill"], [1, "sr-only"], [1, "flex-1", "ms-3", "whitespace-nowrap"], [1, "inline-flex", "items-center", "justify-center", "px-2", "py-0.5", "ms-3", "text-xs", "font-medium", "text-gray-500", "bg-gray-200", "rounded", "dark:bg-gray-700", "dark:text-gray-400"], ["class", "row-auto flex-1 ms-3 text-xs font-light text-gray-500 dark:text-gray-400", 4, "ngIf"], [1, "row-auto", "flex-1", "ms-3", "text-xs", "font-light", "text-gray-500", "dark:text-gray-400"]], template: function PortalConnectComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "form", 0)(1, "div", 1)(2, "div", 2)(3, "div", 3);
         _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](4, "img", 4);
         _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
@@ -945,9 +947,9 @@ function FastenStitchComponent_div_8_Template(rf, ctx) {
     const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnextContext"]();
     let tmp_0_0;
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", !((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipeBind1"](4, 8, ctx_r4.messageBus.componentNavigationSubject)) == null ? null : tmp_0_0.title))("ngIfElse", _r8);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngIf", !((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipeBind1"](4, 9, ctx_r4.messageBus.componentNavigationSubject)) == null ? null : tmp_0_0.title))("ngIfElse", _r8);
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("org", ctx_r4.org)("publicId", ctx_r4.publicId)("apiMode", ctx_r4.apiMode)("connectMode", ctx_r4.connectMode)("reconnectOrgConnectionId", ctx_r4.reconnectOrgConnectionId)("externalId", ctx_r4.externalId);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("org", ctx_r4.org)("publicId", ctx_r4.publicId)("apiMode", ctx_r4.apiMode)("connectMode", ctx_r4.connectMode)("reconnectOrgConnectionId", ctx_r4.reconnectOrgConnectionId)("externalId", ctx_r4.externalId)("externalState", ctx_r4.externalState);
   }
 }
 function FastenStitchComponent_ng_template_9_Template(rf, ctx) {
@@ -994,6 +996,7 @@ class FastenStitchComponent {
     this.connectMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ConnectMode.Redirect;
     this.reconnectOrgConnectionId = null;
     this.externalId = null; //optional opaque id to pass to the callback
+    this.externalState = null; //optional opaque state to pass to the callback
     this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_5__.EventEmitter();
     this.apiMode = _constants__WEBPACK_IMPORTED_MODULE_1__.ApiMode.Test;
     this.flowbitStitchModal = null;
@@ -1044,6 +1047,7 @@ class FastenStitchComponent {
           catalog_portal_id: orgConnection.catalog_portal_id,
           connect_mode: this.connectMode,
           external_id: this.externalId,
+          external_state: this.externalState,
           org_connection_id: orgConnection.org_connection_id,
           public_id: this.publicId
         });
@@ -1086,7 +1090,8 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
     publicId: ["public-id", "publicId"],
     connectMode: ["connect-mode", "connectMode"],
     reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"],
-    externalId: ["external-id", "externalId"]
+    externalId: ["external-id", "externalId"],
+    externalState: ["external-state", "externalState"]
   },
   outputs: {
     orgConnectionCallback: "orgConnectionCallback"
@@ -1094,7 +1099,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   ngContentSelectors: _c2,
   decls: 11,
   vars: 3,
-  consts: [["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], ["stitchModalButton", ""], ["ref", ""], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], ["stitchModal", ""], ["class", "relative p-4 w-full max-w-2xl h-full md:h-auto", 4, "ngIf", "ngIfElse"], ["errorMessagePanel", ""], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "org", "publicId", "apiMode", "connectMode", "reconnectOrgConnectionId", "externalId"], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], ["id", "alert-additional-content-2", "role", "alert", 1, "p-4", "mb-4", "text-red-800", "border", "border-red-300", "rounded-lg", "bg-red-50", "dark:bg-gray-800", "dark:text-red-400", "dark:border-red-800"], [1, "flex", "items-center"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "width", "22", "height", "22", "fill", "currentColor", "viewBox", "0 0 24 24", 1, "flex-shrink-0", "w-4", "h-4", "me-2"], ["fill-rule", "evenodd", "d", "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z", "clip-rule", "evenodd"], [1, "text-lg", "font-medium"], [1, "mt-2", "mb-4", "text-sm"], [1, "flex"], ["type", "button", 1, "text-red-800", "bg-transparent", "border", "border-red-800", "hover:bg-red-900", "hover:text-white", "focus:ring-4", "focus:outline-none", "focus:ring-red-300", "font-medium", "rounded-lg", "text-xs", "px-3", "py-1.5", "text-center", "dark:hover:bg-red-600", "dark:border-red-600", "dark:text-red-500", "dark:hover:text-white", "dark:focus:ring-red-800", 3, "click"]],
+  consts: [["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], ["stitchModalButton", ""], ["ref", ""], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fixed", "top-0", "left-0", "right-0", "z-50", "hidden", "w-full", "p-4", "overflow-x-hidden", "overflow-y-auto", "md:inset-0", "h-[calc(100%-1rem)]", "max-h-full"], ["stitchModal", ""], ["class", "relative p-4 w-full max-w-2xl h-full md:h-auto", 4, "ngIf", "ngIfElse"], ["errorMessagePanel", ""], [1, "relative", "p-4", "w-full", "max-w-2xl", "h-full", "md:h-auto"], [1, "relative", "p-4", "bg-white", "rounded-lg", "shadow", "dark:bg-gray-800", "sm:p-5"], [1, "flex", "justify-between", "items-center", "pb-4", "mb-4", "rounded-t", "border-b", "sm:mb-5", "dark:border-gray-600"], ["class", "text-lg font-semibold text-gray-900 dark:text-white", 4, "ngIf", "ngIfElse"], ["brandName", ""], ["type", "button", 1, "text-gray-400", "bg-transparent", "hover:bg-gray-200", "hover:text-gray-900", "rounded-lg", "text-sm", "p-1.5", "ml-auto", "inline-flex", "items-center", "dark:hover:bg-gray-600", "dark:hover:text-white", 3, "click"], ["aria-hidden", "true", "fill", "currentColor", "viewBox", "0 0 20 20", "xmlns", "http://www.w3.org/2000/svg", 1, "w-5", "h-5"], ["fill-rule", "evenodd", "d", "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z", "clip-rule", "evenodd"], [1, "sr-only"], [3, "org", "publicId", "apiMode", "connectMode", "reconnectOrgConnectionId", "externalId", "externalState"], [1, "text-lg", "font-semibold", "text-gray-900", "dark:text-white"], ["xmlns", "http://www.w3.org/2000/svg", "fill", "none", "viewBox", "0 0 24 24", "stroke-width", "1.5", "stroke", "currentColor", 1, "w-5", "h-5", "rtl:rotate-180"], ["stroke-linecap", "round", "stroke-linejoin", "round", "d", "M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"], ["id", "alert-additional-content-2", "role", "alert", 1, "p-4", "mb-4", "text-red-800", "border", "border-red-300", "rounded-lg", "bg-red-50", "dark:bg-gray-800", "dark:text-red-400", "dark:border-red-800"], [1, "flex", "items-center"], ["aria-hidden", "true", "xmlns", "http://www.w3.org/2000/svg", "width", "22", "height", "22", "fill", "currentColor", "viewBox", "0 0 24 24", 1, "flex-shrink-0", "w-4", "h-4", "me-2"], ["fill-rule", "evenodd", "d", "M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z", "clip-rule", "evenodd"], [1, "text-lg", "font-medium"], [1, "mt-2", "mb-4", "text-sm"], [1, "flex"], ["type", "button", 1, "text-red-800", "bg-transparent", "border", "border-red-800", "hover:bg-red-900", "hover:text-white", "focus:ring-4", "focus:outline-none", "focus:ring-red-300", "font-medium", "rounded-lg", "text-xs", "px-3", "py-1.5", "text-center", "dark:hover:bg-red-600", "dark:border-red-600", "dark:text-red-500", "dark:hover:text-white", "dark:focus:ring-red-800", 3, "click"]],
   template: function FastenStitchComponent_Template(rf, ctx) {
     if (rf & 1) {
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵprojectionDef"]();
@@ -1108,7 +1113,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](5, FastenStitchComponent_span_5_Template, 2, 0, "span", 3);
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](6, "div", 4, 5);
-      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](8, FastenStitchComponent_div_8_Template, 13, 10, "div", 6);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](8, FastenStitchComponent_div_8_Template, 13, 11, "div", 6);
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](9, FastenStitchComponent_ng_template_9_Template, 14, 1, "ng-template", null, 7, _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplateRefExtractor"]);
     }
@@ -1203,6 +1208,7 @@ class NavOutletComponent {
         this.messageBus = messageBus;
         this.reconnectOrgConnectionId = null;
         this.externalId = null; //optional opaque id to pass to the callback
+        this.externalState = null; //optional opaque state to pass to the callback
     }
     ngOnInit() {
         this.loadComponent();
@@ -1232,6 +1238,7 @@ class NavOutletComponent {
             componentRef.instance.connectMode = this.connectMode;
             componentRef.instance.reconnectOrgConnectionId = this.reconnectOrgConnectionId;
             componentRef.instance.externalId = this.externalId;
+            componentRef.instance.externalState = this.externalState;
             componentRef.instance.brand = componentNavEvent.data;
             componentRef.instance.markForCheck();
         }
@@ -1252,7 +1259,7 @@ NavOutletComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_
     } if (rf & 2) {
         let _t;
         _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵloadQuery"]()) && (ctx.navOutlet = _t.first);
-    } }, inputs: { apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId", externalId: "externalId" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵNgOnChangesFeature"]], decls: 1, vars: 0, consts: [["navOutletDirective", ""]], template: function NavOutletComponent_Template(rf, ctx) { if (rf & 1) {
+    } }, inputs: { apiMode: "apiMode", org: "org", publicId: "publicId", connectMode: "connectMode", reconnectOrgConnectionId: "reconnectOrgConnectionId", externalId: "externalId", externalState: "externalState" }, features: [_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵNgOnChangesFeature"]], decls: 1, vars: 0, consts: [["navOutletDirective", ""]], template: function NavOutletComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtemplate"](0, NavOutletComponent_ng_template_0_Template, 0, 0, "ng-template", 0);
     } }, dependencies: [_nav_outlet_directive__WEBPACK_IMPORTED_MODULE_0__.NavOutletDirective], styles: ["\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJuYXYtb3V0bGV0LmNvbXBvbmVudC5jc3MifQ== */"] });
 
@@ -1364,7 +1371,7 @@ class ConnectService {
             return {};
         }));
     }
-    connectWithRedirect(publicId, brandId, portalId, endpointId, reconnectOrgConnectionId, connectMode, externalId) {
+    connectWithRedirect(publicId, brandId, portalId, endpointId, reconnectOrgConnectionId, connectMode, externalId, externalState) {
         const redirectUrlParts = new URL(`${_environments_environment__WEBPACK_IMPORTED_MODULE_0__.environment.connect_api_endpoint_base}/bridge/connect`);
         const redirectParams = new URLSearchParams();
         redirectParams.set("public_id", publicId);
@@ -1379,6 +1386,9 @@ class ConnectService {
         }
         if (externalId) {
             redirectParams.set("external_id", externalId);
+        }
+        if (externalState) {
+            redirectParams.set("external_state", externalState);
         }
         redirectUrlParts.search = redirectParams.toString();
         console.log(redirectUrlParts.toString());
@@ -1473,7 +1483,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants */ 4854);
 
 function ConnectHelper(connectApi, messageBus, connectData) {
-    connectApi.connectWithRedirect(connectData.public_id, connectData.catalog_brand_id, connectData.catalog_portal_id, connectData.catalog_endpoint_id, connectData.org_connection_id, connectData.connect_mode, connectData.external_id).subscribe((orgConnectionCallbackData) => {
+    connectApi.connectWithRedirect(connectData.public_id, connectData.catalog_brand_id, connectData.catalog_portal_id, connectData.catalog_endpoint_id, connectData.org_connection_id, connectData.connect_mode, connectData.external_id, connectData.external_state).subscribe((orgConnectionCallbackData) => {
         console.log(orgConnectionCallbackData);
         if (!orgConnectionCallbackData) {
             return; //wait for redirect
