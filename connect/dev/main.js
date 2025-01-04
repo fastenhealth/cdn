@@ -1404,6 +1404,7 @@ class ConnectService {
             return (0,rxjs__WEBPACK_IMPORTED_MODULE_3__.of)(null); //should never happen
         }
     }
+    //This function must be ".subscribed()" to work. If not, the handler will not be registered and messages will be ignored.
     waitForOrgConnectionOrTimeout(openedWindow) {
         console.log(`waiting for postMessage notification from popup window`);
         //new code to listen to post message
