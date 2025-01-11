@@ -1,0 +1,21 @@
+/*!***************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[5].rules[0].oneOf[0].use[1]!./node_modules/@angular-devkit/build-angular/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[5].rules[0].oneOf[0].use[2]!./src/styles.css ***!
+  \***************************************************************************************************************************************************************************************************************************************************/
+/*
+Because of view encapsulation, the Modal Backdrop CSS will not be styled in the parent application
+We we provide the following CSS to style the backdrop, which must be imported.
+ */
+div[modal-backdrop=""] {
+  background-color: rgb(17 24 39 / 0.5);
+  z-index: 40;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+/*# sourceMappingURL=styles.css.map*/
