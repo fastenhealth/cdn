@@ -1856,9 +1856,7 @@ class VaultProfileSigninCodeComponent {
         this.authService = authService;
         this.loading = false;
         this.errorMsg = "";
-        this.currentEmail = "";
-        // @ts-ignore
-        this.currentEmail = this.router.getCurrentNavigation().extras?.state?.["email"] || 'test@example.com';
+        this.currentEmail = "test@example.com";
     }
     ngOnInit() {
     }
@@ -1889,7 +1887,7 @@ class VaultProfileSigninCodeComponent {
     }
 }
 VaultProfileSigninCodeComponent.ɵfac = function VaultProfileSigninCodeComponent_Factory(t) { return new (t || VaultProfileSigninCodeComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_3__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_1__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.AuthService)); };
-VaultProfileSigninCodeComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({ type: VaultProfileSigninCodeComponent, selectors: [["app-vault-profile-signin-code"]], decls: 25, vars: 3, consts: [[1, "space-y-6", "text-center"], [1, "flex", "justify-center", "items-center"], [1, "az-logo"], [1, "space-y-2"], [1, "text-xl", "font-semibold"], ["id", "verification-hint", 1, "text-sm", "text-gray-600"], ["id", "verification-inputs", 1, "flex", "justify-center", "space-x-2"], [3, "isCodeHidden", "codeLength", "codeCompleted"], ["id", "verification-error", 1, "text-sm", "text-red-500", 2, "display", "none"], [1, "text-sm", "text-gray-600"], ["id", "verification-countdown", 1, "font-semibold", "text-gray-900"], ["type", "button", "id", "resend-code", 1, "verification-button"], ["type", "button", "id", "use-other-method", 1, "verification-button"]], template: function VaultProfileSigninCodeComponent_Template(rf, ctx) { if (rf & 1) {
+VaultProfileSigninCodeComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({ type: VaultProfileSigninCodeComponent, selectors: [["app-vault-profile-signin-code"]], inputs: { currentEmail: "currentEmail" }, decls: 25, vars: 3, consts: [[1, "space-y-6", "text-center"], [1, "flex", "justify-center", "items-center"], [1, "az-logo"], [1, "space-y-2"], [1, "text-xl", "font-semibold"], ["id", "verification-hint", 1, "text-sm", "text-gray-600"], ["id", "verification-inputs", 1, "flex", "justify-center", "space-x-2"], [3, "isCodeHidden", "codeLength", "codeCompleted"], ["id", "verification-error", 1, "text-sm", "text-red-500", 2, "display", "none"], [1, "text-sm", "text-gray-600"], ["id", "verification-countdown", 1, "font-semibold", "text-gray-900"], ["type", "button", "id", "resend-code", 1, "verification-button"], ["type", "button", "id", "use-other-method", 1, "verification-button"]], template: function VaultProfileSigninCodeComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](0, "div", 0)(1, "div", 1)(2, "h1", 2);
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](3, "fasten");
         _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]()();
@@ -2029,7 +2027,7 @@ class VaultProfileSigninComponent {
         this.authService.VaultAuthBegin(this.existingVaultProfile.email)
             .then(() => {
             this.loading = false;
-            this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.ComponentNavPage.VaultProfileSigninCode, { email: this.existingVaultProfile.email });
+            this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.ComponentNavPage.VaultProfileSigninCode, new Map([["currentEmail", this.existingVaultProfile.email]]));
         })
             .catch((err) => {
             this.loading = false;
@@ -2191,7 +2189,7 @@ class NavOutletLinkDirective {
         this.navOutletService = navOutletService;
     }
     set navOutletLink(nextPage) {
-        this.navOutletService.navigateByUrl(nextPage, []);
+        this.navOutletService.navigateByUrl(nextPage);
     }
 }
 NavOutletLinkDirective.ɵfac = function NavOutletLinkDirective_Factory(t) { return new (t || NavOutletLinkDirective)(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_1__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_nav_outlet_service__WEBPACK_IMPORTED_MODULE_0__.NavOutletService)); };
@@ -2236,28 +2234,37 @@ class NavOutletComponent {
     ngOnChanges(changes) {
         this.loadComponent();
     }
+    // WARNING: errors in this method will cause silent failures and limited error messages for some reason.
+    // it will also cause the ngOnInit subscribe functions to be ignored (subscription will be broken for all future calls)
     loadComponent(pageRoute) {
-        //clear the current outlet
-        const viewContainerRef = this.navOutlet.viewContainerRef;
-        viewContainerRef.clear();
-        if (pageRoute == null) {
-            //find the default route
-            for (let route of _app_routing__WEBPACK_IMPORTED_MODULE_1__.Routes) {
-                if (route.page == _app_routing__WEBPACK_IMPORTED_MODULE_1__.ComponentNavPage.Default) {
-                    pageRoute = route;
-                    break;
+        try {
+            //clear the current outlet
+            const viewContainerRef = this.navOutlet.viewContainerRef;
+            viewContainerRef.clear();
+            if (pageRoute == null) {
+                //find the default route
+                for (let route of _app_routing__WEBPACK_IMPORTED_MODULE_1__.Routes) {
+                    if (route.page == _app_routing__WEBPACK_IMPORTED_MODULE_1__.ComponentNavPage.Default) {
+                        pageRoute = route;
+                        break;
+                    }
+                }
+                if (pageRoute == null) {
+                    //throw if the default page not found
+                    throw new Error("default page not found");
                 }
             }
-            if (pageRoute == null) {
-                //throw if the default page not found
-                throw new Error("default page not found");
+            const componentRef = viewContainerRef.createComponent(pageRoute.component);
+            if (pageRoute.inputs != null) {
+                for (let [key, value] of pageRoute.inputs) {
+                    componentRef.instance[key] = value;
+                }
             }
+            componentRef.instance.markForCheck();
         }
-        const componentRef = viewContainerRef.createComponent(pageRoute.component);
-        for (let key in pageRoute.inputs) {
-            componentRef.instance[key] = pageRoute.inputs[key];
+        catch (e) {
+            console.error("NavOutletComponent loadComponent error", e);
         }
-        componentRef.instance.markForCheck();
     }
 }
 NavOutletComponent.ɵfac = function NavOutletComponent_Factory(t) { return new (t || NavOutletComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__.NavOutletService)); };
@@ -2332,7 +2339,12 @@ class NavOutletService {
         let found = false;
         for (let route of _app_routing__WEBPACK_IMPORTED_MODULE_0__.Routes) {
             if (route.page == nextPage) {
-                //TODO: add the payload data to the route, make we do a deep clone before
+                route.inputs = new Map();
+                //add the payload data to the route
+                //TODO: should we do a deep clone before?
+                if (payload != null && payload.size > 0) {
+                    route.inputs = payload;
+                }
                 this.componentNavigationSubject.next(route);
                 found = true;
                 console.log("found route info: ", nextPage);
