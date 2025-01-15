@@ -1015,12 +1015,10 @@ video {
 .delay-300 {
   transition-delay: 300ms;
 }
-dialog::backdrop {
-  background: rgba(255, 0, 0, 0.25);
-}
-.backdrop\:bg-gray-50::backdrop {
-  --tw-bg-opacity: 1;
-  background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1));
+.backdrop\:backdrop-blur::backdrop {
+  --tw-backdrop-blur: blur(8px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
 .hover\:border-\[\#5B47FB\]:hover {
   --tw-border-opacity: 1;
@@ -1171,6 +1169,7 @@ dialog::backdrop {
     --tw-ring-color: rgb(30 64 175 / var(--tw-ring-opacity, 1));
   }
 }
+
 
 
 /*# sourceMappingURL=styles.css.map*/
