@@ -1,37 +1,147 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AngularWebComponent</title>
+  <title>Share Your Medical Record</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
   <style>
     fasten-stitch > button {
-      background-color: green !important
+      background-color: green !important;
+      margin-left: 180px !important;
     }
   </style>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f3f4f7, #e2e6ea);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url("https://plus.unsplash.com/premium_photo-1673953510197-0950d951c6d9?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjF8fG1lZGljYWx8ZW58MHx8MHx8fDA%3D");
+      background-size: auto 120%;
+    }
+
+    .share-wrapper {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .share-container {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .share-container > h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .share-container > p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .share-container > form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .share-container > form > input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    /*.button {*/
+    /*  display: inline-block;*/
+    /*  background-color: #007bff;*/
+    /*  color: white;*/
+    /*  text-decoration: none;*/
+    /*  font-size: 16px;*/
+    /*  font-weight: bold;*/
+    /*  padding: 12px 20px;*/
+    /*  border-radius: 8px;*/
+    /*  transition: background-color 0.3s, transform 0.2s;*/
+    /*  cursor: pointer;*/
+    /*  border: none;*/
+    /*}*/
+
+    /*.button:hover {*/
+    /*  background-color: #0056b3;*/
+    /*  transform: scale(1.05);*/
+    /*}*/
+
+    .share-container > .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    @media (max-width: 480px) {
+      .share-container > h1 {
+        font-size: 24px;
+      }
+
+      .share-container > p {
+        font-size: 14px;
+      }
+
+      .share-container > input {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+    }
+  </style>
+
 <link rel="stylesheet" href="styles.css"></head>
 <body>
-  <p>
+  <div class="share-wrapper">
+    <div class="share-container">
+      <h1>Acme Labs - Study Enrollment</h1>
+      <p>Acme Labs empowers patients like you to securely share your medical records. By contributing, you play a vital role in advancing healthcare and innovation.</p>
+      <form action="#" method="POST">
+        <input type="text" name="name" placeholder="Full Name" required="">
+        <input type="date" name="birthdate" placeholder="Date of Birth" required="">
+        <input type="text" name="zipcode" placeholder="Zip Code" required="">
+        <input type="email" name="email" placeholder="Email Address" required="">
+        <input type="tel" name="phone" placeholder="Phone Number">
+
+      </form>
+      <p class="footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
+    </div>
     <fasten-stitch public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" connect-mode="popup" external-id="1235-123412-123123$^#*@(!"></fasten-stitch>
-  </p>
+  </div>
 
-<script type="application/javascript">
-  const el = document.querySelector('fasten-stitch');
-  el.addEventListener('orgConnectionCallback', (event) => console.log(event.detail));
-
-
-  window.addEventListener('DOMContentLoaded',function () {
-    //your code here
-    // document.querySelector('fasten-stitch').show();
-  });
-</script>
+  <script type="application/javascript">
+    const el = document.querySelector('fasten-stitch');
+    el.addEventListener('orgConnectionCallback', (event) => console.log(event.detail));
 
 
-<button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">hello</button>
+    window.addEventListener('DOMContentLoaded',function () {
+      //your code here
+      // document.querySelector('fasten-stitch').show();
+    });
+  </script>
+
 
 <script src="runtime.js" type="module"></script><script src="polyfills.js" type="module"></script><script src="vendor.js" type="module"></script><script src="main.js" type="module"></script></body>
 </html>

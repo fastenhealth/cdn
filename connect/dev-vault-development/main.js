@@ -219,8 +219,8 @@ class NavOutletRoute {
 }
 const Routes = [
     //on empty, this is where we go
-    // { page: ComponentNavPage.Default, component: VaultProfileSigninComponent },
-    { page: NavOutletPageName.Default, component: _pages_health_system_connecting_health_system_connecting_component__WEBPACK_IMPORTED_MODULE_7__.HealthSystemConnectingComponent },
+    { page: NavOutletPageName.Default, component: _pages_vault_profile_signin_vault_profile_signin_component__WEBPACK_IMPORTED_MODULE_0__.VaultProfileSigninComponent },
+    // { page: NavOutletPageName.Default, component: HealthSystemSearchComponent },
     { page: NavOutletPageName.VaultProfileSignin, component: _pages_vault_profile_signin_vault_profile_signin_component__WEBPACK_IMPORTED_MODULE_0__.VaultProfileSigninComponent },
     { page: NavOutletPageName.VaultProfileSigninCode, component: _pages_vault_profile_signin_code_vault_profile_signin_code_component__WEBPACK_IMPORTED_MODULE_1__.VaultProfileSigninCodeComponent },
     { page: NavOutletPageName.IdentityVerification, component: _pages_identity_verification_identity_verification_component__WEBPACK_IMPORTED_MODULE_2__.IdentityVerificationComponent },
@@ -659,6 +659,7 @@ class SearchFilter {
         this.platformTypes = [];
         this.categories = [];
         this.showHidden = false;
+        this.locations = [];
         //pagination - this is the current page (changes here should be ignored)
         this.searchAfter = '';
         this.fields = []; //specify the fields to return. if null or empty list, return all.
@@ -1804,7 +1805,10 @@ class HealthSystemSearchComponent {
             console.log("querySources() - no filter provided, using current form value", this.filter);
         }
         this.filter.fields = ["*"];
+        // this.filter.locations = ["ALL"]
         this.loading = true;
+        // this.filter.showHidden = true
+        // this.filter.platformTypes = ["epic"]
         var searchObservable = this.vaultServiceApi.searchCatalogBrands(this.configService.systemConfig$.apiMode, this.filter);
         searchObservable.subscribe(wrapper => {
             console.log("search sources", wrapper);
@@ -1969,7 +1973,7 @@ IdentityVerificationComponent.ɵcmp = /*@__PURE__*/ _angular_core__WEBPACK_IMPOR
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](8, "just once ");
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](9, "p", 5);
-        _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](10, " Your leaving Acme Labs to verify your identity with our partner, Clear. This one-time step will bring you right back after your ID has been verified. ");
+        _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](10, " Your leaving Acme Labs to verify your identity with our partner, Persona. This one-time step will bring you right back after your ID has been verified. ");
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](11, "div", 3)(12, "button", 6);
         _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵlistener"]("click", function IdentityVerificationComponent_Template_button_click_12_listener() { return ctx.verifyIdentity(); });
@@ -2027,7 +2031,9 @@ class VaultProfileSigninCodeComponent {
         this.authService.VaultAuthFinish(this.currentEmail, code)
             .then(() => {
             this.loading = false;
-            this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.Dashboard);
+            //TODO: this should attempt to redirect to Dashboard, then fallback to ID verification if not provided
+            // this.navOutletService.navigateByUrl(NavOutletPageName.Dashboard)
+            this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.IdentityVerification);
         })
             .catch((err) => {
             this.loading = false;
@@ -2606,16 +2612,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "NavOutletService": () => (/* binding */ NavOutletService)
 /* harmony export */ });
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ 6317);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ 6317);
 /* harmony import */ var _app_routing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../app.routing */ 6738);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../services/auth.service */ 7556);
+
 
 
 
 class NavOutletService {
-    constructor() {
+    constructor(authService) {
+        this.authService = authService;
         // this subject is populated when the "page" is changed
-        this.componentNavigationSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__.BehaviorSubject(null);
+        this.componentNavigationSubject = new rxjs__WEBPACK_IMPORTED_MODULE_2__.BehaviorSubject(null);
     }
     reset() {
         this.componentNavigationSubject.next(null);
@@ -2648,7 +2657,7 @@ class NavOutletService {
         }
         //check if we can "activate" the new page
         if (foundRoute.canActivate != null) {
-            foundRoute.canActivate.canActivate(foundRoute)
+            foundRoute.canActivate(this.authService, this, foundRoute)
                 .then((cont) => {
                 if (!cont) {
                     return;
@@ -2662,8 +2671,8 @@ class NavOutletService {
         }
     }
 }
-NavOutletService.ɵfac = function NavOutletService_Factory(t) { return new (t || NavOutletService)(); };
-NavOutletService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: NavOutletService, factory: NavOutletService.ɵfac, providedIn: 'root' });
+NavOutletService.ɵfac = function NavOutletService_Factory(t) { return new (t || NavOutletService)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_1__.AuthService)); };
+NavOutletService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineInjectable"]({ token: NavOutletService, factory: NavOutletService.ɵfac, providedIn: 'root' });
 
 
 /***/ }),
@@ -2722,7 +2731,7 @@ class AuthInterceptorService {
             return next.handle(req);
         }
         // Clone the request and ensure that cookies are sent
-        const authReq = req.clone({ withCredentials: true });
+        const authReq = req.clone({ withCredentials: true, headers: req.headers.set('Authorization', 'Bearer ' + this.authService.GetAuthToken()) });
         // catch the error, make specific functions for catching specific errors and you can chain through them with more catch operators
         return next.handle(authReq).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_6__.catchError)(x => this.handleAuthError(x))); //here use an arrow function, otherwise you may get "Cannot read property 'navigate' of undefined" on angular 4.4.2/net core 2/webpack 2.70
     }
@@ -2764,6 +2773,7 @@ class AuthService {
   constructor(_httpClient, configService) {
     this._httpClient = _httpClient;
     this.configService = configService;
+    this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY = 'fasten_connect_auth_vault';
     this.IsAuthenticatedSubject = new rxjs__WEBPACK_IMPORTED_MODULE_3__.BehaviorSubject(false);
   }
   VaultAuthBegin(email) {
@@ -2787,11 +2797,13 @@ class AuthService {
         "email": email,
         "code": code
       }, {
+        observe: 'response',
         withCredentials: true,
         params: {
           "public_id": _this2.configService.systemConfig$.publicId
         }
       }).toPromise();
+      _this2.setAuthToken(resp);
       return resp;
     })();
   }
@@ -2799,18 +2811,14 @@ class AuthService {
     var _this3 = this;
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
       _this3.publishAuthenticationState(false);
-      return _this3.deleteCookie(FASTEN_AUTH_VAULT_COOKIE_NAME);
-      // // let remotePouchDb = new PouchDB(this.getRemoteUserDb(localStorage.getItem("current_user")), {skip_setup: true});
-      // if(this.pouchDb){
-      //   await this.pouchDb.logOut()
-      // }
-      // await this.Close()
+      //cannot delete cookie because of cross origin policies. all we can do is delete the local token in our widget.
+      return localStorage.removeItem(_this3.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY);
     })();
   }
   GetJWTPayload() {
     var _this4 = this;
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
-      let authToken = _this4.getCookie(FASTEN_AUTH_VAULT_COOKIE_NAME);
+      let authToken = _this4.GetAuthToken();
       if (!authToken) {
         return null;
       }
@@ -2825,6 +2833,7 @@ class AuthService {
           issuer: issuerHost,
           audience: issuerHost
         });
+        //TODO: check that the token is not expired
         // @ts-ignore
         _this4.vaultConfigService.systemConfig = {
           user: payload
@@ -2836,38 +2845,20 @@ class AuthService {
       }
     })();
   }
-  IsAuthenticated() {
-    var _this5 = this;
-    return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
-      let payload = yield _this5.GetJWTPayload();
-      let isAuthenticated = payload != null;
-      _this5.publishAuthenticationState(isAuthenticated);
-      return isAuthenticated;
-    })();
+  GetAuthToken() {
+    return localStorage.getItem(this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY);
   }
-  //https://stackoverflow.com/questions/34298133/angular-cookies
-  getCookie(name) {
-    const ca = decodeURIComponent(document.cookie).split(';');
-    const caLen = ca.length;
-    const cookieName = `${name}=`;
-    let c;
-    for (let i = 0; i < caLen; i += 1) {
-      c = ca[i].replace(/^\s+/g, '');
-      if (c.indexOf(cookieName) === 0) {
-        return c.substring(cookieName.length, c.length);
-      }
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  //Private Methods
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  setAuthToken(authResp) {
+    let authHeader = authResp.headers.get("Authorization");
+    if (!authHeader) {
+      return;
     }
-    return '';
-  }
-  deleteCookie(name) {
-    this.setCookie(name, '', -99999); // - 1 was not far back enough to actually remove the cookie, this sets the time before the epoch and will cause the cookie to be deleted.
-  }
-  setCookie(name, value, expireDays, path = '') {
-    const d = new Date();
-    d.setTime(d.getTime() + expireDays * 24 * 60 * 60 * 1000);
-    const expires = `expires=${d.toUTCString()}`;
-    const cpath = path ? `; path=${path}` : '';
-    document.cookie = `${name}=${value}; ${expires}${cpath}; SameSite=Lax`;
+    let token = authHeader.replace("Bearer ", "");
+    localStorage.setItem(this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY, token);
+    this.publishAuthenticationState(true);
   }
   publishAuthenticationState(authenticated) {
     if (this.IsAuthenticatedSubject.value != authenticated) {
@@ -3321,13 +3312,14 @@ const environment = {
     //used to specify the api server that we're going to use (can be relative or absolute). Must not have trailing slash
     // connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
     // if relative, must start with /
-    connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
+    // connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
     //use to specify the host that issued the JWT. This is used to verify the JWT.
     //This should always be the same as the connect_api_endpoint_base, however in local mode it will be different because of angular proxy
     // connect_api_jwt_issuer_host: 'http://localhost:8000',
     //JWKS for JWT verification
     // jwks_uri: 'https://cdn.fastenhealth.com/jwks/fasten-connect/local.json',
     //when using local proxy to api.connect-dev.fastenhealth.com, uncomment the following lines:
+    connect_api_endpoint_base: 'http://localhost:4200/api',
     jwks_uri: 'https://cdn.fastenhealth.com/jwks/fasten-connect/dev.json',
     connect_api_jwt_issuer_host: 'https://api.connect-dev.fastenhealth.com/v1',
 };
