@@ -2731,7 +2731,7 @@ class AuthInterceptorService {
             return next.handle(req);
         }
         // Clone the request and ensure that cookies are sent
-        const authReq = req.clone({ withCredentials: true, headers: req.headers.set('Authorization', 'Bearer ' + this.authService.GetAuthToken()) });
+        const authReq = req.clone({ withCredentials: true });
         // catch the error, make specific functions for catching specific errors and you can chain through them with more catch operators
         return next.handle(authReq).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_6__.catchError)(x => this.handleAuthError(x))); //here use an arrow function, otherwise you may get "Cannot read property 'navigate' of undefined" on angular 4.4.2/net core 2/webpack 2.70
     }
