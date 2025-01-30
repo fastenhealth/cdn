@@ -3302,9 +3302,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "environment": () => (/* binding */ environment)
 /* harmony export */ });
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
 const environment = {
     name: "development",
     //specify the lighthouse base that we're going to use to authenticate against all our source/providers. Must not have trailing slash
@@ -3312,25 +3309,11 @@ const environment = {
     //used to specify the api server that we're going to use (can be relative or absolute). Must not have trailing slash
     // connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
     // if relative, must start with /
-    // connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
-    //use to specify the host that issued the JWT. This is used to verify the JWT.
-    //This should always be the same as the connect_api_endpoint_base, however in local mode it will be different because of angular proxy
-    // connect_api_jwt_issuer_host: 'http://localhost:8000',
-    //JWKS for JWT verification
-    // jwks_uri: 'https://cdn.fastenhealth.com/jwks/fasten-connect/local.json',
-    //when using local proxy to api.connect-dev.fastenhealth.com, uncomment the following lines:
-    connect_api_endpoint_base: 'http://localhost:4200/api',
-    jwks_uri: 'https://cdn.fastenhealth.com/jwks/fasten-connect/dev.json',
+    connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
     connect_api_jwt_issuer_host: 'https://api.connect-dev.fastenhealth.com/v1',
+    //JWKS for JWT verification
+    jwks_uri: 'https://cdn.fastenhealth.com/jwks/fasten-connect/dev.json',
 };
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
 
 
 /***/ }),
