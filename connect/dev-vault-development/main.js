@@ -187,6 +187,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pages_health_system_connecting_health_system_connecting_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./pages/health-system-connecting/health-system-connecting.component */ 3382);
 /* harmony import */ var _pages_complete_complete_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./pages/complete/complete.component */ 5556);
 /* harmony import */ var _pages_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./pages/dashboard/dashboard.component */ 4789);
+/* harmony import */ var _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./auth-guards/is-authenticated-auth-guard */ 6056);
+
 
 
 
@@ -223,15 +225,61 @@ const Routes = [
     // { page: NavOutletPageName.Default, component: HealthSystemSearchComponent },
     { page: NavOutletPageName.VaultProfileSignin, component: _pages_vault_profile_signin_vault_profile_signin_component__WEBPACK_IMPORTED_MODULE_0__.VaultProfileSigninComponent },
     { page: NavOutletPageName.VaultProfileSigninCode, component: _pages_vault_profile_signin_code_vault_profile_signin_code_component__WEBPACK_IMPORTED_MODULE_1__.VaultProfileSigninCodeComponent },
-    { page: NavOutletPageName.IdentityVerification, component: _pages_identity_verification_identity_verification_component__WEBPACK_IMPORTED_MODULE_2__.IdentityVerificationComponent },
-    { page: NavOutletPageName.Dashboard, component: _pages_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_9__.DashboardComponent },
-    { page: NavOutletPageName.FormHealthSystemRequest, component: _pages_form_health_system_request_form_health_system_request_component__WEBPACK_IMPORTED_MODULE_3__.FormHealthSystemRequestComponent },
-    { page: NavOutletPageName.FormSupportRequest, component: _pages_form_support_request_form_support_request_component__WEBPACK_IMPORTED_MODULE_4__.FormSupportRequestComponent },
-    { page: NavOutletPageName.HealthSystemSearch, component: _pages_health_system_search_health_system_search_component__WEBPACK_IMPORTED_MODULE_5__.HealthSystemSearchComponent },
-    { page: NavOutletPageName.HealthSystemBrandDetails, component: _pages_health_system_brand_details_health_system_brand_details_component__WEBPACK_IMPORTED_MODULE_6__.HealthSystemBrandDetailsComponent },
-    { page: NavOutletPageName.HealthSystemConnecting, component: _pages_health_system_connecting_health_system_connecting_component__WEBPACK_IMPORTED_MODULE_7__.HealthSystemConnectingComponent },
-    { page: NavOutletPageName.CompleteSummary, component: _pages_complete_complete_component__WEBPACK_IMPORTED_MODULE_8__.CompleteComponent },
+    { page: NavOutletPageName.IdentityVerification, component: _pages_identity_verification_identity_verification_component__WEBPACK_IMPORTED_MODULE_2__.IdentityVerificationComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.Dashboard, component: _pages_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_9__.DashboardComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.FormHealthSystemRequest, component: _pages_form_health_system_request_form_health_system_request_component__WEBPACK_IMPORTED_MODULE_3__.FormHealthSystemRequestComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.FormSupportRequest, component: _pages_form_support_request_form_support_request_component__WEBPACK_IMPORTED_MODULE_4__.FormSupportRequestComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.HealthSystemSearch, component: _pages_health_system_search_health_system_search_component__WEBPACK_IMPORTED_MODULE_5__.HealthSystemSearchComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.HealthSystemBrandDetails, component: _pages_health_system_brand_details_health_system_brand_details_component__WEBPACK_IMPORTED_MODULE_6__.HealthSystemBrandDetailsComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.HealthSystemConnecting, component: _pages_health_system_connecting_health_system_connecting_component__WEBPACK_IMPORTED_MODULE_7__.HealthSystemConnectingComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
+    { page: NavOutletPageName.CompleteSummary, component: _pages_complete_complete_component__WEBPACK_IMPORTED_MODULE_8__.CompleteComponent, canActivate: _auth_guards_is_authenticated_auth_guard__WEBPACK_IMPORTED_MODULE_10__.IsAuthenticatedAuthGuard },
 ];
+
+
+/***/ }),
+
+/***/ 6056:
+/*!************************************************************!*\
+  !*** ./src/app/auth-guards/is-authenticated-auth-guard.ts ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "IsAuthenticatedAuthGuard": () => (/* binding */ IsAuthenticatedAuthGuard)
+/* harmony export */ });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/auth.service */ 7556);
+/* harmony import */ var _app_routing__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../app.routing */ 6738);
+/* harmony import */ var _router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../router/nav-outlet/nav-outlet.service */ 6773);
+
+
+
+
+function IsAuthenticatedAuthGuard(nextRoute) {
+    const authService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__.inject)(_services_auth_service__WEBPACK_IMPORTED_MODULE_0__.AuthService);
+    const navOutletService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__.inject)(_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__.NavOutletService);
+    return authService.GetJWTPayload()
+        .then(jwtPayload => {
+        //check if the user is authenticated, if not, redirect to login
+        if (!jwtPayload) {
+            navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSignin);
+            return false;
+        }
+        else if (!jwtPayload.has_verified_identity) {
+            console.log("Profile does not have a verified identity, redirecting to id verification step", jwtPayload);
+            navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.IdentityVerification);
+            return false;
+        }
+        // continue as normal
+        return true;
+    })
+        .catch(err => {
+        console.error("Error checking if user is authenticated", err);
+        navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSignin);
+        return false;
+    });
+}
 
 
 /***/ }),
@@ -2053,10 +2101,10 @@ class VaultProfileSigninCodeComponent {
     console.log("submit finish", this.currentEmail, code);
     this.authService.VaultAuthFinish(this.currentEmail, code).then(() => {
       this.loading = false;
-      //TODO: this should attempt to redirect to Dashboard, then fallback to ID verification if not provided
-      // this.navOutletService.navigateByUrl(NavOutletPageName.Dashboard)
-      this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.IdentityVerification);
+      //this will attempt to redirect to Dashboard, then fallback to ID verification if not provided
+      this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.Dashboard);
     }).catch(err => {
+      console.error(err);
       this.loading = false;
       if (err?.name) {
         this.errorMsg = "code is incorrect";
@@ -2669,9 +2717,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 class NavOutletService {
-    constructor(authService) {
+    constructor(authService, injector) {
         this.authService = authService;
+        this.injector = injector;
         // this subject is populated when the "page" is changed
         this.componentNavigationSubject = new rxjs__WEBPACK_IMPORTED_MODULE_2__.BehaviorSubject(null);
     }
@@ -2706,21 +2756,24 @@ class NavOutletService {
         }
         //check if we can "activate" the new page
         if (foundRoute.canActivate != null) {
-            foundRoute.canActivate(this.authService, this, foundRoute)
-                .then((cont) => {
-                if (!cont) {
-                    return;
-                }
-                this.componentNavigationSubject.next(foundRoute);
-            })
-                .catch(console.error);
+            console.info("checking if we can activate the new page: ", foundRoute.page);
+            this.injector.runInContext(() => {
+                foundRoute.canActivate(foundRoute)
+                    .then((cont) => {
+                    if (!cont) {
+                        return;
+                    }
+                    this.componentNavigationSubject.next(foundRoute);
+                })
+                    .catch(console.error);
+            });
         }
         else {
             this.componentNavigationSubject.next(foundRoute);
         }
     }
 }
-NavOutletService.ɵfac = function NavOutletService_Factory(t) { return new (t || NavOutletService)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_1__.AuthService)); };
+NavOutletService.ɵfac = function NavOutletService_Factory(t) { return new (t || NavOutletService)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_1__.AuthService), _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵinject"](_angular_core__WEBPACK_IMPORTED_MODULE_3__.EnvironmentInjector)); };
 NavOutletService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineInjectable"]({ token: NavOutletService, factory: NavOutletService.ɵfac, providedIn: 'root' });
 
 
@@ -2884,7 +2937,7 @@ class AuthService {
         });
         //TODO: check that the token is not expired
         // @ts-ignore
-        _this4.vaultConfigService.systemConfig = {
+        _this4.configService.systemConfig = {
           user: payload
         };
         return payload;
@@ -2901,8 +2954,9 @@ class AuthService {
   //Private Methods
   /////////////////////////////////////////////////////////////////////////////////////////////////
   setAuthToken(authResp) {
-    let authHeader = authResp.headers.get("Authorization");
+    let authHeader = authResp.headers.get("authorization");
     if (!authHeader) {
+      console.warn("no auth header found in response, skipping");
       return;
     }
     let token = authHeader.replace("Bearer ", "");
