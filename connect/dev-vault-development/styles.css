@@ -1022,6 +1022,10 @@ video {
   -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
 }
+.hover\:border-\[\#4936E8\]:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(73 54 232 / var(--tw-border-opacity, 1));
+}
 .hover\:border-\[\#5B47FB\]:hover {
   --tw-border-opacity: 1;
   border-color: rgb(91 71 251 / var(--tw-border-opacity, 1));
