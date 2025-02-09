@@ -474,18 +474,13 @@ class FastenStitchComponent {
     this.messageBus = messageBus;
     this.publicId = ''; //validate
     this.reconnectOrgConnectionId = null;
+    this.staticBackdrop = false;
     this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_5__.EventEmitter();
     //https://stackoverflow.com/a/69173549/1157633
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
-  ngAfterViewInit() {
-    // this.flowbitStitchModal = new Modal(this.stitchModal.nativeElement, {
-    //   onHide: () => {
-    //     this.messageBus.reset()
-    //   },
-    // });
-  }
+  ngAfterViewInit() {}
   ngOnInit() {
     let publicIdParts = this.publicId.split('_');
     let apiMode = _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Test;
@@ -502,7 +497,8 @@ class FastenStitchComponent {
     this.configService.systemConfig = {
       apiMode: apiMode,
       publicId: this.publicId,
-      reconnectOrgConnectionId: this.reconnectOrgConnectionId
+      reconnectOrgConnectionId: this.reconnectOrgConnectionId,
+      staticBackdrop: this.staticBackdrop
     };
     this.vaultService.getOrgByPublicId(this.publicId).subscribe(org => {
       console.log("Fasten Connect registration", org);
@@ -560,6 +556,9 @@ class FastenStitchComponent {
   }
   registerDialogCloseOnBackdropClick() {
     this.stitchModal.nativeElement.addEventListener('click', event => {
+      if (this.configService.systemConfig$.staticBackdrop) {
+        return;
+      }
       var rect = this.stitchModal.nativeElement.getBoundingClientRect();
       var isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
       if (!isInDialog) {
@@ -587,7 +586,8 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   },
   inputs: {
     publicId: ["public-id", "publicId"],
-    reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"]
+    reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"],
+    staticBackdrop: ["static-backdrop", "staticBackdrop"]
   },
   outputs: {
     orgConnectionCallback: "orgConnectionCallback"
