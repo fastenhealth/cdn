@@ -522,11 +522,6 @@ class FastenStitchComponent {
   }
   showStitchModal() {
     if (this.reconnectOrgConnectionId) {
-      //TODO: not supported yet
-      // const childSpan: HTMLElement = document.createElement('span');
-      // childSpan.innerHTML = 'Reconnecting...';
-      // (this.stitchModalButton.nativeElement as HTMLButtonElement).replaceChildren(childSpan); // Component needs to be added here
-      //
       this.vaultService.getOrgConnectionById(this.publicId, this.reconnectOrgConnectionId).subscribe(orgConnection => {
         console.log("Reconnect Org Connection", orgConnection);
         this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", orgConnection.catalog_brand_id], ["portalId", orgConnection.catalog_portal_id], ["endpointId", orgConnection.catalog_endpoint_id], ["orgConnectionId", orgConnection.org_connection_id]
