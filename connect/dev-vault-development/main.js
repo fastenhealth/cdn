@@ -12,7 +12,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ApiMode": () => (/* binding */ ApiMode),
 /* harmony export */   "ConnectMode": () => (/* binding */ ConnectMode),
 /* harmony export */   "ConnectWindowTimeout": () => (/* binding */ ConnectWindowTimeout),
-/* harmony export */   "ConnectionStatus": () => (/* binding */ ConnectionStatus)
+/* harmony export */   "ConnectionStatus": () => (/* binding */ ConnectionStatus),
+/* harmony export */   "EventTypes": () => (/* binding */ EventTypes)
 /* harmony export */ });
 var ApiMode;
 (function (ApiMode) {
@@ -29,6 +30,14 @@ var ConnectMode;
     ConnectMode["Redirect"] = "redirect";
     ConnectMode["Popup"] = "popup";
 })(ConnectMode || (ConnectMode = {}));
+//where possible, these events should
+var EventTypes;
+(function (EventTypes) {
+    EventTypes["EventTypeWidgetComplete"] = "widget.complete";
+    EventTypes["EventTypeConnectionPending"] = "patient.connection_pending";
+    EventTypes["EventTypeConnectionSuccess"] = "patient.connection_success";
+    EventTypes["EventTypeConnectionFailed"] = "patient.connection_failed";
+})(EventTypes || (EventTypes = {}));
 const ConnectWindowTimeout = 24 * 5000; //wait 2 minutes (5 * 24 = 120)
 
 
@@ -499,7 +508,7 @@ class FastenStitchComponent {
     this.reconnectOrgConnectionId = null;
     this.anonymousVaultProfile = false;
     this.staticBackdrop = false;
-    this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_7__.EventEmitter();
+    this.messageBusCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_7__.EventEmitter();
     //https://stackoverflow.com/a/69173549/1157633
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
@@ -534,9 +543,9 @@ class FastenStitchComponent {
       this.errorMessage = 'Could not register Fasten Connect installation using id. Please contact the developer of this app.';
       console.log("Invalid Fasten Connect registration", err);
     });
-    this.messageBus.orgConnectionCallbackSubject.subscribe(orgConnectionCallbackData => {
-      console.log("bubbling up event", orgConnectionCallbackData);
-      this.orgConnectionCallback.emit(orgConnectionCallbackData);
+    this.messageBus.messageBusSubject.subscribe(eventPayload => {
+      console.log("bubbling up event", eventPayload);
+      this.messageBusCallback.emit(eventPayload);
     });
   }
   showStitchModal() {
@@ -609,7 +618,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
     staticBackdrop: ["static-backdrop", "staticBackdrop"]
   },
   outputs: {
-    orgConnectionCallback: "orgConnectionCallback"
+    messageBusCallback: "messageBusCallback"
   },
   ngContentSelectors: _c2,
   decls: 13,
@@ -650,6 +659,22 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   styles: ["\n@keyframes scale {\n  0% {\n    transform: scale(0.8);\n    opacity: 0.7;\n  }\n\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n\n.animate-scale {\n  animation: scale 0.3s ease forwards;\n}\n\n@keyframes shake {\n  10%,\n  90% {\n    transform: translateX(-1px);\n  }\n\n  20%,\n  80% {\n    transform: translateX(2px);\n  }\n\n  30%,\n  50%,\n  70% {\n    transform: translateX(-4px);\n  }\n\n  40%,\n  60% {\n    transform: translateX(4px);\n  }\n}\n\n.animate-shake {\n  animation: shake 0.3s;\n}\n\n@keyframes pulseFlow {\n  0%, 100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n\n.animate-pulse-flow {\n  animation: pulseFlow 2s ease-in-out infinite;\n}\n\n@keyframes bounce {\n  0%, 100% {\n    transform: translateY(-25%);\n  }\n  50% {\n    transform: none;\n  }\n}\n\n.animate-bounce {\n  animation: bounce 1s cubic-bezier(0.8, 0, 1, 1) infinite;\n}\n\n@keyframes successCircle {\n  0% {\n    transform: scale(0);\n    opacity: 0;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n\n@keyframes successCheck {\n  0% {\n    stroke-dashoffset: 100;\n    opacity: 0;\n  }\n  60% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n  100% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n}\n\n.success-circle {\n  animation: successCircle 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n}\n\n.success-check {\n  stroke-dasharray: 100;\n  stroke-dashoffset: 100;\n  animation: successCheck 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n  animation-delay: 0.3s;\n}\n\n.connect-btn {\n  transition: all 0.2s ease;\n}\n\n.connect-btn:hover {\n  transform: scale(1.05);\n}\n\n.connect-btn:active {\n  transform: scale(0.95);\n}\n\n.delay-100 {\n  animation-delay: 0s;\n}\n\n.delay-200 {\n  animation-delay: 0.4s;\n}\n\n.delay-300 {\n  animation-delay: 0.8s;\n}\n\n.step-view {\n  display: none;\n}\n\n.verification-input {\n  width: 2.5rem;\n  height: 2.5rem;\n  text-align: center;\n  border-radius: 0.5rem;\n  font-size: 1.125rem;\n  font-weight: 600;\n  border: 1px solid rgb(209 213 219);\n}\n\n.verification-input:focus {\n  outline: none;\n  border-color: #5B47FB;\n  box-shadow: 0 0 0 2px rgba(91, 71, 251, 0.2);\n}\n\n.verification-input.filled {\n  background-color: rgb(249 250 251);\n  border-color: #5B47FB;\n}\n\n.verification-input.error {\n  border-color: rgb(239 68 68);\n  animation: shake 0.3s;\n}\n\n.verification-button {\n  display: block;\n  width: 100%;\n  text-align: center;\n  color: #5B47FB;\n  font-weight: 500;\n  padding: 0.5rem;\n  border-radius: 0.375rem;\n  transition: color 0.2s;\n}\n\n.verification-button:hover {\n  color: #4936E8;\n  background-color: rgba(91, 71, 251, 0.05);\n}\n\n@keyframes overlayFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes overlayContentSlideUp {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n@keyframes logoFloat {\n  0%, 100% {\n    transform: translateY(0);\n  }\n  50% {\n    transform: translateY(-8px);\n  }\n}\n\n@keyframes pulseGlow {\n  0%, 100% {\n    box-shadow: 0 0 0 0 rgba(91, 71, 251, 0.4);\n  }\n  50% {\n    box-shadow: 0 0 20px 3px rgba(91, 71, 251, 0.2);\n  }\n}\n\n.redirect-overlay-enter {\n  animation: overlayFadeIn 0.3s ease-out;\n}\n\n.redirect-overlay-content {\n  animation: overlayContentSlideUp 0.4s ease-out;\n}\n\n.redirect-logo-container {\n  animation: logoFloat 2s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;\n}\n\n.redirect-dots {\n  display: flex;\n  gap: 4px;\n  justify-content: center;\n  margin-bottom: 8px;\n}\n\n.redirect-dot {\n  width: 6px;\n  height: 6px;\n  background-color: #5B47FB;\n  border-radius: 50%;\n  opacity: 0.3;\n  animation: dotPulse 1s ease-in-out infinite;\n}\n\n.redirect-dot:nth-child(2) {\n  animation-delay: 0.2s;\n}\n\n.redirect-dot:nth-child(3) {\n  animation-delay: 0.4s;\n}\n\n@keyframes dotPulse {\n  0%, 100% {\n    opacity: 0.3;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 1;\n    transform: scale(1.2);\n  }\n}\n\n.az-logo {\n  font-weight: 700;\n  font-size: 28px;\n  font-family: Poppins, sans-serif;\n  text-transform: lowercase;\n  color: #5b47fb;\n  letter-spacing: -1px;\n  display: flex;\n  align-items: center;\n  position: relative;\n  top: -2px;\n}\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImZhc3Rlbi1zdGl0Y2guY29tcG9uZW50LmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiO0FBQ0E7RUFDRTtJQUNFLHFCQUFxQjtJQUNyQixZQUFZO0VBQ2Q7O0VBRUE7SUFDRSxtQkFBbUI7SUFDbkIsVUFBVTtFQUNaO0FBQ0Y7O0FBRUE7RUFDRSxtQ0FBbUM7QUFDckM7O0FBRUE7RUFDRTs7SUFFRSwyQkFBMkI7RUFDN0I7O0VBRUE7O0lBRUUsMEJBQTBCO0VBQzVCOztFQUVBOzs7SUFHRSwyQkFBMkI7RUFDN0I7O0VBRUE7O0lBRUUsMEJBQTBCO0VBQzVCO0FBQ0Y7O0FBRUE7RUFDRSxxQkFBcUI7QUFDdkI7O0FBRUE7RUFDRTtJQUNFLHFCQUFxQjtJQUNyQixZQUFZO0VBQ2Q7RUFDQTtJQUNFLG1CQUFtQjtJQUNuQixVQUFVO0VBQ1o7QUFDRjs7QUFFQTtFQUNFLDRDQUE0QztBQUM5Qzs7QUFFQTtFQUNFO0lBQ0UsMkJBQTJCO0VBQzdCO0VBQ0E7SUFDRSxlQUFlO0VBQ2pCO0FBQ0Y7O0FBRUE7RUFDRSx3REFBd0Q7QUFDMUQ7O0FBRUE7RUFDRTtJQUNFLG1CQUFtQjtJQUNuQixVQUFVO0VBQ1o7RUFDQTtJQUNFLHFCQUFxQjtJQUNyQixZQUFZO0VBQ2Q7RUFDQTtJQUNFLG1CQUFtQjtJQUNuQixVQUFVO0VBQ1o7QUFDRjs7QUFFQTtFQUNFO0lBQ0Usc0JBQXNCO0lBQ3RCLFVBQVU7RUFDWjtFQUNBO0lBQ0Usb0JBQW9CO0lBQ3BCLFVBQVU7RUFDWjtFQUNBO0lBQ0Usb0JBQW9CO0lBQ3BCLFVBQVU7RUFDWjtBQUNGOztBQUVBO0VBQ0Usd0VBQXdFO0FBQzFFOztBQUVBO0VBQ0UscUJBQXFCO0VBQ3JCLHNCQUFzQjtFQUN0Qix1RUFBdUU7RUFDdkUscUJBQXFCO0FBQ3ZCOztBQUVBO0VBQ0UseUJBQXlCO0FBQzNCOztBQUVBO0VBQ0Usc0JBQXNCO0FBQ3hCOztBQUVBO0VBQ0Usc0JBQXNCO0FBQ3hCOztBQUVBO0VBQ0UsbUJBQW1CO0FBQ3JCOztBQUVBO0VBQ0UscUJBQXFCO0FBQ3ZCOztBQUVBO0VBQ0UscUJBQXFCO0FBQ3ZCOztBQUVBO0VBQ0UsYUFBYTtBQUNmOztBQUVBO0VBQ0UsYUFBYTtFQUNiLGNBQWM7RUFDZCxrQkFBa0I7RUFDbEIscUJBQXFCO0VBQ3JCLG1CQUFtQjtFQUNuQixnQkFBZ0I7RUFDaEIsa0NBQWtDO0FBQ3BDOztBQUVBO0VBQ0UsYUFBYTtFQUNiLHFCQUFxQjtFQUNyQiw0Q0FBNEM7QUFDOUM7O0FBRUE7RUFDRSxrQ0FBa0M7RUFDbEMscUJBQXFCO0FBQ3ZCOztBQUVBO0VBQ0UsNEJBQTRCO0VBQzVCLHFCQUFxQjtBQUN2Qjs7QUFFQTtFQUNFLGNBQWM7RUFDZCxXQUFXO0VBQ1gsa0JBQWtCO0VBQ2xCLGNBQWM7RUFDZCxnQkFBZ0I7RUFDaEIsZUFBZTtFQUNmLHVCQUF1QjtFQUN2QixzQkFBc0I7QUFDeEI7O0FBRUE7RUFDRSxjQUFjO0VBQ2QseUNBQXlDO0FBQzNDOztBQUVBO0VBQ0U7SUFDRSxVQUFVO0VBQ1o7RUFDQTtJQUNFLFVBQVU7RUFDWjtBQUNGOztBQUVBO0VBQ0U7SUFDRSxVQUFVO0lBQ1YsMkJBQTJCO0VBQzdCO0VBQ0E7SUFDRSxVQUFVO0lBQ1Ysd0JBQXdCO0VBQzFCO0FBQ0Y7O0FBRUE7RUFDRTtJQUNFLHdCQUF3QjtFQUMxQjtFQUNBO0lBQ0UsMkJBQTJCO0VBQzdCO0FBQ0Y7O0FBRUE7RUFDRTtJQUNFLDBDQUEwQztFQUM1QztFQUNBO0lBQ0UsK0NBQStDO0VBQ2pEO0FBQ0Y7O0FBRUE7RUFDRSxzQ0FBc0M7QUFDeEM7O0FBRUE7RUFDRSw4Q0FBOEM7QUFDaEQ7O0FBRUE7RUFDRSwrRUFBK0U7QUFDakY7O0FBRUE7RUFDRSxhQUFhO0VBQ2IsUUFBUTtFQUNSLHVCQUF1QjtFQUN2QixrQkFBa0I7QUFDcEI7O0FBRUE7RUFDRSxVQUFVO0VBQ1YsV0FBVztFQUNYLHlCQUF5QjtFQUN6QixrQkFBa0I7RUFDbEIsWUFBWTtFQUNaLDJDQUEyQztBQUM3Qzs7QUFFQTtFQUNFLHFCQUFxQjtBQUN2Qjs7QUFFQTtFQUNFLHFCQUFxQjtBQUN2Qjs7QUFFQTtFQUNFO0lBQ0UsWUFBWTtJQUNaLG1CQUFtQjtFQUNyQjtFQUNBO0lBQ0UsVUFBVTtJQUNWLHFCQUFxQjtFQUN2QjtBQUNGOztBQUVBO0VBQ0UsZ0JBQWdCO0VBQ2hCLGVBQWU7RUFDZixnQ0FBZ0M7RUFDaEMseUJBQXlCO0VBQ3pCLGNBQWM7RUFDZCxvQkFBb0I7RUFDcEIsYUFBYTtFQUNiLG1CQUFtQjtFQUNuQixrQkFBa0I7RUFDbEIsU0FBUztBQUNYIiwiZmlsZSI6ImZhc3Rlbi1zdGl0Y2guY29tcG9uZW50LmNzcyIsInNvdXJjZXNDb250ZW50IjpbIlxuQGtleWZyYW1lcyBzY2FsZSB7XG4gIDAlIHtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDAuOCk7XG4gICAgb3BhY2l0eTogMC43O1xuICB9XG5cbiAgMTAwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgxKTtcbiAgICBvcGFjaXR5OiAxO1xuICB9XG59XG5cbi5hbmltYXRlLXNjYWxlIHtcbiAgYW5pbWF0aW9uOiBzY2FsZSAwLjNzIGVhc2UgZm9yd2FyZHM7XG59XG5cbkBrZXlmcmFtZXMgc2hha2Uge1xuICAxMCUsXG4gIDkwJSB7XG4gICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC0xcHgpO1xuICB9XG5cbiAgMjAlLFxuICA4MCUge1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWCgycHgpO1xuICB9XG5cbiAgMzAlLFxuICA1MCUsXG4gIDcwJSB7XG4gICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVYKC00cHgpO1xuICB9XG5cbiAgNDAlLFxuICA2MCUge1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWCg0cHgpO1xuICB9XG59XG5cbi5hbmltYXRlLXNoYWtlIHtcbiAgYW5pbWF0aW9uOiBzaGFrZSAwLjNzO1xufVxuXG5Aa2V5ZnJhbWVzIHB1bHNlRmxvdyB7XG4gIDAlLCAxMDAlIHtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDAuOSk7XG4gICAgb3BhY2l0eTogMC40O1xuICB9XG4gIDUwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgxKTtcbiAgICBvcGFjaXR5OiAxO1xuICB9XG59XG5cbi5hbmltYXRlLXB1bHNlLWZsb3cge1xuICBhbmltYXRpb246IHB1bHNlRmxvdyAycyBlYXNlLWluLW91dCBpbmZpbml0ZTtcbn1cblxuQGtleWZyYW1lcyBib3VuY2Uge1xuICAwJSwgMTAwJSB7XG4gICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0yNSUpO1xuICB9XG4gIDUwJSB7XG4gICAgdHJhbnNmb3JtOiBub25lO1xuICB9XG59XG5cbi5hbmltYXRlLWJvdW5jZSB7XG4gIGFuaW1hdGlvbjogYm91bmNlIDFzIGN1YmljLWJlemllcigwLjgsIDAsIDEsIDEpIGluZmluaXRlO1xufVxuXG5Aa2V5ZnJhbWVzIHN1Y2Nlc3NDaXJjbGUge1xuICAwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgwKTtcbiAgICBvcGFjaXR5OiAwO1xuICB9XG4gIDUwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgxLjEpO1xuICAgIG9wYWNpdHk6IDAuODtcbiAgfVxuICAxMDAlIHtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDEpO1xuICAgIG9wYWNpdHk6IDE7XG4gIH1cbn1cblxuQGtleWZyYW1lcyBzdWNjZXNzQ2hlY2sge1xuICAwJSB7XG4gICAgc3Ryb2tlLWRhc2hvZmZzZXQ6IDEwMDtcbiAgICBvcGFjaXR5OiAwO1xuICB9XG4gIDYwJSB7XG4gICAgc3Ryb2tlLWRhc2hvZmZzZXQ6IDA7XG4gICAgb3BhY2l0eTogMTtcbiAgfVxuICAxMDAlIHtcbiAgICBzdHJva2UtZGFzaG9mZnNldDogMDtcbiAgICBvcGFjaXR5OiAxO1xuICB9XG59XG5cbi5zdWNjZXNzLWNpcmNsZSB7XG4gIGFuaW1hdGlvbjogc3VjY2Vzc0NpcmNsZSAwLjZzIGN1YmljLWJlemllcigwLjIyLCAwLjYxLCAwLjM2LCAxKSBmb3J3YXJkcztcbn1cblxuLnN1Y2Nlc3MtY2hlY2sge1xuICBzdHJva2UtZGFzaGFycmF5OiAxMDA7XG4gIHN0cm9rZS1kYXNob2Zmc2V0OiAxMDA7XG4gIGFuaW1hdGlvbjogc3VjY2Vzc0NoZWNrIDAuOXMgY3ViaWMtYmV6aWVyKDAuMjIsIDAuNjEsIDAuMzYsIDEpIGZvcndhcmRzO1xuICBhbmltYXRpb24tZGVsYXk6IDAuM3M7XG59XG5cbi5jb25uZWN0LWJ0biB7XG4gIHRyYW5zaXRpb246IGFsbCAwLjJzIGVhc2U7XG59XG5cbi5jb25uZWN0LWJ0bjpob3ZlciB7XG4gIHRyYW5zZm9ybTogc2NhbGUoMS4wNSk7XG59XG5cbi5jb25uZWN0LWJ0bjphY3RpdmUge1xuICB0cmFuc2Zvcm06IHNjYWxlKDAuOTUpO1xufVxuXG4uZGVsYXktMTAwIHtcbiAgYW5pbWF0aW9uLWRlbGF5OiAwcztcbn1cblxuLmRlbGF5LTIwMCB7XG4gIGFuaW1hdGlvbi1kZWxheTogMC40cztcbn1cblxuLmRlbGF5LTMwMCB7XG4gIGFuaW1hdGlvbi1kZWxheTogMC44cztcbn1cblxuLnN0ZXAtdmlldyB7XG4gIGRpc3BsYXk6IG5vbmU7XG59XG5cbi52ZXJpZmljYXRpb24taW5wdXQge1xuICB3aWR0aDogMi41cmVtO1xuICBoZWlnaHQ6IDIuNXJlbTtcbiAgdGV4dC1hbGlnbjogY2VudGVyO1xuICBib3JkZXItcmFkaXVzOiAwLjVyZW07XG4gIGZvbnQtc2l6ZTogMS4xMjVyZW07XG4gIGZvbnQtd2VpZ2h0OiA2MDA7XG4gIGJvcmRlcjogMXB4IHNvbGlkIHJnYigyMDkgMjEzIDIxOSk7XG59XG5cbi52ZXJpZmljYXRpb24taW5wdXQ6Zm9jdXMge1xuICBvdXRsaW5lOiBub25lO1xuICBib3JkZXItY29sb3I6ICM1QjQ3RkI7XG4gIGJveC1zaGFkb3c6IDAgMCAwIDJweCByZ2JhKDkxLCA3MSwgMjUxLCAwLjIpO1xufVxuXG4udmVyaWZpY2F0aW9uLWlucHV0LmZpbGxlZCB7XG4gIGJhY2tncm91bmQtY29sb3I6IHJnYigyNDkgMjUwIDI1MSk7XG4gIGJvcmRlci1jb2xvcjogIzVCNDdGQjtcbn1cblxuLnZlcmlmaWNhdGlvbi1pbnB1dC5lcnJvciB7XG4gIGJvcmRlci1jb2xvcjogcmdiKDIzOSA2OCA2OCk7XG4gIGFuaW1hdGlvbjogc2hha2UgMC4zcztcbn1cblxuLnZlcmlmaWNhdGlvbi1idXR0b24ge1xuICBkaXNwbGF5OiBibG9jaztcbiAgd2lkdGg6IDEwMCU7XG4gIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgY29sb3I6ICM1QjQ3RkI7XG4gIGZvbnQtd2VpZ2h0OiA1MDA7XG4gIHBhZGRpbmc6IDAuNXJlbTtcbiAgYm9yZGVyLXJhZGl1czogMC4zNzVyZW07XG4gIHRyYW5zaXRpb246IGNvbG9yIDAuMnM7XG59XG5cbi52ZXJpZmljYXRpb24tYnV0dG9uOmhvdmVyIHtcbiAgY29sb3I6ICM0OTM2RTg7XG4gIGJhY2tncm91bmQtY29sb3I6IHJnYmEoOTEsIDcxLCAyNTEsIDAuMDUpO1xufVxuXG5Aa2V5ZnJhbWVzIG92ZXJsYXlGYWRlSW4ge1xuICBmcm9tIHtcbiAgICBvcGFjaXR5OiAwO1xuICB9XG4gIHRvIHtcbiAgICBvcGFjaXR5OiAxO1xuICB9XG59XG5cbkBrZXlmcmFtZXMgb3ZlcmxheUNvbnRlbnRTbGlkZVVwIHtcbiAgZnJvbSB7XG4gICAgb3BhY2l0eTogMDtcbiAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMjBweCk7XG4gIH1cbiAgdG8ge1xuICAgIG9wYWNpdHk6IDE7XG4gICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKDApO1xuICB9XG59XG5cbkBrZXlmcmFtZXMgbG9nb0Zsb2F0IHtcbiAgMCUsIDEwMCUge1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgwKTtcbiAgfVxuICA1MCUge1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgtOHB4KTtcbiAgfVxufVxuXG5Aa2V5ZnJhbWVzIHB1bHNlR2xvdyB7XG4gIDAlLCAxMDAlIHtcbiAgICBib3gtc2hhZG93OiAwIDAgMCAwIHJnYmEoOTEsIDcxLCAyNTEsIDAuNCk7XG4gIH1cbiAgNTAlIHtcbiAgICBib3gtc2hhZG93OiAwIDAgMjBweCAzcHggcmdiYSg5MSwgNzEsIDI1MSwgMC4yKTtcbiAgfVxufVxuXG4ucmVkaXJlY3Qtb3ZlcmxheS1lbnRlciB7XG4gIGFuaW1hdGlvbjogb3ZlcmxheUZhZGVJbiAwLjNzIGVhc2Utb3V0O1xufVxuXG4ucmVkaXJlY3Qtb3ZlcmxheS1jb250ZW50IHtcbiAgYW5pbWF0aW9uOiBvdmVybGF5Q29udGVudFNsaWRlVXAgMC40cyBlYXNlLW91dDtcbn1cblxuLnJlZGlyZWN0LWxvZ28tY29udGFpbmVyIHtcbiAgYW5pbWF0aW9uOiBsb2dvRmxvYXQgMnMgZWFzZS1pbi1vdXQgaW5maW5pdGUsIHB1bHNlR2xvdyAycyBlYXNlLWluLW91dCBpbmZpbml0ZTtcbn1cblxuLnJlZGlyZWN0LWRvdHMge1xuICBkaXNwbGF5OiBmbGV4O1xuICBnYXA6IDRweDtcbiAganVzdGlmeS1jb250ZW50OiBjZW50ZXI7XG4gIG1hcmdpbi1ib3R0b206IDhweDtcbn1cblxuLnJlZGlyZWN0LWRvdCB7XG4gIHdpZHRoOiA2cHg7XG4gIGhlaWdodDogNnB4O1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjNUI0N0ZCO1xuICBib3JkZXItcmFkaXVzOiA1MCU7XG4gIG9wYWNpdHk6IDAuMztcbiAgYW5pbWF0aW9uOiBkb3RQdWxzZSAxcyBlYXNlLWluLW91dCBpbmZpbml0ZTtcbn1cblxuLnJlZGlyZWN0LWRvdDpudGgtY2hpbGQoMikge1xuICBhbmltYXRpb24tZGVsYXk6IDAuMnM7XG59XG5cbi5yZWRpcmVjdC1kb3Q6bnRoLWNoaWxkKDMpIHtcbiAgYW5pbWF0aW9uLWRlbGF5OiAwLjRzO1xufVxuXG5Aa2V5ZnJhbWVzIGRvdFB1bHNlIHtcbiAgMCUsIDEwMCUge1xuICAgIG9wYWNpdHk6IDAuMztcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDEpO1xuICB9XG4gIDUwJSB7XG4gICAgb3BhY2l0eTogMTtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDEuMik7XG4gIH1cbn1cblxuLmF6LWxvZ28ge1xuICBmb250LXdlaWdodDogNzAwO1xuICBmb250LXNpemU6IDI4cHg7XG4gIGZvbnQtZmFtaWx5OiBQb3BwaW5zLCBzYW5zLXNlcmlmO1xuICB0ZXh0LXRyYW5zZm9ybTogbG93ZXJjYXNlO1xuICBjb2xvcjogIzViNDdmYjtcbiAgbGV0dGVyLXNwYWNpbmc6IC0xcHg7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgdG9wOiAtMnB4O1xufVxuIl19 */"],
   encapsulation: 2
 });
+
+/***/ }),
+
+/***/ 1036:
+/*!*****************************************!*\
+  !*** ./src/app/models/event-payload.ts ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "EventPayload": () => (/* binding */ EventPayload)
+/* harmony export */ });
+class EventPayload {
+}
+
 
 /***/ }),
 
@@ -890,10 +915,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DashboardComponent": () => (/* binding */ DashboardComponent)
 /* harmony export */ });
 /* harmony import */ var _app_routing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../app.routing */ 6738);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 2560);
 /* harmony import */ var _services_vault_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../services/vault.service */ 3843);
 /* harmony import */ var _services_config_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../services/config.service */ 946);
 /* harmony import */ var _router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../router/nav-outlet/nav-outlet.service */ 6773);
+/* harmony import */ var _services_message_bus_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/message-bus.service */ 5983);
+
 
 
 
@@ -902,73 +929,74 @@ __webpack_require__.r(__webpack_exports__);
 
 function DashboardComponent_div_10_Template(rf, ctx) {
   if (rf & 1) {
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](0, "div", 20)(1, "button", 21);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceSVG"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](2, "svg", 22);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](3, "path", 23);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceHTML"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](4, "img", 24);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](5, "div", 25)(6, "p", 26);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](7);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](8, "p", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](9, "Connected");
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 20)(1, "button", 21);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](2, "svg", 22);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](3, "path", 23);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceHTML"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](4, "img", 24);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](5, "div", 25)(6, "p", 26);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](7);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](8, "p", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](9, "Connected");
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()()();
   }
   if (rf & 2) {
     const connectedAccount_r2 = ctx.$implicit;
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](4);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpropertyInterpolate1"]("src", "https://cdn.fastenhealth.com/logos/sources/", connectedAccount_r2.brand == null ? null : connectedAccount_r2.brand.id, ".png", _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵsanitizeUrl"]);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpropertyInterpolate"]("alt", connectedAccount_r2.brand == null ? null : connectedAccount_r2.brand.name);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtextInterpolate"](connectedAccount_r2.portal.name);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](4);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpropertyInterpolate1"]("src", "https://cdn.fastenhealth.com/logos/sources/", connectedAccount_r2.brand == null ? null : connectedAccount_r2.brand.id, ".png", _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵsanitizeUrl"]);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpropertyInterpolate"]("alt", connectedAccount_r2.brand == null ? null : connectedAccount_r2.brand.name);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtextInterpolate"](connectedAccount_r2.portal.name);
   }
 }
 function DashboardComponent_div_12_Template(rf, ctx) {
   if (rf & 1) {
-    const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵgetCurrentView"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](0, "div", 20)(1, "div", 27);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceSVG"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](2, "svg", 28);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](3, "path", 29)(4, "line", 30)(5, "line", 31);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceHTML"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](6, "img", 32);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](7, "div", 25)(8, "p", 26);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](9);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](10, "p", 5);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](11, "Sign in required");
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](12, "a", 33);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵlistener"]("click", function DashboardComponent_div_12_Template_a_click_12_listener() {
-      const restoredCtx = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵrestoreView"](_r5);
+    const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵgetCurrentView"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 20)(1, "div", 27);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](2, "svg", 28);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](3, "path", 29)(4, "line", 30)(5, "line", 31);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceHTML"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](6, "img", 32);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](7, "div", 25)(8, "p", 26);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](9);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](10, "p", 5);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](11, "Sign in required");
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](12, "a", 33);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵlistener"]("click", function DashboardComponent_div_12_Template_a_click_12_listener() {
+      const restoredCtx = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵrestoreView"](_r5);
       const pendingAccount_r3 = restoredCtx.$implicit;
-      const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnextContext"]();
-      return _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵresetView"](ctx_r4.connectAccount(pendingAccount_r3));
+      const ctx_r4 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnextContext"]();
+      return _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵresetView"](ctx_r4.connectAccount(pendingAccount_r3));
     });
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](13, " Sign in ");
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](13, " Sign in ");
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
   }
   if (rf & 2) {
     const pendingAccount_r3 = ctx.$implicit;
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](6);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpropertyInterpolate1"]("src", "https://cdn.fastenhealth.com/logos/sources/", pendingAccount_r3.brand == null ? null : pendingAccount_r3.brand.id, ".png", _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵsanitizeUrl"]);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpropertyInterpolate"]("alt", pendingAccount_r3.brand == null ? null : pendingAccount_r3.brand.name);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](3);
-    _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtextInterpolate"](pendingAccount_r3.portal.name);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](6);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpropertyInterpolate1"]("src", "https://cdn.fastenhealth.com/logos/sources/", pendingAccount_r3.brand == null ? null : pendingAccount_r3.brand.id, ".png", _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵsanitizeUrl"]);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpropertyInterpolate"]("alt", pendingAccount_r3.brand == null ? null : pendingAccount_r3.brand.name);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](3);
+    _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtextInterpolate"](pendingAccount_r3.portal.name);
   }
 }
 const _c0 = function () {
   return [];
 };
 class DashboardComponent {
-  constructor(changeRef, vaultService, configService, navOutletService) {
+  constructor(changeRef, vaultService, configService, navOutletService, messageBus) {
     this.changeRef = changeRef;
     this.vaultService = vaultService;
     this.configService = configService;
     this.navOutletService = navOutletService;
+    this.messageBus = messageBus;
   }
   ngOnInit() {
     // this.vaultService.getRecordLocatorFacilities().subscribe((facilities)=>{
@@ -985,73 +1013,81 @@ class DashboardComponent {
     console.log("connecting account", pendingAccount);
     this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", pendingAccount.brand?.id], ["portalId", pendingAccount.portal?.id], ["endpointId", pendingAccount.endpoint?.id]]));
   }
+  completeAccounts() {
+    //publish events for all connected accounts
+    this.messageBus.publishComplete();
+    this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.CompleteSummary);
+  }
 }
 DashboardComponent.ɵfac = function DashboardComponent_Factory(t) {
-  return new (t || DashboardComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_4__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_vault_service__WEBPACK_IMPORTED_MODULE_1__.VaultService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_3__.NavOutletService));
+  return new (t || DashboardComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_5__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_vault_service__WEBPACK_IMPORTED_MODULE_1__.VaultService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_3__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_4__.MessageBusService));
 };
-DashboardComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdefineComponent"]({
+DashboardComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({
   type: DashboardComponent,
   selectors: [["app-dashboard"]],
   decls: 32,
-  vars: 14,
-  consts: [["id", "step-connecting-systems", 1, "space-y-6"], [1, "flex", "justify-center", "items-center"], [1, "az-logo"], [1, "space-y-2"], [1, "text-xl", "font-bold"], [1, "text-sm", "text-gray-600"], ["id", "connecting-systems-list", 1, "space-y-3"], ["class", "flex items-center p-3 border rounded-lg hover:border-[#5B47FB]/30 hover:shadow-sm transition-all", 4, "ngFor", "ngForOf"], ["id", "search-button", 1, "w-full", "border", "border-gray-200", "rounded-lg", "flex", "justify-between", "items-center", "px-4", "py-3", "text-sm", "font-medium", "hover:border-[#5B47FB]", "hover:bg-[#5B47FB]/5", "transition-all", 3, "navOutletLink"], [1, "flex", "items-center", "gap-2"], ["xmlns", "http://www.w3.org/2000/svg", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", 1, "w-5", "h-5"], ["d", "M21 21l-5.2-5.2m2.2-5.3a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round"], ["xmlns", "http://www.w3.org/2000/svg", "width", "24", "height", "24", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "lucide", "lucide-chevron-right", "w-5", "h-5", "text-gray-400"], ["points", "9 6 15 12 9 18"], [1, "flex", "items-center", "justify-between", "pt-4"], [1, "flex", "items-center", "gap-2", "text-sm", "text-gray-600"], ["xmlns", "http://www.w3.org/2000/svg", "width", "24", "height", "24", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "lucide", "lucide-lock", "w-4", "h-4"], ["width", "18", "height", "11", "x", "3", "y", "11", "rx", "2", "ry", "2"], ["d", "M7 11V7a5 5 0 0 1 10 0v4"], ["id", "connecting-continue", 1, "bg-[#5B47FB]", "hover:bg-[#4936E8]", "text-white", "py-2", "px-4", "rounded-md", "disabled:opacity-50", 3, "disabled", "navOutletLink"], [1, "flex", "items-center", "p-3", "border", "rounded-lg", "hover:border-[#5B47FB]/30", "hover:shadow-sm", "transition-all"], [1, "connect-btn", "w-8", "h-8", "rounded-full", "border", "border-[#5B47FB]", "bg-[#5B47FB]", "transition-all", "hover:bg-[#4936E8]", "hover:border-[#4936E8]", "animate-scale"], ["fill", "none", "viewBox", "0 0 24 24", "stroke", "currentColor", 1, "w-4", "h-4", "mx-auto", "text-white", "animate-scale"], ["stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M5 13l4 4L19 7"], ["imageFallback", "", 1, "w-8", "max-h-8", "mx-4", "rounded", 3, "src", "alt"], [1, "flex-1", "min-w-0"], [1, "font-semibold"], [1, "w-8", "h-8", "flex", "items-center", "justify-center", "animate-bounce"], ["xmlns", "http://www.w3.org/2000/svg", "width", "20", "height", "20", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "1.5", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "text-amber-500"], ["d", "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"], ["x1", "12", "y1", "9", "x2", "12", "y2", "13"], ["x1", "12", "y1", "17", "x2", "12.01", "y2", "17"], ["imageFallback", "", 1, "w-8", "max-h-8", "mx-3", "rounded", 3, "src", "alt"], [1, "border", "border-[#5B47FB]", "text-[#5B47FB]", "hover:bg-[#5B47FB]", "hover:text-white", "px-4", "py-1.5", "rounded-lg", "text-sm", "font-medium", "transition-colors", 3, "click"]],
+  vars: 13,
+  consts: [["id", "step-connecting-systems", 1, "space-y-6"], [1, "flex", "justify-center", "items-center"], [1, "az-logo"], [1, "space-y-2"], [1, "text-xl", "font-bold"], [1, "text-sm", "text-gray-600"], ["id", "connecting-systems-list", 1, "space-y-3"], ["class", "flex items-center p-3 border rounded-lg hover:border-[#5B47FB]/30 hover:shadow-sm transition-all", 4, "ngFor", "ngForOf"], ["id", "search-button", 1, "w-full", "border", "border-gray-200", "rounded-lg", "flex", "justify-between", "items-center", "px-4", "py-3", "text-sm", "font-medium", "hover:border-[#5B47FB]", "hover:bg-[#5B47FB]/5", "transition-all", 3, "navOutletLink"], [1, "flex", "items-center", "gap-2"], ["xmlns", "http://www.w3.org/2000/svg", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", 1, "w-5", "h-5"], ["d", "M21 21l-5.2-5.2m2.2-5.3a7.5 7.5 0 11-15 0 7.5 7.5 0 0115 0z", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round"], ["xmlns", "http://www.w3.org/2000/svg", "width", "24", "height", "24", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "lucide", "lucide-chevron-right", "w-5", "h-5", "text-gray-400"], ["points", "9 6 15 12 9 18"], [1, "flex", "items-center", "justify-between", "pt-4"], [1, "flex", "items-center", "gap-2", "text-sm", "text-gray-600"], ["xmlns", "http://www.w3.org/2000/svg", "width", "24", "height", "24", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "2", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "lucide", "lucide-lock", "w-4", "h-4"], ["width", "18", "height", "11", "x", "3", "y", "11", "rx", "2", "ry", "2"], ["d", "M7 11V7a5 5 0 0 1 10 0v4"], ["id", "connecting-continue", 1, "bg-[#5B47FB]", "hover:bg-[#4936E8]", "text-white", "py-2", "px-4", "rounded-md", "disabled:opacity-50", 3, "disabled", "click"], [1, "flex", "items-center", "p-3", "border", "rounded-lg", "hover:border-[#5B47FB]/30", "hover:shadow-sm", "transition-all"], [1, "connect-btn", "w-8", "h-8", "rounded-full", "border", "border-[#5B47FB]", "bg-[#5B47FB]", "transition-all", "hover:bg-[#4936E8]", "hover:border-[#4936E8]", "animate-scale"], ["fill", "none", "viewBox", "0 0 24 24", "stroke", "currentColor", 1, "w-4", "h-4", "mx-auto", "text-white", "animate-scale"], ["stroke-linecap", "round", "stroke-linejoin", "round", "stroke-width", "2", "d", "M5 13l4 4L19 7"], ["imageFallback", "", 1, "w-8", "max-h-8", "mx-4", "rounded", 3, "src", "alt"], [1, "flex-1", "min-w-0"], [1, "font-semibold"], [1, "w-8", "h-8", "flex", "items-center", "justify-center", "animate-bounce"], ["xmlns", "http://www.w3.org/2000/svg", "width", "20", "height", "20", "viewBox", "0 0 24 24", "fill", "none", "stroke", "currentColor", "stroke-width", "1.5", "stroke-linecap", "round", "stroke-linejoin", "round", 1, "text-amber-500"], ["d", "M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"], ["x1", "12", "y1", "9", "x2", "12", "y2", "13"], ["x1", "12", "y1", "17", "x2", "12.01", "y2", "17"], ["imageFallback", "", 1, "w-8", "max-h-8", "mx-3", "rounded", 3, "src", "alt"], [1, "border", "border-[#5B47FB]", "text-[#5B47FB]", "hover:bg-[#5B47FB]", "hover:text-white", "px-4", "py-1.5", "rounded-lg", "text-sm", "font-medium", "transition-colors", 3, "click"]],
   template: function DashboardComponent_Template(rf, ctx) {
     if (rf & 1) {
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](0, "div", 0)(1, "div", 1)(2, "h1", 2);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](3, "fasten");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](4, "div", 3)(5, "h2", 4);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](6, "Select Health Systems");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](7, "p", 5);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](8, " Choose the health systems you'd like to connect ");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](9, "div", 6);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](10, DashboardComponent_div_10_Template, 10, 3, "div", 7);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipe"](11, "async");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtemplate"](12, DashboardComponent_div_12_Template, 14, 3, "div", 7);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipe"](13, "async");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](14, "button", 8)(15, "div", 9);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceSVG"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](16, "svg", 10);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](17, "path", 11);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceHTML"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](18, "span");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](19, "Connect a new health system");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceSVG"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](20, "svg", 12);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](21, "polyline", 13);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceHTML"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](22, "div", 14)(23, "div", 15);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceSVG"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](24, "svg", 16);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelement"](25, "rect", 17)(26, "path", 18);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵnamespaceHTML"]();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](27, "span");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](28, "Your medical records are secure");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](29, "button", 19);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipe"](30, "async");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](31, " Continue ");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 0)(1, "div", 1)(2, "h1", 2);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](3, "fasten");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](4, "div", 3)(5, "h2", 4);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](6, "Select Health Systems");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](7, "p", 5);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](8, " Choose the health systems you'd like to connect ");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](9, "div", 6);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](10, DashboardComponent_div_10_Template, 10, 3, "div", 7);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipe"](11, "async");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtemplate"](12, DashboardComponent_div_12_Template, 14, 3, "div", 7);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipe"](13, "async");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](14, "button", 8)(15, "div", 9);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](16, "svg", 10);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](17, "path", 11);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceHTML"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](18, "span");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](19, "Connect a new health system");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](20, "svg", 12);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](21, "polyline", 13);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceHTML"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](22, "div", 14)(23, "div", 15);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](24, "svg", 16);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelement"](25, "rect", 17)(26, "path", 18);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceHTML"]();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](27, "span");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](28, "Your medical records are secure");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](29, "button", 19);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵlistener"]("click", function DashboardComponent_Template_button_click_29_listener() {
+        return ctx.completeAccounts();
+      });
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipe"](30, "async");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](31, " Continue ");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()()();
     }
     if (rf & 2) {
       let tmp_0_0;
       let tmp_1_0;
       let tmp_3_0;
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](10);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("ngForOf", ((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipeBind1"](11, 5, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_0_0.connectedPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpureFunction0"](11, _c0));
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](2);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("ngForOf", ((tmp_1_0 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipeBind1"](13, 7, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_1_0.pendingPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpureFunction0"](12, _c0));
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](2);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("navOutletLink", "health-system-search");
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](15);
-      _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("disabled", !(((tmp_3_0 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpipeBind1"](30, 9, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_3_0.connectedPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵpureFunction0"](13, _c0)).length)("navOutletLink", "complete");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](10);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngForOf", ((tmp_0_0 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipeBind1"](11, 4, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_0_0.connectedPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpureFunction0"](10, _c0));
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](2);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("ngForOf", ((tmp_1_0 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipeBind1"](13, 6, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_1_0.pendingPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpureFunction0"](11, _c0));
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](2);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("navOutletLink", "health-system-search");
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](15);
+      _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵproperty"]("disabled", !(((tmp_3_0 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpipeBind1"](30, 8, ctx.configService.vaultProfileConfigSubject)) == null ? null : tmp_3_0.connectedPatientAccounts) || _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵpureFunction0"](12, _c0)).length);
     }
   },
   styles: [".blurred[_ngcontent-%COMP%] {\n  \n  filter: blur(3px);\n  \n  filter: url(\"/assets/blur.svg#gaussian_blur\");\n  \n  -webkit-filter: blur(3px);\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImRhc2hib2FyZC5jb21wb25lbnQuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUVFLG9DQUFBO0VBQ0EsaUJBQUE7RUFFQSxtQ0FBQTtFQUNBLDZDQUFBO0VBRUEseURBQUE7RUFDQSx5QkFBQTtBQUZGIiwiZmlsZSI6ImRhc2hib2FyZC5jb21wb25lbnQuc2NzcyIsInNvdXJjZXNDb250ZW50IjpbIi5ibHVycmVkIHtcblxuICAvKiBBbnkgYnJvd3NlciB3aGljaCBzdXBwb3J0cyBDU1MzICovXG4gIGZpbHRlcjogYmx1cigzcHgpO1xuXG4gIC8qIEZpcmVmb3ggdmVyc2lvbiAzNCBhbmQgZWFybGllciAqL1xuICBmaWx0ZXI6IHVybChcIi9hc3NldHMvYmx1ci5zdmcjZ2F1c3NpYW5fYmx1clwiKTtcblxuICAvKiBXZWJraXQgaW4gQ2hyb21lIDUyLCBTYWZhcmkgOSwgT3BlcmEgMzksIGFuZCBlYXJsaWVyICovXG4gIC13ZWJraXQtZmlsdGVyOiBibHVyKDNweCk7XG59XG4iXX0= */"]
@@ -1703,9 +1739,9 @@ class HealthSystemConnectingComponent {
     this.injector.runInContext(() => {
       (0,_utils_connect_helper__WEBPACK_IMPORTED_MODULE_0__.ConnectHelper)({
         public_id: this.configService.systemConfig$.publicId,
-        catalog_brand_id: this.brandId,
-        catalog_portal_id: this.portalId,
-        catalog_endpoint_id: this.endpointId,
+        brand_id: this.brandId,
+        portal_id: this.portalId,
+        endpoint_id: this.endpointId,
         org_connection_id: this.orgConnectionId,
         external_id: this.externalId,
         external_state: this.externalState
@@ -3211,12 +3247,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "MessageBusService": () => (/* binding */ MessageBusService)
 /* harmony export */ });
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs */ 6317);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ 6317);
+/* harmony import */ var _models_event_payload__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../models/event-payload */ 1036);
+/* harmony import */ var _app_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../app.constants */ 2976);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _config_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./config.service */ 946);
+
+
+
 
 
 class MessageBusService {
-    constructor() {
+    constructor(configService) {
+        this.configService = configService;
         //this subject is populated when in popup mode, and a Portal/Endpoint has been selected.
         // A separate window will be opened, and credentials & metadata from that connection will be passed to this callback fn.
         // SEE: https://docs.connect.fastenhealth.com/stitch/webcomponent for example data structure.
@@ -3224,11 +3267,49 @@ class MessageBusService {
         //   "org_connection_id": "1234-1234-1234-1234-1234",
         //   "endpoint_id": "1234-1234-1234-1234-1234"
         // }
-        this.orgConnectionCallbackSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__.BehaviorSubject(null);
+        this.messageBusSubject = new rxjs__WEBPACK_IMPORTED_MODULE_3__.BehaviorSubject(null);
+    }
+    //this event is published when the popup window is opened.
+    publishOrgConnectionPending(pendingConnectData) {
+        let eventPayload = new _models_event_payload__WEBPACK_IMPORTED_MODULE_0__.EventPayload();
+        eventPayload.api_mode = this.configService.systemConfig$.apiMode;
+        eventPayload.data = pendingConnectData;
+        eventPayload.event_type = _app_constants__WEBPACK_IMPORTED_MODULE_1__.EventTypes.EventTypeConnectionPending;
+        this.messageBusSubject.next(eventPayload);
+    }
+    //this event is published when the popup window is closed, and the connection is successful or failed.
+    publishOrgConnectionComplete(orgConnectionCallbackData) {
+        //determine if the connection was successful or failed, and update the UI accordingly.
+        let eventPayload = new _models_event_payload__WEBPACK_IMPORTED_MODULE_0__.EventPayload();
+        eventPayload.api_mode = this.configService.systemConfig$.apiMode;
+        eventPayload.data = orgConnectionCallbackData;
+        if (orgConnectionCallbackData.error) {
+            eventPayload.event_type = _app_constants__WEBPACK_IMPORTED_MODULE_1__.EventTypes.EventTypeConnectionFailed;
+        }
+        else {
+            eventPayload.event_type = _app_constants__WEBPACK_IMPORTED_MODULE_1__.EventTypes.EventTypeConnectionSuccess;
+        }
+        this.messageBusSubject.next(eventPayload);
+    }
+    //this event is published when the widget is closed. It will publish a list of all
+    publishComplete() {
+        let eventPayload = new _models_event_payload__WEBPACK_IMPORTED_MODULE_0__.EventPayload();
+        eventPayload.api_mode = this.configService.systemConfig$.apiMode;
+        eventPayload.data = this.configService.vaultProfileConfig$.connectedPatientAccounts.map((account) => {
+            return {
+                org_connection_id: account.org_connection_id,
+                platform_type: account.platform_type,
+                brand_id: account.brand?.id,
+                portal_id: account.portal?.id,
+                endpoint_id: account.endpoint?.id
+            };
+        });
+        eventPayload.event_type = _app_constants__WEBPACK_IMPORTED_MODULE_1__.EventTypes.EventTypeWidgetComplete;
+        this.messageBusSubject.next(eventPayload);
     }
 }
-MessageBusService.ɵfac = function MessageBusService_Factory(t) { return new (t || MessageBusService)(); };
-MessageBusService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineInjectable"]({ token: MessageBusService, factory: MessageBusService.ɵfac, providedIn: 'root' });
+MessageBusService.ɵfac = function MessageBusService_Factory(t) { return new (t || MessageBusService)(_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵinject"](_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService)); };
+MessageBusService.ɵprov = /*@__PURE__*/ _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdefineInjectable"]({ token: MessageBusService, factory: MessageBusService.ɵfac, providedIn: 'root' });
 
 
 /***/ }),
@@ -3517,6 +3598,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 2560);
 /* harmony import */ var _services_message_bus_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/message-bus.service */ 5983);
 /* harmony import */ var _services_config_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/config.service */ 946);
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! uuid */ 8926);
+
 
 
 
@@ -3528,14 +3611,19 @@ function ConnectHelper(connectData) {
     const configService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.inject)(_services_config_service__WEBPACK_IMPORTED_MODULE_4__.ConfigService);
     const navOutletService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.inject)(_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_1__.NavOutletService);
     const messageBusService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.inject)(_services_message_bus_service__WEBPACK_IMPORTED_MODULE_3__.MessageBusService);
-    vaultApi.accountConnectWithPopup(connectData.catalog_brand_id, connectData.catalog_portal_id, connectData.catalog_endpoint_id, connectData.org_connection_id, connectData.external_id, connectData.external_state).subscribe((orgConnectionCallbackData) => {
+    if (!connectData.external_state) {
+        connectData.external_state = (0,uuid__WEBPACK_IMPORTED_MODULE_6__["default"])();
+    }
+    //publish the pending connection event
+    messageBusService.publishOrgConnectionPending(connectData);
+    vaultApi.accountConnectWithPopup(connectData.brand_id, connectData.portal_id, connectData.endpoint_id, connectData.org_connection_id, connectData.external_id, connectData.external_state).subscribe((orgConnectionCallbackData) => {
         console.log(orgConnectionCallbackData);
         if (!orgConnectionCallbackData) {
             return; //wait for redirect
         }
         //Note: this code will only run when this.connectMode == popup
         //when connectMode == 'redirect', the user is redirected in the same window, and this code is never executed.
-        messageBusService.orgConnectionCallbackSubject.next(orgConnectionCallbackData);
+        messageBusService.publishOrgConnectionComplete(orgConnectionCallbackData);
         configService.vaultProfileAddConnectedAccount(orgConnectionCallbackData);
         // redirect the browser back to the search page (TODO: this should show the support request page if an error occurred)
         navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_2__.NavOutletPageName.Dashboard);
