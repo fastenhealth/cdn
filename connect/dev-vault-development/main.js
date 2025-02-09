@@ -249,17 +249,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "IsAuthenticatedAuthGuard": () => (/* binding */ IsAuthenticatedAuthGuard)
 /* harmony export */ });
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 2560);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/core */ 2560);
 /* harmony import */ var _services_auth_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/auth.service */ 7556);
 /* harmony import */ var _app_routing__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../app.routing */ 6738);
 /* harmony import */ var _router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../router/nav-outlet/nav-outlet.service */ 6773);
+/* harmony import */ var _services_config_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/config.service */ 946);
+
 
 
 
 
 function IsAuthenticatedAuthGuard(nextRoute) {
-    const authService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__.inject)(_services_auth_service__WEBPACK_IMPORTED_MODULE_0__.AuthService);
-    const navOutletService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__.inject)(_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__.NavOutletService);
+    const authService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_4__.inject)(_services_auth_service__WEBPACK_IMPORTED_MODULE_0__.AuthService);
+    const navOutletService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_4__.inject)(_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_2__.NavOutletService);
+    const configService = (0,_angular_core__WEBPACK_IMPORTED_MODULE_4__.inject)(_services_config_service__WEBPACK_IMPORTED_MODULE_3__.ConfigService);
+    if (configService.systemConfig$.anonymousVaultProfile) {
+        return Promise.resolve(true); //skip auth check
+    }
     return authService.GetJWTPayload()
         .then(jwtPayload => {
         //check if the user is authenticated, if not, redirect to login
@@ -491,6 +497,7 @@ class FastenStitchComponent {
     this.messageBus = messageBus;
     this.publicId = ''; //validate
     this.reconnectOrgConnectionId = null;
+    this.anonymousVaultProfile = false;
     this.staticBackdrop = false;
     this.orgConnectionCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_7__.EventEmitter();
     //https://stackoverflow.com/a/69173549/1157633
@@ -515,7 +522,8 @@ class FastenStitchComponent {
       apiMode: apiMode,
       publicId: this.publicId,
       reconnectOrgConnectionId: this.reconnectOrgConnectionId,
-      staticBackdrop: this.staticBackdrop
+      staticBackdrop: this.staticBackdrop,
+      anonymousVaultProfile: this.anonymousVaultProfile
     };
     this.vaultService.getOrgByPublicId(this.publicId).subscribe(org => {
       console.log("Fasten Connect registration", org);
@@ -548,6 +556,9 @@ class FastenStitchComponent {
         this.registerDialogCloseOnBackdropClick();
       });
     } else {
+      if (this.anonymousVaultProfile) {
+        this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemSearch);
+      }
       this.stitchModal.nativeElement.showModal();
       this.registerDialogCloseOnBackdropClick();
     }
@@ -594,6 +605,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   inputs: {
     publicId: ["public-id", "publicId"],
     reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"],
+    anonymousVaultProfile: ["anonymous-vault-profile", "anonymousVaultProfile"],
     staticBackdrop: ["static-backdrop", "staticBackdrop"]
   },
   outputs: {
@@ -1699,6 +1711,7 @@ class HealthSystemConnectingComponent {
         external_state: this.externalState
         // connect_mode: this.connectMode,
       });
+      //TODO: on complete, if reconnecting, we should redirect to the complete page, otherwise, we should redirect to the dashboard
     });
   }
   markForCheck() {

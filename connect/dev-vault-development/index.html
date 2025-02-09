@@ -128,10 +128,14 @@
       </form>
       <p class="footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
     </div>
-    <fasten-stitch public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" connect-mode="popup" external-id="1235-123412-123123$^#*@(!" reconnect-org-connection-id="c2f0358c-f330-49ed-b32f-8018296873a2"></fasten-stitch>
+    <fasten-stitch public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" connect-mode="popup" external-id="1235-123412-123123$^#*@(!" anonymous-vault-profile="true"></fasten-stitch>
   </div>
 
   <script type="application/javascript">
+    //      reconnect-org-connection-id="c2f0358c-f330-49ed-b32f-8018296873a2"
+
+
+
     const el = document.querySelector('fasten-stitch');
     el.addEventListener('orgConnectionCallback', (event) => console.log(event.detail));
 
