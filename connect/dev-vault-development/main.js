@@ -505,6 +505,7 @@ class FastenStitchComponent {
     this.navOutletService = navOutletService;
     this.messageBus = messageBus;
     this.publicId = ''; //validate
+    this.externalId = ''; //validate
     this.reconnectOrgConnectionId = null;
     this.anonymousVaultProfile = false;
     this.staticBackdrop = false;
@@ -514,8 +515,39 @@ class FastenStitchComponent {
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
   ngAfterViewInit() {}
+  ngOnChanges(changes) {
+    Object.keys(changes).forEach((key, index) => {
+      if (changes[key].currentValue == changes[key].previousValue) {
+        return; //do nothing, noop
+      }
+      let systemUpdates = {};
+      systemUpdates[key] = changes[key].currentValue;
+      if (key == 'publicId') {
+        console.log("Fasten Connect publicId changed", changes[key].currentValue);
+        let apiMode = this.getApiModeFromPublicId(changes[key].currentValue);
+        systemUpdates['apiMode'] = apiMode;
+      }
+      this.configService.systemConfig = systemUpdates;
+    });
+  }
   ngOnInit() {
-    let publicIdParts = this.publicId.split('_');
+    let apiMode = this.getApiModeFromPublicId(this.publicId);
+    //update the system config
+    this.configService.systemConfig = {
+      apiMode: apiMode,
+      publicId: this.publicId,
+      externalId: this.externalId,
+      reconnectOrgConnectionId: this.reconnectOrgConnectionId,
+      staticBackdrop: this.staticBackdrop,
+      anonymousVaultProfile: this.anonymousVaultProfile
+    };
+    this.messageBus.messageBusSubject.subscribe(eventPayload => {
+      console.log("bubbling up event", eventPayload);
+      this.messageBusCallback.emit(eventPayload);
+    });
+  }
+  getApiModeFromPublicId(publicId) {
+    let publicIdParts = publicId.split('_');
     let apiMode = _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Test;
     if (publicIdParts.length == 3 && publicIdParts[1] == _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Live) {
       apiMode = _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Live;
@@ -523,37 +555,30 @@ class FastenStitchComponent {
     if (publicIdParts.length != 3) {
       console.error("Could not register Fasten Connect installation: missing or invalid id", this.publicId);
       this.errorMessage = 'Could not register Fasten Connect installation: missing or invalid id. Please contact the developer of this app.';
-      return;
-    }
-    console.log(this.publicId, publicIdParts, apiMode);
-    //update the system config
-    this.configService.systemConfig = {
-      apiMode: apiMode,
-      publicId: this.publicId,
-      reconnectOrgConnectionId: this.reconnectOrgConnectionId,
-      staticBackdrop: this.staticBackdrop,
-      anonymousVaultProfile: this.anonymousVaultProfile
-    };
-    this.vaultService.getOrgByPublicId(this.publicId).subscribe(org => {
-      console.log("Fasten Connect registration", org);
+      //reset the org setting if set
       this.configService.systemConfig = {
-        org: org
+        org: null
       };
-    }, err => {
-      this.errorMessage = 'Could not register Fasten Connect installation using id. Please contact the developer of this app.';
-      console.log("Invalid Fasten Connect registration", err);
-    });
-    this.messageBus.messageBusSubject.subscribe(eventPayload => {
-      console.log("bubbling up event", eventPayload);
-      this.messageBusCallback.emit(eventPayload);
-    });
+      return apiMode;
+    } else {
+      this.errorMessage = "";
+      this.vaultService.getOrgByPublicId(this.publicId).subscribe(org => {
+        console.log("Fasten Connect registration", org);
+        this.configService.systemConfig = {
+          org: org
+        };
+      }, err => {
+        this.errorMessage = 'Could not register Fasten Connect installation using id. Please contact the developer of this app.';
+        console.log("Invalid Fasten Connect registration", err);
+      });
+      return apiMode;
+    }
   }
   showStitchModal() {
     if (this.reconnectOrgConnectionId) {
       this.vaultService.getOrgConnectionById(this.publicId, this.reconnectOrgConnectionId).subscribe(orgConnection => {
         console.log("Reconnect Org Connection", orgConnection);
-        this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", orgConnection.catalog_brand_id], ["portalId", orgConnection.catalog_portal_id], ["endpointId", orgConnection.catalog_endpoint_id], ["orgConnectionId", orgConnection.org_connection_id]
-        // ["externalId", this.externalId],
+        this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", orgConnection.catalog_brand_id], ["portalId", orgConnection.catalog_portal_id], ["endpointId", orgConnection.catalog_endpoint_id], ["orgConnectionId", orgConnection.org_connection_id], ["externalId", this.externalId]
         // ["externalState", this.externalState],
         ]));
         this.stitchModal.nativeElement.showModal();
@@ -572,15 +597,14 @@ class FastenStitchComponent {
       this.registerDialogCloseOnBackdropClick();
     }
   }
-  // TODO: this is required because when using the showStitchModal() method, the Search component is not being rendered correctly
-  // this function can be called externally to show the modal
+  // these functions can be called externally to show/hide the widget via javascript
   showStitchModalExt() {
-    this.stitchModal.nativeElement.showModal();
-    this.registerDialogCloseOnBackdropClick();
+    this.showStitchModal();
   }
   hideStitchModalExt() {
     this.stitchModal.nativeElement.close();
   }
+  //event handler for backdrop click
   registerDialogCloseOnBackdropClick() {
     this.stitchModal.nativeElement.addEventListener('click', event => {
       if (this.configService.systemConfig$.staticBackdrop) {
@@ -613,6 +637,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   },
   inputs: {
     publicId: ["public-id", "publicId"],
+    externalId: ["external-id", "externalId"],
     reconnectOrgConnectionId: ["reconnect-org-connection-id", "reconnectOrgConnectionId"],
     anonymousVaultProfile: ["anonymous-vault-profile", "anonymousVaultProfile"],
     staticBackdrop: ["static-backdrop", "staticBackdrop"]
@@ -620,6 +645,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   outputs: {
     messageBusCallback: "messageBusCallback"
   },
+  features: [_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵNgOnChangesFeature"]],
   ngContentSelectors: _c2,
   decls: 13,
   vars: 6,
@@ -1011,7 +1037,7 @@ class DashboardComponent {
   }
   connectAccount(pendingAccount) {
     console.log("connecting account", pendingAccount);
-    this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", pendingAccount.brand?.id], ["portalId", pendingAccount.portal?.id], ["endpointId", pendingAccount.endpoint?.id]]));
+    this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", pendingAccount.brand?.id], ["portalId", pendingAccount.portal?.id], ["endpointId", pendingAccount.endpoint?.id], ["externalId", this.configService.systemConfig$.externalId]]));
   }
   completeAccounts() {
     //publish events for all connected accounts
