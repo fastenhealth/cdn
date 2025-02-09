@@ -264,13 +264,24 @@ function IsAuthenticatedAuthGuard(nextRoute) {
         .then(jwtPayload => {
         //check if the user is authenticated, if not, redirect to login
         if (!jwtPayload) {
-            navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSignin);
-            return false;
+            if (nextRoute.page === _app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSignin) {
+                return true;
+            }
+            else {
+                console.log("User is not authenticated, redirecting to login page");
+                navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSignin);
+                return false;
+            }
         }
         else if (!jwtPayload.has_verified_identity) {
-            console.log("Profile does not have a verified identity, redirecting to id verification step", jwtPayload);
-            navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.IdentityVerification);
-            return false;
+            if (nextRoute.page === _app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.IdentityVerification) {
+                return true;
+            }
+            else {
+                console.log("Profile does not have a verified identity, redirecting to id verification step", jwtPayload);
+                navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.IdentityVerification);
+                return false;
+            }
         }
         // continue as normal
         return true;
