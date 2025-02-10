@@ -575,6 +575,7 @@ class FastenStitchComponent {
     }
   }
   showStitchModal() {
+    this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.Default);
     if (this.reconnectOrgConnectionId) {
       this.vaultService.getOrgConnectionById(this.publicId, this.reconnectOrgConnectionId).subscribe(orgConnection => {
         console.log("Reconnect Org Connection", orgConnection);
