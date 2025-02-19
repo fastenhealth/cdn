@@ -3370,7 +3370,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const ConnectWindowTimeout = 2 * 60 * 1000; //wait 2 minutes (in milliseconds)
+const ConnectWindowTimeout = 20 * 60 * 1000; //wait 20 minutes (in milliseconds)
 class VaultService {
     constructor(_httpClient, deviceService, configService) {
         this._httpClient = _httpClient;
