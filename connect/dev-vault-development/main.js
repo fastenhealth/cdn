@@ -436,6 +436,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const _c0 = ["stitchModalButton"];
 const _c1 = ["stitchModal"];
+
 function FastenStitchComponent_span_5_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "span");
@@ -443,6 +444,7 @@ function FastenStitchComponent_span_5_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function FastenStitchComponent_div_8_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "div", 9);
@@ -454,6 +456,7 @@ function FastenStitchComponent_div_8_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function FastenStitchComponent_div_10_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "div", 19);
@@ -461,9 +464,11 @@ function FastenStitchComponent_div_10_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function FastenStitchComponent_ng_template_11_Template(rf, ctx) {
   if (rf & 1) {
     const _r9 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵgetCurrentView"]();
+
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "div", 20)(1, "div", 21)(2, "div", 22);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵnamespaceSVG"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](3, "svg", 23);
@@ -488,12 +493,14 @@ function FastenStitchComponent_ng_template_11_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtext"](13, "Close");
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]()()()();
   }
+
   if (rf & 2) {
     const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](10);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtextInterpolate1"](" ", ctx_r7.errorMessage, " ");
   }
 }
+
 const _c2 = ["*"];
 class SourceListItem {}
 class FastenStitchComponent {
@@ -505,34 +512,42 @@ class FastenStitchComponent {
     this.navOutletService = navOutletService;
     this.messageBus = messageBus;
     this.publicId = ''; //validate
+
     this.externalId = ''; //validate
+
     this.reconnectOrgConnectionId = null;
     this.anonymousVaultProfile = false;
     this.staticBackdrop = false;
-    this.messageBusCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_7__.EventEmitter();
-    //https://stackoverflow.com/a/69173549/1157633
+    this.messageBusCallback = new _angular_core__WEBPACK_IMPORTED_MODULE_7__.EventEmitter(); //https://stackoverflow.com/a/69173549/1157633
+
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
+
   ngAfterViewInit() {}
+
   ngOnChanges(changes) {
     Object.keys(changes).forEach((key, index) => {
       if (changes[key].currentValue == changes[key].previousValue) {
         return; //do nothing, noop
       }
+
       let systemUpdates = {};
       systemUpdates[key] = changes[key].currentValue;
+
       if (key == 'publicId') {
         console.log("Fasten Connect publicId changed", changes[key].currentValue);
         let apiMode = this.getApiModeFromPublicId(changes[key].currentValue);
         systemUpdates['apiMode'] = apiMode;
       }
+
       this.configService.systemConfig = systemUpdates;
     });
   }
+
   ngOnInit() {
-    let apiMode = this.getApiModeFromPublicId(this.publicId);
-    //update the system config
+    let apiMode = this.getApiModeFromPublicId(this.publicId); //update the system config
+
     this.configService.systemConfig = {
       apiMode: apiMode,
       publicId: this.publicId,
@@ -546,16 +561,19 @@ class FastenStitchComponent {
       this.messageBusCallback.emit(eventPayload);
     });
   }
+
   getApiModeFromPublicId(publicId) {
     let publicIdParts = publicId.split('_');
     let apiMode = _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Test;
+
     if (publicIdParts.length == 3 && publicIdParts[1] == _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Live) {
       apiMode = _app_constants__WEBPACK_IMPORTED_MODULE_0__.ApiMode.Live;
     }
+
     if (publicIdParts.length != 3) {
       console.error("Could not register Fasten Connect installation: missing or invalid id", this.publicId);
-      this.errorMessage = 'Could not register Fasten Connect installation: missing or invalid id. Please contact the developer of this app.';
-      //reset the org setting if set
+      this.errorMessage = 'Could not register Fasten Connect installation: missing or invalid id. Please contact the developer of this app.'; //reset the org setting if set
+
       this.configService.systemConfig = {
         org: null
       };
@@ -574,13 +592,14 @@ class FastenStitchComponent {
       return apiMode;
     }
   }
+
   showStitchModal() {
     this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.Default);
+
     if (this.reconnectOrgConnectionId) {
       this.vaultService.getOrgConnectionById(this.publicId, this.reconnectOrgConnectionId).subscribe(orgConnection => {
         console.log("Reconnect Org Connection", orgConnection);
-        this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", orgConnection.catalog_brand_id], ["portalId", orgConnection.catalog_portal_id], ["endpointId", orgConnection.catalog_endpoint_id], ["orgConnectionId", orgConnection.org_connection_id], ["externalId", this.externalId]
-        // ["externalState", this.externalState],
+        this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", orgConnection.catalog_brand_id], ["portalId", orgConnection.catalog_portal_id], ["endpointId", orgConnection.catalog_endpoint_id], ["orgConnectionId", orgConnection.org_connection_id], ["externalId", this.externalId] // ["externalState", this.externalState],
         ]));
         this.stitchModal.nativeElement.showModal();
         this.registerDialogCloseOnBackdropClick();
@@ -594,34 +613,43 @@ class FastenStitchComponent {
       if (this.anonymousVaultProfile) {
         this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.HealthSystemSearch);
       }
+
       this.stitchModal.nativeElement.showModal();
       this.registerDialogCloseOnBackdropClick();
     }
-  }
-  // these functions can be called externally to show/hide the widget via javascript
+  } // these functions can be called externally to show/hide the widget via javascript
+
+
   showStitchModalExt() {
     this.showStitchModal();
   }
+
   hideStitchModalExt() {
     this.stitchModal.nativeElement.close();
-  }
-  //event handler for backdrop click
+  } //event handler for backdrop click
+
+
   registerDialogCloseOnBackdropClick() {
     this.stitchModal.nativeElement.addEventListener('click', event => {
       if (this.configService.systemConfig$.staticBackdrop) {
         return;
       }
+
       var rect = this.stitchModal.nativeElement.getBoundingClientRect();
       var isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
+
       if (!isInDialog) {
         this.stitchModal.nativeElement.close();
       }
     });
   }
+
 }
+
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) {
   return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_7__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_services_vault_service__WEBPACK_IMPORTED_MODULE_3__.VaultService), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_4__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_5__.MessageBusService));
 };
+
 FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdefineComponent"]({
   type: FastenStitchComponent,
   selectors: [["fasten-stitch"]],
@@ -630,8 +658,10 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵviewQuery"](_c0, 5);
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵviewQuery"](_c1, 5);
     }
+
     if (rf & 2) {
       let _t;
+
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵloadQuery"]()) && (ctx.stitchModalButton = _t.first);
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵqueryRefresh"](_t = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵloadQuery"]()) && (ctx.stitchModal = _t.first);
     }
@@ -670,9 +700,12 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtemplate"](11, FastenStitchComponent_ng_template_11_Template, 14, 1, "ng-template", null, 8, _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtemplateRefExtractor"]);
     }
+
     if (rf & 2) {
       const _r1 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵreference"](3);
+
       const _r6 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵreference"](12);
+
       let tmp_1_0;
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](5);
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵproperty"]("ngIf", !_r1.hasChildNodes());
@@ -884,14 +917,19 @@ class CompleteComponent {
     this.changeRef = changeRef;
     this.configService = configService;
   }
+
   ngOnInit() {}
+
   markForCheck() {
     this.changeRef.markForCheck();
   }
+
 }
+
 CompleteComponent.ɵfac = function CompleteComponent_Factory(t) {
   return new (t || CompleteComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_1__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_0__.ConfigService));
 };
+
 CompleteComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineComponent"]({
   type: CompleteComponent,
   selectors: [["app-complete"]],
@@ -920,6 +958,7 @@ CompleteComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_1_
       _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtext"](14, " Close ");
       _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementEnd"]()();
     }
+
     if (rf & 2) {
       _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵadvance"](11);
       _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵtextInterpolate1"](" Your health records have been successfully linked with ", (_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵpipeBind1"](12, 1, ctx.configService.systemConfigSubject).org == null ? null : _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵpipeBind1"](12, 1, ctx.configService.systemConfigSubject).org.name) || "Unknown", ". You can now close this window. ");
@@ -954,6 +993,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 function DashboardComponent_div_10_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 20)(1, "button", 21);
@@ -970,6 +1010,7 @@ function DashboardComponent_div_10_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](9, "Connected");
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()()();
   }
+
   if (rf & 2) {
     const connectedAccount_r2 = ctx.$implicit;
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](4);
@@ -979,9 +1020,11 @@ function DashboardComponent_div_10_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtextInterpolate"](connectedAccount_r2.portal.name);
   }
 }
+
 function DashboardComponent_div_12_Template(rf, ctx) {
   if (rf & 1) {
     const _r5 = _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵgetCurrentView"]();
+
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](0, "div", 20)(1, "div", 27);
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵnamespaceSVG"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementStart"](2, "svg", 28);
@@ -1005,6 +1048,7 @@ function DashboardComponent_div_12_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](13, " Sign in ");
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()();
   }
+
   if (rf & 2) {
     const pendingAccount_r3 = ctx.$implicit;
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵadvance"](6);
@@ -1014,9 +1058,11 @@ function DashboardComponent_div_12_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtextInterpolate"](pendingAccount_r3.portal.name);
   }
 }
+
 const _c0 = function () {
   return [];
 };
+
 class DashboardComponent {
   constructor(changeRef, vaultService, configService, navOutletService, messageBus) {
     this.changeRef = changeRef;
@@ -1025,30 +1071,36 @@ class DashboardComponent {
     this.navOutletService = navOutletService;
     this.messageBus = messageBus;
   }
-  ngOnInit() {
-    // this.vaultService.getRecordLocatorFacilities().subscribe((facilities)=>{
+
+  ngOnInit() {// this.vaultService.getRecordLocatorFacilities().subscribe((facilities)=>{
     //   console.log("record locator facilities", facilities)
     //   for (let facility of facilities) {
     //     this.configService.vaultProfileAddConnectedAccount(facility)
     //   }
     // })
   }
+
   markForCheck() {
     this.changeRef.markForCheck();
   }
+
   connectAccount(pendingAccount) {
     console.log("connecting account", pendingAccount);
     this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.HealthSystemConnecting, new Map([["brandId", pendingAccount.brand?.id], ["portalId", pendingAccount.portal?.id], ["endpointId", pendingAccount.endpoint?.id], ["externalId", this.configService.systemConfig$.externalId]]));
   }
+
   completeAccounts() {
     //publish events for all connected accounts
     this.messageBus.publishComplete();
     this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.CompleteSummary);
   }
+
 }
+
 DashboardComponent.ɵfac = function DashboardComponent_Factory(t) {
   return new (t || DashboardComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_5__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_vault_service__WEBPACK_IMPORTED_MODULE_1__.VaultService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_3__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_4__.MessageBusService));
 };
+
 DashboardComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({
   type: DashboardComponent,
   selectors: [["app-dashboard"]],
@@ -1103,6 +1155,7 @@ DashboardComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_5
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵtext"](31, " Continue ");
       _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵelementEnd"]()()();
     }
+
     if (rf & 2) {
       let tmp_0_0;
       let tmp_1_0;
@@ -1725,9 +1778,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 function HealthSystemConnectingComponent_button_2_Template(rf, ctx) {
   if (rf & 1) {
     const _r3 = _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵgetCurrentView"]();
+
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](0, "button", 27);
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵlistener"]("click", function HealthSystemConnectingComponent_button_2_Template_button_click_0_listener() {
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵrestoreView"](_r3);
@@ -1740,6 +1795,7 @@ function HealthSystemConnectingComponent_button_2_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
   }
 }
+
 function HealthSystemConnectingComponent_button_3_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementStart"](0, "button", 30);
@@ -1749,6 +1805,7 @@ function HealthSystemConnectingComponent_button_3_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()();
   }
 }
+
 class HealthSystemConnectingComponent {
   constructor(changeRef, configService, navOutletService, injector) {
     this.changeRef = changeRef;
@@ -1762,6 +1819,7 @@ class HealthSystemConnectingComponent {
     this.externalId = "";
     this.externalState = "";
   }
+
   ngOnInit() {
     this.injector.runInContext(() => {
       (0,_utils_connect_helper__WEBPACK_IMPORTED_MODULE_0__.ConnectHelper)({
@@ -1771,22 +1829,26 @@ class HealthSystemConnectingComponent {
         endpoint_id: this.endpointId,
         org_connection_id: this.orgConnectionId,
         external_id: this.externalId,
-        external_state: this.externalState
-        // connect_mode: this.connectMode,
-      });
-      //TODO: on complete, if reconnecting, we should redirect to the complete page, otherwise, we should redirect to the dashboard
+        external_state: this.externalState // connect_mode: this.connectMode,
+
+      }); //TODO: on complete, if reconnecting, we should redirect to the complete page, otherwise, we should redirect to the dashboard
     });
   }
+
   markForCheck() {
     this.changeRef.markForCheck();
   }
+
   cancelAccountConnect() {
     this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.Dashboard);
   }
+
 }
+
 HealthSystemConnectingComponent.ɵfac = function HealthSystemConnectingComponent_Factory(t) {
   return new (t || HealthSystemConnectingComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_4__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_3__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_4__.EnvironmentInjector));
 };
+
 HealthSystemConnectingComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵdefineComponent"]({
   type: HealthSystemConnectingComponent,
   selectors: [["app-health-system-connecting"]],
@@ -1840,6 +1902,7 @@ HealthSystemConnectingComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPO
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵtext"](32, " Contact Support ");
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵelementEnd"]()()();
     }
+
     if (rf & 2) {
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵadvance"](2);
       _angular_core__WEBPACK_IMPORTED_MODULE_4__["ɵɵproperty"]("ngIf", !ctx.orgConnectionId);
@@ -2252,18 +2315,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 function VaultProfileSigninCodeComponent_p_15_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementStart"](0, "p", 13);
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]();
   }
+
   if (rf & 2) {
     const ctx_r0 = _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵnextContext"]();
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx_r0.errorMsg);
   }
 }
+
 class VaultProfileSigninCodeComponent {
   constructor(changeRef, navOutletService, authService) {
     this.changeRef = changeRef;
@@ -2275,35 +2341,42 @@ class VaultProfileSigninCodeComponent {
     this.codeExpirySeconds = 300;
     this.timeRemaining$ = (0,rxjs__WEBPACK_IMPORTED_MODULE_4__.timer)(0, 1000).pipe((0,rxjs__WEBPACK_IMPORTED_MODULE_5__.map)(n => (this.codeExpirySeconds - n) * 1000), (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.takeWhile)(n => n >= 0));
   }
+
   ngOnInit() {}
+
   markForCheck() {
     this.changeRef.markForCheck();
   }
+
   onCodeCompleted(code) {
     this.loading = true;
     console.log("submit finish", this.currentEmail, code);
     this.authService.VaultAuthFinish(this.currentEmail, code).then(() => {
-      this.loading = false;
-      //this will attempt to redirect to Dashboard, then fallback to ID verification if not provided
+      this.loading = false; //this will attempt to redirect to Dashboard, then fallback to ID verification if not provided
+
       this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_0__.NavOutletPageName.Dashboard);
     }).catch(err => {
       console.error(err);
       this.loading = false;
+
       if (err?.name) {
         this.errorMsg = "code is incorrect";
       } else {
         this.errorMsg = "an unknown error occurred during sign-in";
-      }
-      // const toastNotification = new ToastNotification()
+      } // const toastNotification = new ToastNotification()
       // toastNotification.type = ToastType.Error
       // toastNotification.message = this.errorMsg
       // this.toastService.show(toastNotification)
+
     });
   }
+
 }
+
 VaultProfileSigninCodeComponent.ɵfac = function VaultProfileSigninCodeComponent_Factory(t) {
   return new (t || VaultProfileSigninCodeComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_3__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_1__.NavOutletService), _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdirectiveInject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_2__.AuthService));
 };
+
 VaultProfileSigninCodeComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵdefineComponent"]({
   type: VaultProfileSigninCodeComponent,
   selectors: [["app-vault-profile-signin-code"]],
@@ -2348,6 +2421,7 @@ VaultProfileSigninCodeComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPO
       _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtext"](26, " Use another verification method ");
       _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵelementEnd"]()()();
     }
+
     if (rf & 2) {
       _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵadvance"](12);
       _angular_core__WEBPACK_IMPORTED_MODULE_3__["ɵɵtextInterpolate"](ctx.currentEmail);
@@ -2396,6 +2470,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 function VaultProfileSigninComponent_p_51_span_1_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "span");
@@ -2403,6 +2478,7 @@ function VaultProfileSigninComponent_p_51_span_1_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function VaultProfileSigninComponent_p_51_span_2_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "span");
@@ -2410,6 +2486,7 @@ function VaultProfileSigninComponent_p_51_span_2_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function VaultProfileSigninComponent_p_51_span_3_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "span");
@@ -2417,6 +2494,7 @@ function VaultProfileSigninComponent_p_51_span_3_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
 }
+
 function VaultProfileSigninComponent_p_51_span_4_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "span", 42)(1, "strong");
@@ -2425,12 +2503,14 @@ function VaultProfileSigninComponent_p_51_span_4_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtext"](3);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
+
   if (rf & 2) {
     const ctx_r7 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵnextContext"](2);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](3);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtextInterpolate1"](" ", ctx_r7.errorMsg, " ");
   }
 }
+
 function VaultProfileSigninComponent_p_51_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementStart"](0, "p", 40);
@@ -2440,9 +2520,12 @@ function VaultProfileSigninComponent_p_51_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtemplate"](4, VaultProfileSigninComponent_p_51_span_4_Template, 4, 1, "span", 41);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]();
   }
+
   if (rf & 2) {
     const ctx_r2 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵnextContext"]();
+
     const _r1 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵreference"](50);
+
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](1);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵproperty"]("ngIf", _r1.errors == null ? null : _r1.errors["required"]);
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](1);
@@ -2453,11 +2536,13 @@ function VaultProfileSigninComponent_p_51_Template(rf, ctx) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵproperty"]("ngIf", ctx_r2.errorMsg);
   }
 }
+
 function VaultProfileSigninComponent_app_spinner_62_Template(rf, ctx) {
   if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelement"](0, "app-spinner");
   }
 }
+
 class VaultProfileSigninComponent {
   constructor(changeRef, configService, authService, navOutletService) {
     this.changeRef = changeRef;
@@ -2471,13 +2556,16 @@ class VaultProfileSigninComponent {
     this.errorMsg = "";
     this.message = "";
   }
+
   ngOnInit() {
     const urlParams = new URLSearchParams(window.location.search);
     this.setMessage(urlParams.get('action') || "");
   }
+
   markForCheck() {
     this.changeRef.markForCheck();
   }
+
   signinSubmit() {
     this.submitted = true;
     this.loading = true;
@@ -2487,17 +2575,19 @@ class VaultProfileSigninComponent {
       this.navOutletService.navigateByUrl(_app_routing__WEBPACK_IMPORTED_MODULE_1__.NavOutletPageName.VaultProfileSigninCode, new Map([["currentEmail", this.existingVaultProfile.email]]));
     }).catch(err => {
       this.loading = false;
+
       if (err?.name) {
         this.errorMsg = "email or password is incorrect";
       } else {
         this.errorMsg = "an unknown error occurred during sign-in";
-      }
-      // const toastNotification = new ToastNotification()
+      } // const toastNotification = new ToastNotification()
       // toastNotification.type = ToastType.Error
       // toastNotification.message = this.errorMsg
       // this.toastService.show(toastNotification)
+
     });
   }
+
   setMessage(action) {
     if (action === "email-changed") {
       this.showMessage = true;
@@ -2507,10 +2597,13 @@ class VaultProfileSigninComponent {
       this.message = "Password successfully changed! Please sign in with your new password.";
     }
   }
+
 }
+
 VaultProfileSigninComponent.ɵfac = function VaultProfileSigninComponent_Factory(t) {
   return new (t || VaultProfileSigninComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_7__.ChangeDetectorRef), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_services_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_services_auth_service__WEBPACK_IMPORTED_MODULE_3__.AuthService), _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdirectiveInject"](_router_nav_outlet_nav_outlet_service__WEBPACK_IMPORTED_MODULE_4__.NavOutletService));
 };
+
 VaultProfileSigninComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵdefineComponent"]({
   type: VaultProfileSigninComponent,
   selectors: [["app-auth-signin"]],
@@ -2594,9 +2687,12 @@ VaultProfileSigninComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵtext"](63, " Continue ");
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵelementEnd"]()()();
     }
+
     if (rf & 2) {
       const _r0 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵreference"](46);
+
       const _r1 = _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵreference"](50);
+
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](6);
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵproperty"]("src", _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵpipeBind1"](7, 8, ctx.configService.systemConfigSubject).org == null ? null : _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵpipeBind1"](7, 8, ctx.configService.systemConfigSubject).org.logo_uri, _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵsanitizeUrl"]);
       _angular_core__WEBPACK_IMPORTED_MODULE_7__["ɵɵadvance"](17);
@@ -3061,8 +3157,10 @@ class AuthService {
     this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY = 'fasten_connect_auth_vault';
     this.IsAuthenticatedSubject = new rxjs__WEBPACK_IMPORTED_MODULE_3__.BehaviorSubject(false);
   }
+
   VaultAuthBegin(email) {
     var _this = this;
+
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
       let resp = yield _this._httpClient.post(`${_environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.connect_api_endpoint_base}/bridge/vault_auth_begin`, {
         "email": email
@@ -3075,8 +3173,10 @@ class AuthService {
       return resp;
     })();
   }
+
   VaultAuthFinish(email, code) {
     var _this2 = this;
+
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
       let resp = yield _this2._httpClient.post(`${_environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.connect_api_endpoint_base}/bridge/vault_auth_finish`, {
         "email": email,
@@ -3088,27 +3188,37 @@ class AuthService {
           "public_id": _this2.configService.systemConfig$.publicId
         }
       }).toPromise();
+
       _this2.setAuthToken(resp);
+
       return resp;
     })();
   }
+
   Signout() {
     var _this3 = this;
+
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
-      _this3.publishAuthenticationState(false);
-      //cannot delete cookie because of cross origin policies. all we can do is delete the local token in our widget.
+      _this3.publishAuthenticationState(false); //cannot delete cookie because of cross origin policies. all we can do is delete the local token in our widget.
+
+
       return localStorage.removeItem(_this3.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY);
     })();
   }
+
   GetJWTPayload() {
     var _this4 = this;
+
     return (0,_home_runner_work_fasten_connect_stitch_fasten_connect_stitch_node_modules_babel_runtime_helpers_esm_asyncToGenerator_js__WEBPACK_IMPORTED_MODULE_0__["default"])(function* () {
       let authToken = _this4.GetAuthToken();
+
       if (!authToken) {
         return null;
       }
+
       let jwks = jose__WEBPACK_IMPORTED_MODULE_4__.createRemoteJWKSet(new URL(_environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.jwks_uri));
       let issuerHost = _environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.connect_api_jwt_issuer_host;
+
       try {
         //audience and issuer must be the same. This token is only valid on the fasten connect api
         const {
@@ -3117,9 +3227,9 @@ class AuthService {
         } = yield jose__WEBPACK_IMPORTED_MODULE_5__.jwtVerify(authToken, jwks, {
           issuer: issuerHost,
           audience: issuerHost
-        });
-        //TODO: check that the token is not expired
+        }); //TODO: check that the token is not expired
         // @ts-ignore
+
         _this4.configService.systemConfig = {
           user: payload
         };
@@ -3130,31 +3240,39 @@ class AuthService {
       }
     })();
   }
+
   GetAuthToken() {
     return localStorage.getItem(this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY);
-  }
-  /////////////////////////////////////////////////////////////////////////////////////////////////
+  } /////////////////////////////////////////////////////////////////////////////////////////////////
   //Private Methods
   /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
   setAuthToken(authResp) {
     let authHeader = authResp.headers.get("authorization");
+
     if (!authHeader) {
       console.warn("no auth header found in response, skipping");
       return;
     }
+
     let token = authHeader.replace("Bearer ", "");
     localStorage.setItem(this.FASTEN_CONNECT_JWT_LOCALSTORAGE_KEY, token);
     this.publishAuthenticationState(true);
   }
+
   publishAuthenticationState(authenticated) {
     if (this.IsAuthenticatedSubject.value != authenticated) {
       this.IsAuthenticatedSubject.next(authenticated);
     }
   }
+
 }
+
 AuthService.ɵfac = function AuthService_Factory(t) {
   return new (t || AuthService)(_angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_7__.HttpClient), _angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵinject"](_config_service__WEBPACK_IMPORTED_MODULE_2__.ConfigService));
 };
+
 AuthService.ɵprov = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_6__["ɵɵdefineInjectable"]({
   token: AuthService,
   factory: AuthService.ɵfac,
