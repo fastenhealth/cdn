@@ -32700,7 +32700,8 @@ var AppComponent = class _AppComponent {
   }
   // postMessage registration, listen to events from the child/iframe window
   receivePostMessage(event) {
-    console.log("bubbling up event to listeners (messageBusCallback)", event);
+    let payload = JSON.parse(event.data);
+    console.log("bubbling up event to listeners (messageBusCallback)", payload);
     this.messageBusCallback.emit(event);
   }
   static {
