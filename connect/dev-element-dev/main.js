@@ -32690,6 +32690,7 @@ var AppComponent = class _AppComponent {
     this.stitchIframeEmbed.nativeElement.src = environment.embed_endpoint_base + "?" + this.encodeOptionsAsQueryStringParameters();
     this.stitchModal.nativeElement.showModal();
     this.registerDialogCloseOnBackdropClick();
+    this.stitchIframeEmbed.nativeElement.contentWindow?.postMessage(JSON.stringify("hello from parent"), "*");
   }
   // these functions can be called externally to show/hide the widget via javascript
   showStitchModalExt() {
