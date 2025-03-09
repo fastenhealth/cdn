@@ -32635,17 +32635,6 @@ var AppComponent = class _AppComponent {
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
   ngOnInit() {
-    window.addEventListener("message", (event) => {
-      if (event.origin !== "http://localhost:4201") {
-        console.error("Message received from invalid origin", event.origin);
-        return;
-      }
-      const responseElement = document.getElementById("response");
-      if (responseElement) {
-        responseElement.innerHTML = "Hello " + event.data.text + " " + event.data.number;
-      }
-      console.log(event.data);
-    }, false);
   }
   // buttonClick(): void {
   //   console.log("button clicked...updating iframe");
@@ -32709,6 +32698,11 @@ var AppComponent = class _AppComponent {
       }
     });
   }
+  // postMessage registration, listen to events from the child/iframe window
+  receivePostMessage(event) {
+    console.log("bubbling up event to listeners (messageBusCallback)", event);
+    this.messageBusCallback.emit(event);
+  }
   static {
     this.\u0275fac = function AppComponent_Factory(__ngFactoryType__) {
       return new (__ngFactoryType__ || _AppComponent)(\u0275\u0275directiveInject(ElementRef));
@@ -32726,6 +32720,12 @@ var AppComponent = class _AppComponent {
         \u0275\u0275queryRefresh(_t = \u0275\u0275loadQuery()) && (ctx.stitchModalButton = _t.first);
         \u0275\u0275queryRefresh(_t = \u0275\u0275loadQuery()) && (ctx.stitchModal = _t.first);
         \u0275\u0275queryRefresh(_t = \u0275\u0275loadQuery()) && (ctx.stitchIframeEmbed = _t.first);
+      }
+    }, hostBindings: function AppComponent_HostBindings(rf, ctx) {
+      if (rf & 1) {
+        \u0275\u0275listener("message", function AppComponent_message_HostBindingHandler($event) {
+          return ctx.receivePostMessage($event);
+        }, false, \u0275\u0275resolveWindow);
       }
     }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], anonymousVaultProfile: [0, "anonymous-vault-profile", "anonymousVaultProfile"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"] }, outputs: { messageBusCallback: "messageBusCallback" }, standalone: false, ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "border-none", "p-0", "backdrop:backdrop-blur", "w-full", "max-w-[440px]", "min-h-[600px]", "bg-white", "rounded-lg", "shadow-lg"], ["src", \u0275\u0275trustConstantResourceUrl`https://embed.connect-dev.fastenhealth.com`, 1, "border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
@@ -32754,7 +32754,7 @@ var AppComponent = class _AppComponent {
   }
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 22 });
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 24 });
 })();
 
 // projects/fasten-connect-stitch-element/src/app/app.module.ts
