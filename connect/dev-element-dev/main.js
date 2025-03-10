@@ -8102,13 +8102,6 @@ function maybeUnwrapFn(value) {
   }
 }
 var VALUE_STRING_LENGTH_LIMIT = 200;
-function assertStandaloneComponentType(type) {
-  assertComponentDef(type);
-  const componentDef = getComponentDef(type);
-  if (!componentDef.standalone) {
-    throw new RuntimeError(907, `The ${stringifyForError(type)} component is not marked as standalone, but Angular expects to have a standalone component here. Please make sure the ${stringifyForError(type)} component has the \`standalone: true\` flag in the decorator.`);
-  }
-}
 function assertComponentDef(type) {
   if (!getComponentDef(type)) {
     throw new RuntimeError(906, `The ${stringifyForError(type)} is not an Angular component, make sure it has the \`@Component\` decorator.`);
@@ -22063,15 +22056,6 @@ function assertPlatform(requiredToken) {
 function getPlatform() {
   return _platformInjector?.get(PlatformRef) ?? null;
 }
-function createOrReusePlatformInjector(providers = []) {
-  if (_platformInjector) return _platformInjector;
-  publishDefaultGlobalUtils();
-  const injector = createPlatformInjector(providers);
-  _platformInjector = injector;
-  publishSignalConfiguration();
-  runPlatformInitializers(injector);
-  return injector;
-}
 function runPlatformInitializers(injector) {
   const inits = injector.get(PLATFORM_INITIALIZER, null);
   runInInjectionContext(injector, () => {
@@ -23049,47 +23033,6 @@ var ApplicationModule = class _ApplicationModule {
     type: ApplicationRef
   }], null);
 })();
-function internalCreateApplication(config2) {
-  profiler(
-    8
-    /* ProfilerEvent.BootstrapApplicationStart */
-  );
-  try {
-    const {
-      rootComponent,
-      appProviders,
-      platformProviders
-    } = config2;
-    if ((typeof ngDevMode === "undefined" || ngDevMode) && rootComponent !== void 0) {
-      assertStandaloneComponentType(rootComponent);
-    }
-    const platformInjector = createOrReusePlatformInjector(platformProviders);
-    const allAppProviders = [internalProvideZoneChangeDetection({}), {
-      provide: ChangeDetectionScheduler,
-      useExisting: ChangeDetectionSchedulerImpl
-    }, ...appProviders || []];
-    const adapter = new EnvironmentNgModuleRefAdapter({
-      providers: allAppProviders,
-      parent: platformInjector,
-      debugName: typeof ngDevMode === "undefined" || ngDevMode ? "Environment Injector" : "",
-      // We skip environment initializers because we need to run them inside the NgZone, which
-      // happens after we get the NgZone instance from the Injector.
-      runEnvironmentInitializers: false
-    });
-    return bootstrap({
-      r3Injector: adapter.injector,
-      platformInjector,
-      rootComponent
-    });
-  } catch (e) {
-    return Promise.reject(e);
-  } finally {
-    profiler(
-      9
-      /* ProfilerEvent.BootstrapApplicationEnd */
-    );
-  }
-}
 function booleanAttribute(value) {
   return typeof value === "boolean" ? value : value != null && value !== "false";
 }
@@ -23622,12 +23565,6 @@ if (typeof ngDevMode !== "undefined" && ngDevMode) {
     throw new Error("It looks like your application or one of its dependencies is using i18n.\nAngular 9 introduced a global `$localize()` function that needs to be loaded.\nPlease run `ng add @angular/localize` from the Angular CLI.\n(For non-CLI projects, add `import '@angular/localize/init';` to your `polyfills.ts` file.\nFor server-side rendering applications add the import to your `main.server.ts` file.)");
   };
 }
-
-// projects/fasten-connect-stitch-element/src/environments/environment.ts
-var environment = {
-  name: "development",
-  embed_endpoint_base: "https://embed.connect-dev.fastenhealth.com"
-};
 
 // node_modules/@angular/common/fesm2022/common.mjs
 var _DOM = null;
@@ -31671,15 +31608,6 @@ var KeyEventsPlugin = class _KeyEventsPlugin extends EventManagerPlugin {
     }]
   }], null);
 })();
-function createApplication(options) {
-  return internalCreateApplication(createProvidersConfig(options));
-}
-function createProvidersConfig(options) {
-  return {
-    appProviders: [...BROWSER_MODULE_PROVIDERS, ...options?.providers ?? []],
-    platformProviders: INTERNAL_BROWSER_PLATFORM_PROVIDERS
-  };
-}
 function initDomAdapter() {
   BrowserDomAdapter.makeCurrent();
 }
@@ -32353,6 +32281,12 @@ var HydrationFeatureKind;
 })(HydrationFeatureKind || (HydrationFeatureKind = {}));
 var VERSION3 = new Version("19.2.1");
 
+// projects/fasten-connect-stitch-element/src/environments/environment.ts
+var environment = {
+  name: "development",
+  embed_endpoint_base: "https://embed.connect-dev.fastenhealth.com"
+};
+
 // node_modules/@angular/elements/fesm2022/elements.mjs
 var scheduler = {
   /**
@@ -32761,7 +32695,7 @@ var AppComponent = class _AppComponent {
     };
   }
   static {
-    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AppComponent, selectors: [["fasten-stitch-element-app"]], viewQuery: function AppComponent_Query(rf, ctx) {
+    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AppComponent, selectors: [["fasten-stitch-element"]], viewQuery: function AppComponent_Query(rf, ctx) {
       if (rf & 1) {
         \u0275\u0275viewQuery(_c0, 5);
         \u0275\u0275viewQuery(_c1, 5);
@@ -32779,7 +32713,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], anonymousVaultProfile: [0, "anonymous-vault-profile", "anonymousVaultProfile"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"] }, outputs: { messageBusCallback: "messageBusCallback" }, ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "border-none", "p-0", "backdrop:backdrop-blur", "w-full", "max-w-[440px]", "min-h-[600px]", "bg-white", "rounded-lg", "shadow-lg"], ["src", \u0275\u0275trustConstantResourceUrl`https://embed.connect-dev.fastenhealth.com`, 1, "border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], anonymousVaultProfile: [0, "anonymous-vault-profile", "anonymousVaultProfile"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"] }, outputs: { messageBusCallback: "messageBusCallback" }, standalone: false, ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "border-none", "p-0", "backdrop:backdrop-blur", "w-full", "max-w-[440px]", "min-h-[600px]", "bg-white", "rounded-lg", "shadow-lg"], ["src", \u0275\u0275trustConstantResourceUrl`https://embed.connect-dev.fastenhealth.com`, 1, "border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();
@@ -32802,21 +32736,39 @@ var AppComponent = class _AppComponent {
         \u0275\u0275advance(5);
         \u0275\u0275property("ngIf", !ref_r2.hasChildNodes());
       }
-    }, dependencies: [CommonModule, NgIf], styles: ["/* projects/fasten-connect-stitch-element/src/app/app.component.scss */\n@keyframes scale {\n  0% {\n    transform: scale(0.8);\n    opacity: 0.7;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n.animate-scale {\n  animation: scale 0.3s ease forwards;\n}\n@keyframes shake {\n  10%, 90% {\n    transform: translateX(-1px);\n  }\n  20%, 80% {\n    transform: translateX(2px);\n  }\n  30%, 50%, 70% {\n    transform: translateX(-4px);\n  }\n  40%, 60% {\n    transform: translateX(4px);\n  }\n}\n.animate-shake {\n  animation: shake 0.3s;\n}\n@keyframes pulseFlow {\n  0%, 100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n.animate-pulse-flow {\n  animation: pulseFlow 2s ease-in-out infinite;\n}\n@keyframes bounce {\n  0%, 100% {\n    transform: translateY(-25%);\n  }\n  50% {\n    transform: none;\n  }\n}\n.animate-bounce {\n  animation: bounce 1s cubic-bezier(0.8, 0, 1, 1) infinite;\n}\n@keyframes successCircle {\n  0% {\n    transform: scale(0);\n    opacity: 0;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n@keyframes successCheck {\n  0% {\n    stroke-dashoffset: 100;\n    opacity: 0;\n  }\n  60% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n  100% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n}\n.success-circle {\n  animation: successCircle 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n}\n.success-check {\n  stroke-dasharray: 100;\n  stroke-dashoffset: 100;\n  animation: successCheck 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n  animation-delay: 0.3s;\n}\n.connect-btn {\n  transition: all 0.2s ease;\n}\n.connect-btn:hover {\n  transform: scale(1.05);\n}\n.connect-btn:active {\n  transform: scale(0.95);\n}\n.delay-100 {\n  animation-delay: 0s;\n}\n.delay-200 {\n  animation-delay: 0.4s;\n}\n.delay-300 {\n  animation-delay: 0.8s;\n}\n.step-view {\n  display: none;\n}\n.verification-input {\n  width: 2.5rem;\n  height: 2.5rem;\n  text-align: center;\n  border-radius: 0.5rem;\n  font-size: 1.125rem;\n  font-weight: 600;\n  border: 1px solid rgb(209, 213, 219);\n}\n.verification-input:focus {\n  outline: none;\n  border-color: #5B47FB;\n  box-shadow: 0 0 0 2px rgba(91, 71, 251, 0.2);\n}\n.verification-input.filled {\n  background-color: rgb(249, 250, 251);\n  border-color: #5B47FB;\n}\n.verification-input.error {\n  border-color: rgb(239, 68, 68);\n  animation: shake 0.3s;\n}\n.verification-button {\n  display: block;\n  width: 100%;\n  text-align: center;\n  color: #5B47FB;\n  font-weight: 500;\n  padding: 0.5rem;\n  border-radius: 0.375rem;\n  transition: color 0.2s;\n}\n.verification-button:hover {\n  color: #4936E8;\n  background-color: rgba(91, 71, 251, 0.05);\n}\n@keyframes overlayFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n@keyframes overlayContentSlideUp {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n@keyframes logoFloat {\n  0%, 100% {\n    transform: translateY(0);\n  }\n  50% {\n    transform: translateY(-8px);\n  }\n}\n@keyframes pulseGlow {\n  0%, 100% {\n    box-shadow: 0 0 0 0 rgba(91, 71, 251, 0.4);\n  }\n  50% {\n    box-shadow: 0 0 20px 3px rgba(91, 71, 251, 0.2);\n  }\n}\n.redirect-overlay-enter {\n  animation: overlayFadeIn 0.3s ease-out;\n}\n.redirect-overlay-content {\n  animation: overlayContentSlideUp 0.4s ease-out;\n}\n.redirect-logo-container {\n  animation: logoFloat 2s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;\n}\n.redirect-dots {\n  display: flex;\n  gap: 4px;\n  justify-content: center;\n  margin-bottom: 8px;\n}\n.redirect-dot {\n  width: 6px;\n  height: 6px;\n  background-color: #5B47FB;\n  border-radius: 50%;\n  opacity: 0.3;\n  animation: dotPulse 1s ease-in-out infinite;\n}\n.redirect-dot:nth-child(2) {\n  animation-delay: 0.2s;\n}\n.redirect-dot:nth-child(3) {\n  animation-delay: 0.4s;\n}\n@keyframes dotPulse {\n  0%, 100% {\n    opacity: 0.3;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 1;\n    transform: scale(1.2);\n  }\n}\n.az-logo {\n  font-weight: 700;\n  font-size: 28px;\n  font-family: Poppins, sans-serif;\n  text-transform: lowercase;\n  color: #5b47fb;\n  letter-spacing: -1px;\n  display: flex;\n  align-items: center;\n  position: relative;\n  top: -2px;\n}\n/*# sourceMappingURL=app.component.css.map */\n"], encapsulation: 2 });
+    }, dependencies: [NgIf], styles: ["/* projects/fasten-connect-stitch-element/src/app/app.component.scss */\n@keyframes scale {\n  0% {\n    transform: scale(0.8);\n    opacity: 0.7;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n.animate-scale {\n  animation: scale 0.3s ease forwards;\n}\n@keyframes shake {\n  10%, 90% {\n    transform: translateX(-1px);\n  }\n  20%, 80% {\n    transform: translateX(2px);\n  }\n  30%, 50%, 70% {\n    transform: translateX(-4px);\n  }\n  40%, 60% {\n    transform: translateX(4px);\n  }\n}\n.animate-shake {\n  animation: shake 0.3s;\n}\n@keyframes pulseFlow {\n  0%, 100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n.animate-pulse-flow {\n  animation: pulseFlow 2s ease-in-out infinite;\n}\n@keyframes bounce {\n  0%, 100% {\n    transform: translateY(-25%);\n  }\n  50% {\n    transform: none;\n  }\n}\n.animate-bounce {\n  animation: bounce 1s cubic-bezier(0.8, 0, 1, 1) infinite;\n}\n@keyframes successCircle {\n  0% {\n    transform: scale(0);\n    opacity: 0;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(1);\n    opacity: 1;\n  }\n}\n@keyframes successCheck {\n  0% {\n    stroke-dashoffset: 100;\n    opacity: 0;\n  }\n  60% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n  100% {\n    stroke-dashoffset: 0;\n    opacity: 1;\n  }\n}\n.success-circle {\n  animation: successCircle 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n}\n.success-check {\n  stroke-dasharray: 100;\n  stroke-dashoffset: 100;\n  animation: successCheck 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;\n  animation-delay: 0.3s;\n}\n.connect-btn {\n  transition: all 0.2s ease;\n}\n.connect-btn:hover {\n  transform: scale(1.05);\n}\n.connect-btn:active {\n  transform: scale(0.95);\n}\n.delay-100 {\n  animation-delay: 0s;\n}\n.delay-200 {\n  animation-delay: 0.4s;\n}\n.delay-300 {\n  animation-delay: 0.8s;\n}\n.step-view {\n  display: none;\n}\n.verification-input {\n  width: 2.5rem;\n  height: 2.5rem;\n  text-align: center;\n  border-radius: 0.5rem;\n  font-size: 1.125rem;\n  font-weight: 600;\n  border: 1px solid rgb(209, 213, 219);\n}\n.verification-input:focus {\n  outline: none;\n  border-color: #5B47FB;\n  box-shadow: 0 0 0 2px rgba(91, 71, 251, 0.2);\n}\n.verification-input.filled {\n  background-color: rgb(249, 250, 251);\n  border-color: #5B47FB;\n}\n.verification-input.error {\n  border-color: rgb(239, 68, 68);\n  animation: shake 0.3s;\n}\n.verification-button {\n  display: block;\n  width: 100%;\n  text-align: center;\n  color: #5B47FB;\n  font-weight: 500;\n  padding: 0.5rem;\n  border-radius: 0.375rem;\n  transition: color 0.2s;\n}\n.verification-button:hover {\n  color: #4936E8;\n  background-color: rgba(91, 71, 251, 0.05);\n}\n@keyframes overlayFadeIn {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n@keyframes overlayContentSlideUp {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n@keyframes logoFloat {\n  0%, 100% {\n    transform: translateY(0);\n  }\n  50% {\n    transform: translateY(-8px);\n  }\n}\n@keyframes pulseGlow {\n  0%, 100% {\n    box-shadow: 0 0 0 0 rgba(91, 71, 251, 0.4);\n  }\n  50% {\n    box-shadow: 0 0 20px 3px rgba(91, 71, 251, 0.2);\n  }\n}\n.redirect-overlay-enter {\n  animation: overlayFadeIn 0.3s ease-out;\n}\n.redirect-overlay-content {\n  animation: overlayContentSlideUp 0.4s ease-out;\n}\n.redirect-logo-container {\n  animation: logoFloat 2s ease-in-out infinite, pulseGlow 2s ease-in-out infinite;\n}\n.redirect-dots {\n  display: flex;\n  gap: 4px;\n  justify-content: center;\n  margin-bottom: 8px;\n}\n.redirect-dot {\n  width: 6px;\n  height: 6px;\n  background-color: #5B47FB;\n  border-radius: 50%;\n  opacity: 0.3;\n  animation: dotPulse 1s ease-in-out infinite;\n}\n.redirect-dot:nth-child(2) {\n  animation-delay: 0.2s;\n}\n.redirect-dot:nth-child(3) {\n  animation-delay: 0.4s;\n}\n@keyframes dotPulse {\n  0%, 100% {\n    opacity: 0.3;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 1;\n    transform: scale(1.2);\n  }\n}\n.az-logo {\n  font-weight: 700;\n  font-size: 28px;\n  font-family: Poppins, sans-serif;\n  text-transform: lowercase;\n  color: #5b47fb;\n  letter-spacing: -1px;\n  display: flex;\n  align-items: center;\n  position: relative;\n  top: -2px;\n}\n/*# sourceMappingURL=app.component.css.map */\n"], encapsulation: 2 });
   }
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 24 });
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 23 });
 })();
+
+// projects/fasten-connect-stitch-element/src/app/app.module.ts
+var AppModule = class _AppModule {
+  constructor(injector) {
+    const el = createCustomElement(AppComponent, { injector });
+    customElements.define("fasten-stitch-element", el);
+  }
+  ngDoBootstrap() {
+  }
+  static {
+    this.\u0275fac = function AppModule_Factory(__ngFactoryType__) {
+      return new (__ngFactoryType__ || _AppModule)(\u0275\u0275inject(Injector));
+    };
+  }
+  static {
+    this.\u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({ type: _AppModule, bootstrap: [AppComponent] });
+  }
+  static {
+    this.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({ imports: [BrowserModule] });
+  }
+};
 
 // projects/fasten-connect-stitch-element/src/main.ts
 if (environment.name != "local") {
   enableProdMode();
 }
-createApplication().then((app) => {
-  const FastenStitchElementButton = createCustomElement(AppComponent, { injector: app.injector });
-  customElements.define("fasten-stitch-element", FastenStitchElementButton);
-}).catch((err) => console.error(err));
+platformBrowser().bootstrapModule(AppModule).catch((err) => console.error(err));
 /*! Bundled license information:
 
 @angular/core/fesm2022/primitives/signals.mjs:
