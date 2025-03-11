@@ -1325,6 +1325,167 @@ var ReplaySubject = class extends Subject {
   }
 };
 
+// node_modules/rxjs/dist/esm/internal/scheduler/Action.js
+var Action = class extends Subscription {
+  constructor(scheduler2, work) {
+    super();
+  }
+  schedule(state, delay = 0) {
+    return this;
+  }
+};
+
+// node_modules/rxjs/dist/esm/internal/scheduler/intervalProvider.js
+var intervalProvider = {
+  setInterval(handler, timeout, ...args) {
+    const {
+      delegate
+    } = intervalProvider;
+    if (delegate === null || delegate === void 0 ? void 0 : delegate.setInterval) {
+      return delegate.setInterval(handler, timeout, ...args);
+    }
+    return setInterval(handler, timeout, ...args);
+  },
+  clearInterval(handle) {
+    const {
+      delegate
+    } = intervalProvider;
+    return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearInterval) || clearInterval)(handle);
+  },
+  delegate: void 0
+};
+
+// node_modules/rxjs/dist/esm/internal/scheduler/AsyncAction.js
+var AsyncAction = class extends Action {
+  constructor(scheduler2, work) {
+    super(scheduler2, work);
+    this.scheduler = scheduler2;
+    this.work = work;
+    this.pending = false;
+  }
+  schedule(state, delay = 0) {
+    var _a;
+    if (this.closed) {
+      return this;
+    }
+    this.state = state;
+    const id = this.id;
+    const scheduler2 = this.scheduler;
+    if (id != null) {
+      this.id = this.recycleAsyncId(scheduler2, id, delay);
+    }
+    this.pending = true;
+    this.delay = delay;
+    this.id = (_a = this.id) !== null && _a !== void 0 ? _a : this.requestAsyncId(scheduler2, this.id, delay);
+    return this;
+  }
+  requestAsyncId(scheduler2, _id, delay = 0) {
+    return intervalProvider.setInterval(scheduler2.flush.bind(scheduler2, this), delay);
+  }
+  recycleAsyncId(_scheduler, id, delay = 0) {
+    if (delay != null && this.delay === delay && this.pending === false) {
+      return id;
+    }
+    if (id != null) {
+      intervalProvider.clearInterval(id);
+    }
+    return void 0;
+  }
+  execute(state, delay) {
+    if (this.closed) {
+      return new Error("executing a cancelled action");
+    }
+    this.pending = false;
+    const error = this._execute(state, delay);
+    if (error) {
+      return error;
+    } else if (this.pending === false && this.id != null) {
+      this.id = this.recycleAsyncId(this.scheduler, this.id, null);
+    }
+  }
+  _execute(state, _delay) {
+    let errored = false;
+    let errorValue;
+    try {
+      this.work(state);
+    } catch (e) {
+      errored = true;
+      errorValue = e ? e : new Error("Scheduled action threw falsy error");
+    }
+    if (errored) {
+      this.unsubscribe();
+      return errorValue;
+    }
+  }
+  unsubscribe() {
+    if (!this.closed) {
+      const {
+        id,
+        scheduler: scheduler2
+      } = this;
+      const {
+        actions
+      } = scheduler2;
+      this.work = this.state = this.scheduler = null;
+      this.pending = false;
+      arrRemove(actions, this);
+      if (id != null) {
+        this.id = this.recycleAsyncId(scheduler2, id, null);
+      }
+      this.delay = null;
+      super.unsubscribe();
+    }
+  }
+};
+
+// node_modules/rxjs/dist/esm/internal/Scheduler.js
+var Scheduler = class _Scheduler {
+  constructor(schedulerActionCtor, now = _Scheduler.now) {
+    this.schedulerActionCtor = schedulerActionCtor;
+    this.now = now;
+  }
+  schedule(work, delay = 0, state) {
+    return new this.schedulerActionCtor(this, work).schedule(state, delay);
+  }
+};
+Scheduler.now = dateTimestampProvider.now;
+
+// node_modules/rxjs/dist/esm/internal/scheduler/AsyncScheduler.js
+var AsyncScheduler = class extends Scheduler {
+  constructor(SchedulerAction, now = Scheduler.now) {
+    super(SchedulerAction, now);
+    this.actions = [];
+    this._active = false;
+  }
+  flush(action) {
+    const {
+      actions
+    } = this;
+    if (this._active) {
+      actions.push(action);
+      return;
+    }
+    let error;
+    this._active = true;
+    do {
+      if (error = action.execute(action.state, action.delay)) {
+        break;
+      }
+    } while (action = actions.shift());
+    this._active = false;
+    if (error) {
+      while (action = actions.shift()) {
+        action.unsubscribe();
+      }
+      throw error;
+    }
+  }
+};
+
+// node_modules/rxjs/dist/esm/internal/scheduler/async.js
+var asyncScheduler = new AsyncScheduler(AsyncAction);
+var async = asyncScheduler;
+
 // node_modules/rxjs/dist/esm/internal/observable/empty.js
 var EMPTY = new Observable((subscriber) => subscriber.complete());
 
@@ -1762,6 +1923,23 @@ function of(...args) {
   return from(args, scheduler2);
 }
 
+// node_modules/rxjs/dist/esm/internal/observable/throwError.js
+function throwError(errorOrErrorFactory, scheduler2) {
+  const errorFactory = isFunction(errorOrErrorFactory) ? errorOrErrorFactory : () => errorOrErrorFactory;
+  const init = (subscriber) => subscriber.error(errorFactory());
+  return new Observable(scheduler2 ? (subscriber) => scheduler2.schedule(init, 0, subscriber) : init);
+}
+
+// node_modules/rxjs/dist/esm/internal/util/isObservable.js
+function isObservable(obj) {
+  return !!obj && (obj instanceof Observable || isFunction(obj.lift) && isFunction(obj.subscribe));
+}
+
+// node_modules/rxjs/dist/esm/internal/util/isDate.js
+function isValidDate(value) {
+  return value instanceof Date && !isNaN(value);
+}
+
 // node_modules/rxjs/dist/esm/internal/operators/map.js
 function map(project, thisArg) {
   return operate((source, subscriber) => {
@@ -1840,6 +2018,35 @@ function mergeAll(concurrent = Infinity) {
   return mergeMap(identity, concurrent);
 }
 
+// node_modules/rxjs/dist/esm/internal/observable/timer.js
+function timer(dueTime = 0, intervalOrScheduler, scheduler2 = async) {
+  let intervalDuration = -1;
+  if (intervalOrScheduler != null) {
+    if (isScheduler(intervalOrScheduler)) {
+      scheduler2 = intervalOrScheduler;
+    } else {
+      intervalDuration = intervalOrScheduler;
+    }
+  }
+  return new Observable((subscriber) => {
+    let due = isValidDate(dueTime) ? +dueTime - scheduler2.now() : dueTime;
+    if (due < 0) {
+      due = 0;
+    }
+    let n = 0;
+    return scheduler2.schedule(function() {
+      if (!subscriber.closed) {
+        subscriber.next(n++);
+        if (0 <= intervalDuration) {
+          this.schedule(void 0, intervalDuration);
+        } else {
+          subscriber.complete();
+        }
+      }
+    }, due);
+  });
+}
+
 // node_modules/rxjs/dist/esm/internal/observable/merge.js
 function merge(...args) {
   const scheduler2 = popScheduler(args);
@@ -1856,9 +2063,48 @@ function filter(predicate, thisArg) {
   });
 }
 
+// node_modules/rxjs/dist/esm/internal/operators/catchError.js
+function catchError(selector) {
+  return operate((source, subscriber) => {
+    let innerSub = null;
+    let syncUnsub = false;
+    let handledResult;
+    innerSub = source.subscribe(createOperatorSubscriber(subscriber, void 0, void 0, (err) => {
+      handledResult = innerFrom(selector(err, catchError(selector)(source)));
+      if (innerSub) {
+        innerSub.unsubscribe();
+        innerSub = null;
+        handledResult.subscribe(subscriber);
+      } else {
+        syncUnsub = true;
+      }
+    }));
+    if (syncUnsub) {
+      innerSub.unsubscribe();
+      innerSub = null;
+      handledResult.subscribe(subscriber);
+    }
+  });
+}
+
 // node_modules/rxjs/dist/esm/internal/operators/concatMap.js
 function concatMap(project, resultSelector) {
   return isFunction(resultSelector) ? mergeMap(project, resultSelector, 1) : mergeMap(project, 1);
+}
+
+// node_modules/rxjs/dist/esm/internal/operators/take.js
+function take(count) {
+  return count <= 0 ? () => EMPTY : operate((source, subscriber) => {
+    let seen = 0;
+    source.subscribe(createOperatorSubscriber(subscriber, (value) => {
+      if (++seen <= count) {
+        subscriber.next(value);
+        if (count <= seen) {
+          subscriber.complete();
+        }
+      }
+    }));
+  });
 }
 
 // node_modules/rxjs/dist/esm/internal/operators/finalize.js
@@ -1869,6 +2115,170 @@ function finalize(callback) {
     } finally {
       subscriber.add(callback);
     }
+  });
+}
+
+// node_modules/rxjs/dist/esm/internal/operators/retry.js
+function retry(configOrCount = Infinity) {
+  let config2;
+  if (configOrCount && typeof configOrCount === "object") {
+    config2 = configOrCount;
+  } else {
+    config2 = {
+      count: configOrCount
+    };
+  }
+  const {
+    count = Infinity,
+    delay,
+    resetOnSuccess = false
+  } = config2;
+  return count <= 0 ? identity : operate((source, subscriber) => {
+    let soFar = 0;
+    let innerSub;
+    const subscribeForRetry = () => {
+      let syncUnsub = false;
+      innerSub = source.subscribe(createOperatorSubscriber(subscriber, (value) => {
+        if (resetOnSuccess) {
+          soFar = 0;
+        }
+        subscriber.next(value);
+      }, void 0, (err) => {
+        if (soFar++ < count) {
+          const resub = () => {
+            if (innerSub) {
+              innerSub.unsubscribe();
+              innerSub = null;
+              subscribeForRetry();
+            } else {
+              syncUnsub = true;
+            }
+          };
+          if (delay != null) {
+            const notifier = typeof delay === "number" ? timer(delay) : innerFrom(delay(err, soFar));
+            const notifierSubscriber = createOperatorSubscriber(subscriber, () => {
+              notifierSubscriber.unsubscribe();
+              resub();
+            }, () => {
+              subscriber.complete();
+            });
+            notifier.subscribe(notifierSubscriber);
+          } else {
+            resub();
+          }
+        } else {
+          subscriber.error(err);
+        }
+      }));
+      if (syncUnsub) {
+        innerSub.unsubscribe();
+        innerSub = null;
+        subscribeForRetry();
+      }
+    };
+    subscribeForRetry();
+  });
+}
+
+// node_modules/rxjs/dist/esm/internal/operators/share.js
+function share(options = {}) {
+  const {
+    connector = () => new Subject(),
+    resetOnError = true,
+    resetOnComplete = true,
+    resetOnRefCountZero = true
+  } = options;
+  return (wrapperSource) => {
+    let connection;
+    let resetConnection;
+    let subject;
+    let refCount = 0;
+    let hasCompleted = false;
+    let hasErrored = false;
+    const cancelReset = () => {
+      resetConnection === null || resetConnection === void 0 ? void 0 : resetConnection.unsubscribe();
+      resetConnection = void 0;
+    };
+    const reset = () => {
+      cancelReset();
+      connection = subject = void 0;
+      hasCompleted = hasErrored = false;
+    };
+    const resetAndUnsubscribe = () => {
+      const conn = connection;
+      reset();
+      conn === null || conn === void 0 ? void 0 : conn.unsubscribe();
+    };
+    return operate((source, subscriber) => {
+      refCount++;
+      if (!hasErrored && !hasCompleted) {
+        cancelReset();
+      }
+      const dest = subject = subject !== null && subject !== void 0 ? subject : connector();
+      subscriber.add(() => {
+        refCount--;
+        if (refCount === 0 && !hasErrored && !hasCompleted) {
+          resetConnection = handleReset(resetAndUnsubscribe, resetOnRefCountZero);
+        }
+      });
+      dest.subscribe(subscriber);
+      if (!connection && refCount > 0) {
+        connection = new SafeSubscriber({
+          next: (value) => dest.next(value),
+          error: (err) => {
+            hasErrored = true;
+            cancelReset();
+            resetConnection = handleReset(reset, resetOnError, err);
+            dest.error(err);
+          },
+          complete: () => {
+            hasCompleted = true;
+            cancelReset();
+            resetConnection = handleReset(reset, resetOnComplete);
+            dest.complete();
+          }
+        });
+        innerFrom(source).subscribe(connection);
+      }
+    })(wrapperSource);
+  };
+}
+function handleReset(reset, on, ...args) {
+  if (on === true) {
+    reset();
+    return;
+  }
+  if (on === false) {
+    return;
+  }
+  const onSubscriber = new SafeSubscriber({
+    next: () => {
+      onSubscriber.unsubscribe();
+      reset();
+    }
+  });
+  return on(...args).subscribe(onSubscriber);
+}
+
+// node_modules/rxjs/dist/esm/internal/operators/shareReplay.js
+function shareReplay(configOrBufferSize, windowTime, scheduler2) {
+  let bufferSize;
+  let refCount = false;
+  if (configOrBufferSize && typeof configOrBufferSize === "object") {
+    ({
+      bufferSize = Infinity,
+      windowTime = Infinity,
+      refCount = false,
+      scheduler: scheduler2
+    } = configOrBufferSize);
+  } else {
+    bufferSize = configOrBufferSize !== null && configOrBufferSize !== void 0 ? configOrBufferSize : Infinity;
+  }
+  return share({
+    connector: () => new ReplaySubject(bufferSize, windowTime, scheduler2),
+    resetOnError: true,
+    resetOnComplete: false,
+    resetOnRefCountZero: refCount
   });
 }
 
@@ -2160,7 +2570,7 @@ function isForwardRef(fn) {
 }
 function assertNumber(actual, msg) {
   if (!(typeof actual === "number")) {
-    throwError(msg, typeof actual, "number", "===");
+    throwError2(msg, typeof actual, "number", "===");
   }
 }
 function assertNumberInRange(actual, minInclusive, maxInclusive) {
@@ -2170,86 +2580,86 @@ function assertNumberInRange(actual, minInclusive, maxInclusive) {
 }
 function assertString(actual, msg) {
   if (!(typeof actual === "string")) {
-    throwError(msg, actual === null ? "null" : typeof actual, "string", "===");
+    throwError2(msg, actual === null ? "null" : typeof actual, "string", "===");
   }
 }
 function assertFunction(actual, msg) {
   if (!(typeof actual === "function")) {
-    throwError(msg, actual === null ? "null" : typeof actual, "function", "===");
+    throwError2(msg, actual === null ? "null" : typeof actual, "function", "===");
   }
 }
 function assertEqual(actual, expected, msg) {
   if (!(actual == expected)) {
-    throwError(msg, actual, expected, "==");
+    throwError2(msg, actual, expected, "==");
   }
 }
 function assertNotEqual(actual, expected, msg) {
   if (!(actual != expected)) {
-    throwError(msg, actual, expected, "!=");
+    throwError2(msg, actual, expected, "!=");
   }
 }
 function assertSame(actual, expected, msg) {
   if (!(actual === expected)) {
-    throwError(msg, actual, expected, "===");
+    throwError2(msg, actual, expected, "===");
   }
 }
 function assertNotSame(actual, expected, msg) {
   if (!(actual !== expected)) {
-    throwError(msg, actual, expected, "!==");
+    throwError2(msg, actual, expected, "!==");
   }
 }
 function assertLessThan(actual, expected, msg) {
   if (!(actual < expected)) {
-    throwError(msg, actual, expected, "<");
+    throwError2(msg, actual, expected, "<");
   }
 }
 function assertLessThanOrEqual(actual, expected, msg) {
   if (!(actual <= expected)) {
-    throwError(msg, actual, expected, "<=");
+    throwError2(msg, actual, expected, "<=");
   }
 }
 function assertGreaterThan(actual, expected, msg) {
   if (!(actual > expected)) {
-    throwError(msg, actual, expected, ">");
+    throwError2(msg, actual, expected, ">");
   }
 }
 function assertGreaterThanOrEqual(actual, expected, msg) {
   if (!(actual >= expected)) {
-    throwError(msg, actual, expected, ">=");
+    throwError2(msg, actual, expected, ">=");
   }
 }
 function assertDefined(actual, msg) {
   if (actual == null) {
-    throwError(msg, actual, null, "!=");
+    throwError2(msg, actual, null, "!=");
   }
 }
-function throwError(msg, actual, expected, comparison) {
+function throwError2(msg, actual, expected, comparison) {
   throw new Error(`ASSERTION ERROR: ${msg}` + (comparison == null ? "" : ` [Expected=> ${expected} ${comparison} ${actual} <=Actual]`));
 }
 function assertDomNode(node) {
   if (!(node instanceof Node)) {
-    throwError(`The provided value must be an instance of a DOM Node but got ${stringify(node)}`);
+    throwError2(`The provided value must be an instance of a DOM Node but got ${stringify(node)}`);
   }
 }
 function assertElement(node) {
   if (!(node instanceof Element)) {
-    throwError(`The provided value must be an element but got ${stringify(node)}`);
+    throwError2(`The provided value must be an element but got ${stringify(node)}`);
   }
 }
 function assertIndexInRange(arr, index) {
   assertDefined(arr, "Array must be defined.");
   const maxLen = arr.length;
   if (index < 0 || index >= maxLen) {
-    throwError(`Index expected to be less than ${maxLen} but got ${index}`);
+    throwError2(`Index expected to be less than ${maxLen} but got ${index}`);
   }
 }
 function assertOneOf(value, ...validValues) {
   if (validValues.indexOf(value) !== -1) return true;
-  throwError(`Expected value to be one of ${JSON.stringify(validValues)} but was ${JSON.stringify(value)}.`);
+  throwError2(`Expected value to be one of ${JSON.stringify(validValues)} but was ${JSON.stringify(value)}.`);
 }
 function assertNotReactive(fn) {
   if (getActiveConsumer() !== null) {
-    throwError(`${fn}() should never be called in a reactive context.`);
+    throwError2(`${fn}() should never be called in a reactive context.`);
   }
 }
 function \u0275\u0275defineInjectable(opts) {
@@ -2334,28 +2744,28 @@ var InjectionToken = class {
 };
 var _injectorProfilerContext;
 function getInjectorProfilerContext() {
-  !ngDevMode && throwError("getInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError2("getInjectorProfilerContext should never be called in production mode");
   return _injectorProfilerContext;
 }
 function setInjectorProfilerContext(context2) {
-  !ngDevMode && throwError("setInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError2("setInjectorProfilerContext should never be called in production mode");
   const previous = _injectorProfilerContext;
   _injectorProfilerContext = context2;
   return previous;
 }
 var injectorProfilerCallback = null;
 var setInjectorProfiler = (injectorProfiler2) => {
-  !ngDevMode && throwError("setInjectorProfiler should never be called in production mode");
+  !ngDevMode && throwError2("setInjectorProfiler should never be called in production mode");
   injectorProfilerCallback = injectorProfiler2;
 };
 function injectorProfiler(event) {
-  !ngDevMode && throwError("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
   if (injectorProfilerCallback != null) {
     injectorProfilerCallback(event);
   }
 }
 function emitProviderConfiguredEvent(eventProvider, isViewProvider = false) {
-  !ngDevMode && throwError("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
   let token;
   if (typeof eventProvider === "function") {
     token = eventProvider;
@@ -2379,7 +2789,7 @@ function emitProviderConfiguredEvent(eventProvider, isViewProvider = false) {
   });
 }
 function emitInstanceCreatedByInjectorEvent(instance) {
-  !ngDevMode && throwError("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
   injectorProfiler({
     type: 1,
     context: getInjectorProfilerContext(),
@@ -2389,7 +2799,7 @@ function emitInstanceCreatedByInjectorEvent(instance) {
   });
 }
 function emitInjectEvent(token, value, flags) {
-  !ngDevMode && throwError("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
   injectorProfiler({
     type: 0,
     context: getInjectorProfilerContext(),
@@ -2401,7 +2811,7 @@ function emitInjectEvent(token, value, flags) {
   });
 }
 function emitEffectCreatedEvent(effect2) {
-  !ngDevMode && throwError("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
   injectorProfiler({
     type: 3,
     context: getInjectorProfilerContext(),
@@ -2409,7 +2819,7 @@ function emitEffectCreatedEvent(effect2) {
   });
 }
 function runInInjectorProfilerContext(injector, token, callback) {
-  !ngDevMode && throwError("runInInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError2("runInInjectorProfilerContext should never be called in production mode");
   const prevInjectContext = setInjectorProfilerContext({
     injector,
     token
@@ -3690,28 +4100,28 @@ function assertTNodeForTView(tNode, tView) {
       return;
     }
   }
-  throwError("This TNode does not belong to this TView.");
+  throwError2("This TNode does not belong to this TView.");
 }
 function assertTNode(tNode) {
   assertDefined(tNode, "TNode must be defined");
   if (!(tNode && typeof tNode === "object" && tNode.hasOwnProperty("directiveStylingLast"))) {
-    throwError("Not of type TNode, got: " + tNode);
+    throwError2("Not of type TNode, got: " + tNode);
   }
 }
 function assertTIcu(tIcu) {
   assertDefined(tIcu, "Expected TIcu to be defined");
   if (!(typeof tIcu.currentCaseLViewIndex === "number")) {
-    throwError("Object is not of TIcu type.");
+    throwError2("Object is not of TIcu type.");
   }
 }
 function assertComponentType(actual, msg = "Type passed in is not ComponentType, it does not have '\u0275cmp' property.") {
   if (!getComponentDef(actual)) {
-    throwError(msg);
+    throwError2(msg);
   }
 }
 function assertNgModuleType(actual, msg = "Type passed in is not NgModuleType, it does not have '\u0275mod' property.") {
   if (!getNgModuleDef(actual)) {
-    throwError(msg);
+    throwError2(msg);
   }
 }
 function assertHasParent(tNode) {
@@ -3737,7 +4147,7 @@ function assertFirstUpdatePass(tView, errMessage) {
 }
 function assertDirectiveDef(obj) {
   if (obj.type === void 0 || obj.selectors == void 0 || obj.inputs === void 0) {
-    throwError(`Expected a DirectiveDef/ComponentDef and this object does not seem to have the expected shape.`);
+    throwError2(`Expected a DirectiveDef/ComponentDef and this object does not seem to have the expected shape.`);
   }
 }
 function assertIndexInDeclRange(tView, index) {
@@ -3749,7 +4159,7 @@ function assertIndexInExpandoRange(lView, index) {
 }
 function assertBetween(lower, upper, index) {
   if (!(lower <= index && index < upper)) {
-    throwError(`Index out of range (expecting ${lower} <= ${index} < ${upper})`);
+    throwError2(`Index out of range (expecting ${lower} <= ${index} < ${upper})`);
   }
 }
 function assertProjectionSlots(lView, errMessage) {
@@ -4093,15 +4503,15 @@ function getContextLView() {
   return contextLView;
 }
 function isInCheckNoChangesMode() {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   return _checkNoChangesMode !== CheckNoChangesMode.Off;
 }
 function isExhaustiveCheckNoChanges() {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   return _checkNoChangesMode === CheckNoChangesMode.Exhaustive;
 }
 function setIsInCheckNoChangesMode(mode) {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   _checkNoChangesMode = mode;
 }
 function isRefreshingViews() {
@@ -4548,12 +4958,12 @@ function hasStyleInput(tNode) {
 function assertTNodeType(tNode, expectedTypes, message) {
   assertDefined(tNode, "should be called with a TNode");
   if ((tNode.type & expectedTypes) === 0) {
-    throwError(message || `Expected [${toTNodeTypeAsString(expectedTypes)}] but got ${toTNodeTypeAsString(tNode.type)}.`);
+    throwError2(message || `Expected [${toTNodeTypeAsString(expectedTypes)}] but got ${toTNodeTypeAsString(tNode.type)}.`);
   }
 }
 function assertPureTNodeType(type) {
   if (!(type === 2 || type === 1 || type === 4 || type === 8 || type === 32 || type === 16 || type === 64 || type === 128)) {
-    throwError(`Expected TNodeType to have only a single type selected, but got ${toTNodeTypeAsString(type)}.`);
+    throwError2(`Expected TNodeType to have only a single type selected, but got ${toTNodeTypeAsString(type)}.`);
   }
 }
 function setUpAttributes(renderer, native, attrs) {
@@ -7142,7 +7552,7 @@ function getTemplateIndexForState(newState, hostLView, tNode) {
     case DeferBlockState.Placeholder:
       return tDetails.placeholderTmplIndex;
     default:
-      ngDevMode && throwError(`Unexpected defer block state: ${newState}`);
+      ngDevMode && throwError2(`Unexpected defer block state: ${newState}`);
       return null;
   }
 }
@@ -8055,19 +8465,19 @@ function reportUnknownPropertyError(message) {
   }
 }
 function getDeclarationComponentDef(lView) {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   const declarationLView = lView[DECLARATION_COMPONENT_VIEW];
   const context2 = declarationLView[CONTEXT];
   if (!context2) return null;
   return context2.constructor ? getComponentDef(context2.constructor) : null;
 }
 function isHostComponentStandalone(lView) {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   const componentDef = getDeclarationComponentDef(lView);
   return !!componentDef?.standalone;
 }
 function getTemplateLocationDetails(lView) {
-  !ngDevMode && throwError("Must never be called in production mode");
+  !ngDevMode && throwError2("Must never be called in production mode");
   const hostComponentDef = getDeclarationComponentDef(lView);
   const componentClassName = hostComponentDef?.type?.name;
   return componentClassName ? ` (used in the '${componentClassName}' component template)` : "";
@@ -10787,7 +11197,7 @@ function getTIcu(tView, index) {
   const value = tView.data[index];
   if (value === null || typeof value === "string") return null;
   if (ngDevMode && !(value.hasOwnProperty("tView") || value.hasOwnProperty("currentCaseLViewIndex"))) {
-    throwError("We expect to get 'null'|'TIcu'|'TIcuContainer', but got: " + value);
+    throwError2("We expect to get 'null'|'TIcu'|'TIcuContainer', but got: " + value);
   }
   const tIcu = value.hasOwnProperty("currentCaseLViewIndex") ? value : value.value;
   ngDevMode && assertTIcu(tIcu);
@@ -11982,7 +12392,7 @@ var R3ViewContainerRef = class ViewContainerRef2 extends VE_ViewContainerRef {
       }
       const options = indexOrOptions || {};
       if (ngDevMode && options.environmentInjector && options.ngModuleRef) {
-        throwError(`Cannot pass both environmentInjector and ngModuleRef options to createComponent().`);
+        throwError2(`Cannot pass both environmentInjector and ngModuleRef options to createComponent().`);
       }
       index = options.index;
       injector = options.injector;
@@ -12363,7 +12773,7 @@ function createSpecialToken(lView, tNode, read) {
     );
     return createContainerRef(tNode, lView);
   } else {
-    ngDevMode && throwError(`Special token to read should be one of ElementRef, TemplateRef or ViewContainerRef but got ${stringify(read)}.`);
+    ngDevMode && throwError2(`Special token to read should be one of ElementRef, TemplateRef or ViewContainerRef but got ${stringify(read)}.`);
   }
 }
 function materializeViewResults(tView, lView, tQuery, queryIndex) {
@@ -14021,7 +14431,7 @@ function handleInjectorProfilerEvent(injectorProfilerEvent) {
 function handleEffectCreatedEvent(context2, effect2) {
   const diResolver = getDIResolver(context2.injector);
   if (diResolver === null) {
-    throwError("An EffectCreated event must be run within an injection context.");
+    throwError2("An EffectCreated event must be run within an injection context.");
   }
   const {
     resolverToEffects
@@ -14034,7 +14444,7 @@ function handleEffectCreatedEvent(context2, effect2) {
 function handleInjectEvent(context2, data) {
   const diResolver = getDIResolver(context2.injector);
   if (diResolver === null) {
-    throwError("An Inject event must be run within an injection context.");
+    throwError2("An Inject event must be run within an injection context.");
   }
   const diResolverToInstantiatedToken = frameworkDIDebugData.resolverToTokenToDependencies;
   if (!diResolverToInstantiatedToken.has(diResolver)) {
@@ -14072,7 +14482,7 @@ function handleInjectEvent(context2, data) {
 }
 function getNodeInjectorContext(injector) {
   if (!(injector instanceof NodeInjector)) {
-    throwError("getNodeInjectorContext must be called with a NodeInjector");
+    throwError2("getNodeInjectorContext must be called with a NodeInjector");
   }
   const lView = getNodeInjectorLView(injector);
   const tNode = getNodeInjectorTNode(injector);
@@ -14090,7 +14500,7 @@ function handleInstanceCreatedByInjectorEvent(context2, data) {
     value
   } = data;
   if (getDIResolver(context2.injector) === null) {
-    throwError("An InjectorCreatedInstance event must be run within an injection context.");
+    throwError2("An InjectorCreatedInstance event must be run within an injection context.");
   }
   let standaloneComponent = void 0;
   if (typeof value === "object") {
@@ -14128,7 +14538,7 @@ function handleProviderConfiguredEvent(context2, data) {
     diResolver = context2.injector;
   }
   if (diResolver === null) {
-    throwError("A ProviderConfigured event must be run within an injection context.");
+    throwError2("A ProviderConfigured event must be run within an injection context.");
   }
   if (!resolverToProviders.has(diResolver)) {
     resolverToProviders.set(diResolver, []);
@@ -14456,7 +14866,7 @@ function getInjectorProviders(injector) {
   } else if (injector instanceof EnvironmentInjector) {
     return getEnvironmentInjectorProviders(injector);
   }
-  throwError("getInjectorProviders only supports NodeInjector and EnvironmentInjector");
+  throwError2("getInjectorProviders only supports NodeInjector and EnvironmentInjector");
 }
 function getInjectorMetadata(injector) {
   if (injector instanceof NodeInjector) {
@@ -14495,7 +14905,7 @@ function getInjectorResolutionPathHelper(injector, resolutionPath) {
       if (firstInjector instanceof NodeInjector) {
         const moduleInjector = getModuleInjectorOfNodeInjector(firstInjector);
         if (moduleInjector === null) {
-          throwError("NodeInjector must have some connection to the module injector tree");
+          throwError2("NodeInjector must have some connection to the module injector tree");
         }
         resolutionPath.push(moduleInjector);
         getInjectorResolutionPathHelper(moduleInjector, resolutionPath);
@@ -14526,7 +14936,7 @@ function getInjectorParent(injector) {
   } else if (injector instanceof ChainedInjector) {
     return injector.parentInjector;
   } else {
-    throwError("getInjectorParent only support injectors of type R3Injector, NodeInjector, NullInjector");
+    throwError2("getInjectorParent only support injectors of type R3Injector, NodeInjector, NullInjector");
   }
   const parentLocation = getParentInjectorLocation(tNode, lView);
   if (hasParentInjector(parentLocation)) {
@@ -14552,12 +14962,12 @@ function getModuleInjectorOfNodeInjector(injector) {
   if (injector instanceof NodeInjector) {
     lView = getNodeInjectorLView(injector);
   } else {
-    throwError("getModuleInjectorOfNodeInjector must be called with a NodeInjector");
+    throwError2("getModuleInjectorOfNodeInjector must be called with a NodeInjector");
   }
   const inj = lView[INJECTOR];
   const moduleInjector = inj instanceof ChainedInjector ? inj.parentInjector : inj.parent;
   if (!moduleInjector) {
-    throwError("NodeInjector must have some connection to the module injector tree");
+    throwError2("NodeInjector must have some connection to the module injector tree");
   }
   return moduleInjector;
 }
@@ -14646,7 +15056,7 @@ function extractSignalNodesAndEdgesFromRoots(nodes, signalDependenciesMap = /* @
 function getSignalGraph(injector) {
   let templateConsumer = null;
   if (!(injector instanceof NodeInjector) && !(injector instanceof R3Injector)) {
-    return throwError("getSignalGraph must be called with a NodeInjector or R3Injector");
+    return throwError2("getSignalGraph must be called with a NodeInjector or R3Injector");
   }
   if (injector instanceof NodeInjector) {
     templateConsumer = getTemplateConsumer(injector);
@@ -15672,7 +16082,7 @@ function triggerDeferBlock(triggerType, lView, tNode) {
       break;
     default:
       if (ngDevMode) {
-        throwError("Unknown defer block state");
+        throwError2("Unknown defer block state");
       }
   }
 }
@@ -16710,7 +17120,7 @@ function consumeQuotedText(text, quoteCharCode, startIndex, endIndex) {
 }
 function malformedStyleError(text, expecting, index) {
   ngDevMode && assertEqual(typeof text === "string", true, "String expected here");
-  throw throwError(`Malformed style at location ${index} in string '` + text.substring(0, index) + "[>>" + text.substring(index, index + 1) + "<<]" + text.slice(index + 1) + `'. Expecting '${expecting}'.`);
+  throw throwError2(`Malformed style at location ${index} in string '` + text.substring(0, index) + "[>>" + text.substring(index, index + 1) + "<<]" + text.slice(index + 1) + `'. Expecting '${expecting}'.`);
 }
 function \u0275\u0275property(propName, value, sanitizer) {
   const lView = getLView();
@@ -16916,7 +17326,7 @@ function toStylingKeyValueArray(keyValueArraySet2, stringParser, value) {
   } else if (typeof unwrappedValue === "string") {
     stringParser(styleKeyValueArray, unwrappedValue);
   } else {
-    ngDevMode && throwError("Unsupported styling type " + typeof unwrappedValue + ": " + unwrappedValue);
+    ngDevMode && throwError2("Unsupported styling type " + typeof unwrappedValue + ": " + unwrappedValue);
   }
   return styleKeyValueArray;
 }
@@ -17981,7 +18391,7 @@ function applyMutableOpCodes(tView, mutableOpCodes, lView, anchorRNode) {
           }
           break;
         default:
-          ngDevMode && throwError(`Unable to determine the type of mutate operation for "${opCode}"`);
+          ngDevMode && throwError2(`Unable to determine the type of mutate operation for "${opCode}"`);
       }
     }
   }
@@ -26524,8 +26934,8 @@ function invalidPipeArgumentError(type, value) {
   return new RuntimeError(2100, ngDevMode && `InvalidPipeArgument: '${value}' for pipe '${stringify(type)}'`);
 }
 var SubscribableStrategy = class {
-  createSubscription(async, updateLatestValue) {
-    return untracked(() => async.subscribe({
+  createSubscription(async2, updateLatestValue) {
+    return untracked(() => async2.subscribe({
       next: updateLatestValue,
       error: (e) => {
         throw e;
@@ -26537,8 +26947,8 @@ var SubscribableStrategy = class {
   }
 };
 var PromiseStrategy = class {
-  createSubscription(async, updateLatestValue) {
-    return async.then(updateLatestValue, (e) => {
+  createSubscription(async2, updateLatestValue) {
+    return async2.then(updateLatestValue, (e) => {
       throw e;
     });
   }
@@ -26601,8 +27011,8 @@ var AsyncPipe = class _AsyncPipe {
     this._subscription = null;
     this._obj = null;
   }
-  _updateLatestValue(async, value) {
-    if (async === this._obj) {
+  _updateLatestValue(async2, value) {
+    if (async2 === this._obj) {
       this._latestValue = value;
       if (this.markForCheckOnValueUpdate) {
         this._ref?.markForCheck();
@@ -32610,6 +33020,1074 @@ function createCustomElement(component, config2) {
 }
 var VERSION4 = new Version("19.2.1");
 
+// node_modules/vlq/dist/vlq.es.js
+var charToInteger = {};
+var integerToChar = {};
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".split("").forEach(function(char, i) {
+  charToInteger[char] = i;
+  integerToChar[i] = char;
+});
+function decode(string) {
+  var result = [];
+  var shift = 0;
+  var value = 0;
+  for (var i = 0; i < string.length; i += 1) {
+    var integer = charToInteger[string[i]];
+    if (integer === void 0) {
+      throw new Error("Invalid character (" + string[i] + ")");
+    }
+    var hasContinuationBit = integer & 32;
+    integer &= 31;
+    value += integer << shift;
+    if (hasContinuationBit) {
+      shift += 5;
+    } else {
+      var shouldNegate = value & 1;
+      value >>>= 1;
+      if (shouldNegate) {
+        result.push(value === 0 ? -2147483648 : -value);
+      } else {
+        result.push(value);
+      }
+      value = shift = 0;
+    }
+  }
+  return result;
+}
+
+// node_modules/ngx-logger/fesm2020/ngx-logger.mjs
+var TOKEN_LOGGER_CONFIG = "TOKEN_LOGGER_CONFIG";
+var NGXLoggerConfigEngine = class {
+  constructor(config2) {
+    this.config = this._clone(config2);
+  }
+  /** Get a readonly access to the level configured for the NGXLogger */
+  get level() {
+    return this.config.level;
+  }
+  /** Get a readonly access to the serverLogLevel configured for the NGXLogger */
+  get serverLogLevel() {
+    return this.config.serverLogLevel;
+  }
+  updateConfig(config2) {
+    this.config = this._clone(config2);
+  }
+  /** Update the config partially
+   * This is useful if you want to update only one parameter of the config
+   */
+  partialUpdateConfig(partialConfig) {
+    if (!partialConfig) {
+      return;
+    }
+    Object.keys(partialConfig).forEach((configParamKey) => {
+      this.config[configParamKey] = partialConfig[configParamKey];
+    });
+  }
+  getConfig() {
+    return this._clone(this.config);
+  }
+  // TODO: This is a shallow clone, If the config ever becomes hierarchical we must make this a deep clone
+  _clone(object) {
+    const cloneConfig = {
+      level: null
+    };
+    Object.keys(object).forEach((key) => {
+      cloneConfig[key] = object[key];
+    });
+    return cloneConfig;
+  }
+};
+var TOKEN_LOGGER_CONFIG_ENGINE_FACTORY = "TOKEN_LOGGER_CONFIG_ENGINE_FACTORY";
+var NGXLoggerConfigEngineFactory = class {
+  provideConfigEngine(config2) {
+    return new NGXLoggerConfigEngine(config2);
+  }
+};
+var TOKEN_LOGGER_MAPPER_SERVICE = "TOKEN_LOGGER_MAPPER_SERVICE";
+var NGXLoggerMapperService = class {
+  constructor(httpBackend) {
+    this.httpBackend = httpBackend;
+    this.sourceMapCache = /* @__PURE__ */ new Map();
+    this.logPositionCache = /* @__PURE__ */ new Map();
+  }
+  /**
+   * Returns the log position of the caller
+   * If sourceMaps are enabled, it attemps to get the source map from the server, and use that to parse the position
+   * @param config
+   * @param metadata
+   * @returns
+   */
+  getLogPosition(config2, metadata) {
+    const stackLine = this.getStackLine(config2);
+    if (!stackLine) {
+      return of({
+        fileName: "",
+        lineNumber: 0,
+        columnNumber: 0
+      });
+    }
+    const logPosition = this.getLocalPosition(stackLine);
+    if (!config2.enableSourceMaps) {
+      return of(logPosition);
+    }
+    const sourceMapLocation = this.getSourceMapLocation(stackLine);
+    return this.getSourceMap(sourceMapLocation, logPosition);
+  }
+  /**
+   * Get the stackline of the original caller
+   * @param config
+   * @returns null if stackline was not found
+   */
+  getStackLine(config2) {
+    const error = new Error();
+    try {
+      throw error;
+    } catch (e) {
+      try {
+        let defaultProxy = 4;
+        const firstStackLine = error.stack.split("\n")[0];
+        if (!firstStackLine.includes(".js:")) {
+          defaultProxy = defaultProxy + 1;
+        }
+        return error.stack.split("\n")[defaultProxy + (config2.proxiedSteps || 0)];
+      } catch (e2) {
+        return null;
+      }
+    }
+  }
+  /**
+   * Get position of caller without using sourceMaps
+   * @param stackLine
+   * @returns
+   */
+  getLocalPosition(stackLine) {
+    const positionStartIndex = stackLine.lastIndexOf("/");
+    let positionEndIndex = stackLine.indexOf(")");
+    if (positionEndIndex < 0) {
+      positionEndIndex = void 0;
+    }
+    const position = stackLine.substring(positionStartIndex + 1, positionEndIndex);
+    const dataArray = position.split(":");
+    if (dataArray.length === 3) {
+      return {
+        fileName: dataArray[0],
+        lineNumber: +dataArray[1],
+        columnNumber: +dataArray[2]
+      };
+    }
+    return {
+      fileName: "unknown",
+      lineNumber: 0,
+      columnNumber: 0
+    };
+  }
+  getTranspileLocation(stackLine) {
+    let locationStartIndex = stackLine.indexOf("(");
+    if (locationStartIndex < 0) {
+      locationStartIndex = stackLine.lastIndexOf("@");
+      if (locationStartIndex < 0) {
+        locationStartIndex = stackLine.lastIndexOf(" ");
+      }
+    }
+    let locationEndIndex = stackLine.indexOf(")");
+    if (locationEndIndex < 0) {
+      locationEndIndex = void 0;
+    }
+    return stackLine.substring(locationStartIndex + 1, locationEndIndex);
+  }
+  /**
+   * Gets the URL of the sourcemap (the URL can be relative or absolute, it is browser dependant)
+   * @param stackLine
+   * @returns
+   */
+  getSourceMapLocation(stackLine) {
+    const file = this.getTranspileLocation(stackLine);
+    const mapFullPath = file.substring(0, file.lastIndexOf(":"));
+    return mapFullPath.substring(0, mapFullPath.lastIndexOf(":")) + ".map";
+  }
+  getMapping(sourceMap, position) {
+    let sourceFileIndex = 0, sourceCodeLine = 0, sourceCodeColumn = 0;
+    const lines = sourceMap.mappings.split(";");
+    for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+      let generatedCodeColumn = 0;
+      const columns = lines[lineIndex].split(",");
+      for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+        const decodedSection = decode(columns[columnIndex]);
+        if (decodedSection.length >= 4) {
+          generatedCodeColumn += decodedSection[0];
+          sourceFileIndex += decodedSection[1];
+          sourceCodeLine += decodedSection[2];
+          sourceCodeColumn += decodedSection[3];
+        }
+        if (lineIndex === position.lineNumber) {
+          if (generatedCodeColumn === position.columnNumber) {
+            return {
+              fileName: sourceMap.sources[sourceFileIndex],
+              lineNumber: sourceCodeLine,
+              columnNumber: sourceCodeColumn
+            };
+          } else if (columnIndex + 1 === columns.length) {
+            return {
+              fileName: sourceMap.sources[sourceFileIndex],
+              lineNumber: sourceCodeLine,
+              columnNumber: 0
+            };
+          }
+        }
+      }
+    }
+    return {
+      fileName: "unknown",
+      lineNumber: 0,
+      columnNumber: 0
+    };
+  }
+  /**
+   * does the http get request to get the source map
+   * @param sourceMapLocation
+   * @param distPosition
+   */
+  getSourceMap(sourceMapLocation, distPosition) {
+    const req = new HttpRequest("GET", sourceMapLocation);
+    const distPositionKey = `${distPosition.fileName}:${distPosition.lineNumber}:${distPosition.columnNumber}`;
+    if (this.logPositionCache.has(distPositionKey)) {
+      return this.logPositionCache.get(distPositionKey);
+    }
+    if (!this.sourceMapCache.has(sourceMapLocation)) {
+      if (!this.httpBackend) {
+        console.error("NGXLogger : Can't get sourcemap because HttpBackend is not provided. You need to import HttpClientModule");
+        this.sourceMapCache.set(sourceMapLocation, of(null));
+      } else {
+        this.sourceMapCache.set(sourceMapLocation, this.httpBackend.handle(req).pipe(filter((e) => e instanceof HttpResponse), map((httpResponse) => httpResponse.body), retry(3), shareReplay(1)));
+      }
+    }
+    const logPosition$ = this.sourceMapCache.get(sourceMapLocation).pipe(map((sourceMap) => {
+      if (!sourceMap) {
+        return distPosition;
+      }
+      return this.getMapping(sourceMap, distPosition);
+    }), catchError(() => of(distPosition)), shareReplay(1));
+    this.logPositionCache.set(distPositionKey, logPosition$);
+    return logPosition$;
+  }
+};
+NGXLoggerMapperService.\u0275fac = function NGXLoggerMapperService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLoggerMapperService)(\u0275\u0275inject(HttpBackend, 8));
+};
+NGXLoggerMapperService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLoggerMapperService,
+  factory: NGXLoggerMapperService.\u0275fac
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLoggerMapperService, [{
+    type: Injectable
+  }], function() {
+    return [{
+      type: HttpBackend,
+      decorators: [{
+        type: Optional
+      }]
+    }];
+  }, null);
+})();
+var TOKEN_LOGGER_METADATA_SERVICE = "TOKEN_LOGGER_METADATA_SERVICE";
+var NGXLoggerMetadataService = class {
+  constructor(datePipe) {
+    this.datePipe = datePipe;
+  }
+  computeTimestamp(config2) {
+    const defaultTimestamp = () => (/* @__PURE__ */ new Date()).toISOString();
+    if (config2.timestampFormat) {
+      if (!this.datePipe) {
+        console.error("NGXLogger : Can't use timeStampFormat because DatePipe is not provided. You need to provide DatePipe");
+        return defaultTimestamp();
+      } else {
+        return this.datePipe.transform(/* @__PURE__ */ new Date(), config2.timestampFormat);
+      }
+    }
+    return defaultTimestamp();
+  }
+  getMetadata(level, config2, message, additional) {
+    const metadata = {
+      level,
+      additional
+    };
+    if (message && typeof message === "function") {
+      metadata.message = message();
+    } else {
+      metadata.message = message;
+    }
+    metadata.timestamp = this.computeTimestamp(config2);
+    return metadata;
+  }
+};
+NGXLoggerMetadataService.\u0275fac = function NGXLoggerMetadataService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLoggerMetadataService)(\u0275\u0275inject(DatePipe, 8));
+};
+NGXLoggerMetadataService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLoggerMetadataService,
+  factory: NGXLoggerMetadataService.\u0275fac
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLoggerMetadataService, [{
+    type: Injectable
+  }], function() {
+    return [{
+      type: DatePipe,
+      decorators: [{
+        type: Optional
+      }]
+    }];
+  }, null);
+})();
+var TOKEN_LOGGER_RULES_SERVICE = "TOKEN_LOGGER_RULES_SERVICE";
+var NGXLoggerRulesService = class {
+  shouldCallWriter(level, config2, message, additional) {
+    return !config2.disableConsoleLogging && level >= config2.level;
+  }
+  shouldCallServer(level, config2, message, additional) {
+    return !!config2.serverLoggingUrl && level >= config2.serverLogLevel;
+  }
+  shouldCallMonitor(level, config2, message, additional) {
+    return this.shouldCallWriter(level, config2, message, additional) || this.shouldCallServer(level, config2, message, additional);
+  }
+};
+NGXLoggerRulesService.\u0275fac = function NGXLoggerRulesService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLoggerRulesService)();
+};
+NGXLoggerRulesService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLoggerRulesService,
+  factory: NGXLoggerRulesService.\u0275fac
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLoggerRulesService, [{
+    type: Injectable
+  }], null, null);
+})();
+var TOKEN_LOGGER_SERVER_SERVICE = "TOKEN_LOGGER_SERVER_SERVICE";
+var NGXLoggerServerService = class {
+  constructor(httpBackend, ngZone) {
+    this.httpBackend = httpBackend;
+    this.ngZone = ngZone;
+    this.serverCallsQueue = [];
+    this.flushingQueue = new BehaviorSubject(false);
+  }
+  ngOnDestroy() {
+    if (this.flushingQueue) {
+      this.flushingQueue.complete();
+      this.flushingQueue = null;
+    }
+    if (this.addToQueueTimer) {
+      this.addToQueueTimer.unsubscribe();
+      this.addToQueueTimer = null;
+    }
+  }
+  /**
+   * Transforms an error object into a readable string (taking only the stack)
+   * This is needed because JSON.stringify would return "{}"
+   * @param err the error object
+   * @returns The stack of the error
+   */
+  secureErrorObject(err) {
+    return err?.stack;
+  }
+  /**
+   * Transforms the additional parameters to avoid any json error when sending the data to the server
+   * Basically it just replaces unstringifiable object to a string mentioning an error
+   * @param additional The additional data to be sent
+   * @returns The additional data secured
+   */
+  secureAdditionalParameters(additional) {
+    if (additional === null || additional === void 0) {
+      return null;
+    }
+    return additional.map((next, idx) => {
+      try {
+        if (next instanceof Error) {
+          return this.secureErrorObject(next);
+        }
+        if (typeof next === "object") {
+          JSON.stringify(next);
+        }
+        return next;
+      } catch (e) {
+        return `The additional[${idx}] value could not be parsed using JSON.stringify().`;
+      }
+    });
+  }
+  /**
+   * Transforms the message so that it can be sent to the server
+   * @param message the message to be sent
+   * @returns the message secured
+   */
+  secureMessage(message) {
+    try {
+      if (message instanceof Error) {
+        return this.secureErrorObject(message);
+      }
+      if (typeof message !== "string") {
+        message = JSON.stringify(message, null, 2);
+      }
+    } catch (e) {
+      message = 'The provided "message" value could not be parsed with JSON.stringify().';
+    }
+    return message;
+  }
+  /**
+   * Edits HttpRequest object before sending request to server
+   * @param httpRequest default request object
+   * @returns altered httprequest
+   */
+  alterHttpRequest(httpRequest) {
+    return httpRequest;
+  }
+  /**
+   * Sends request to server
+   * @param url
+   * @param logContent
+   * @param options
+   * @returns
+   */
+  logOnServer(url, logContent, options) {
+    if (!this.httpBackend) {
+      console.error("NGXLogger : Can't log on server because HttpBackend is not provided. You need to import HttpClientModule");
+      return of(null);
+    }
+    let defaultRequest = new HttpRequest("POST", url, logContent, options || {});
+    let finalRequest = of(defaultRequest);
+    const alteredRequest = this.alterHttpRequest(defaultRequest);
+    if (isObservable(alteredRequest)) {
+      finalRequest = alteredRequest;
+    } else if (alteredRequest) {
+      finalRequest = of(alteredRequest);
+    } else {
+      console.warn("NGXLogger : alterHttpRequest returned an invalid request. Using default one instead");
+    }
+    return finalRequest.pipe(concatMap((req) => {
+      if (!req) {
+        console.warn("NGXLogger : alterHttpRequest returned an invalid request (observable). Using default one instead");
+        return this.httpBackend.handle(defaultRequest);
+      }
+      return this.httpBackend.handle(req);
+    }), filter((e) => e instanceof HttpResponse), map((httpResponse) => httpResponse.body));
+  }
+  /**
+   * Customise the data sent to the API
+   * @param metadata the data provided by NGXLogger
+   * @returns the data that will be sent to the API in the body
+   */
+  customiseRequestBody(metadata) {
+    return metadata;
+  }
+  /**
+   * Flush the queue of the logger
+   * @param config
+   */
+  flushQueue(config2) {
+    this.flushingQueue.next(true);
+    if (this.addToQueueTimer) {
+      this.addToQueueTimer.unsubscribe();
+      this.addToQueueTimer = null;
+    }
+    if (!!this.serverCallsQueue && this.serverCallsQueue.length > 0) {
+      this.sendToServerAction(this.serverCallsQueue, config2);
+    }
+    this.serverCallsQueue = [];
+    this.flushingQueue.next(false);
+  }
+  sendToServerAction(metadata, config2) {
+    let requestBody;
+    const secureMetadata = (pMetadata) => {
+      const securedMetadata = __spreadValues({}, pMetadata);
+      securedMetadata.additional = this.secureAdditionalParameters(securedMetadata.additional);
+      securedMetadata.message = this.secureMessage(securedMetadata.message);
+      return securedMetadata;
+    };
+    if (Array.isArray(metadata)) {
+      requestBody = [];
+      metadata.forEach((m) => {
+        requestBody.push(secureMetadata(m));
+      });
+    } else {
+      requestBody = secureMetadata(metadata);
+    }
+    requestBody = this.customiseRequestBody(requestBody);
+    const headers = config2.customHttpHeaders || new HttpHeaders();
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+    const logOnServerAction = () => {
+      this.logOnServer(config2.serverLoggingUrl, requestBody, {
+        headers,
+        params: config2.customHttpParams || new HttpParams(),
+        responseType: config2.httpResponseType || "json",
+        withCredentials: config2.withCredentials || false
+      }).pipe(catchError((err) => {
+        console.error("NGXLogger: Failed to log on server", err);
+        return throwError(err);
+      })).subscribe();
+    };
+    if (config2.serverCallsOutsideNgZone === true) {
+      if (!this.ngZone) {
+        console.error("NGXLogger: NgZone is not provided and serverCallsOutsideNgZone is set to true");
+        return;
+      }
+      this.ngZone.runOutsideAngular(logOnServerAction);
+    } else {
+      logOnServerAction();
+    }
+  }
+  /**
+   * Sends the content to be logged to the server according to the config
+   * @param metadata
+   * @param config
+   */
+  sendToServer(metadata, config2) {
+    if ((!config2.serverCallsBatchSize || config2.serverCallsBatchSize <= 0) && (!config2.serverCallsTimer || config2.serverCallsTimer <= 0)) {
+      this.sendToServerAction(metadata, config2);
+      return;
+    }
+    const addLogToQueueAction = () => {
+      this.serverCallsQueue.push(__spreadValues({}, metadata));
+      if (!!config2.serverCallsBatchSize && this.serverCallsQueue.length > config2.serverCallsBatchSize) {
+        this.flushQueue(config2);
+      }
+      if (config2.serverCallsTimer > 0 && !this.addToQueueTimer) {
+        this.addToQueueTimer = timer(config2.serverCallsTimer).subscribe((_) => {
+          this.flushQueue(config2);
+        });
+      }
+    };
+    if (this.flushingQueue.value === true) {
+      this.flushingQueue.pipe(filter((fq) => fq === false), take(1)).subscribe((_) => {
+        addLogToQueueAction();
+      });
+    } else {
+      addLogToQueueAction();
+    }
+  }
+};
+NGXLoggerServerService.\u0275fac = function NGXLoggerServerService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLoggerServerService)(\u0275\u0275inject(HttpBackend, 8), \u0275\u0275inject(NgZone, 8));
+};
+NGXLoggerServerService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLoggerServerService,
+  factory: NGXLoggerServerService.\u0275fac
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLoggerServerService, [{
+    type: Injectable
+  }], function() {
+    return [{
+      type: HttpBackend,
+      decorators: [{
+        type: Optional
+      }]
+    }, {
+      type: NgZone,
+      decorators: [{
+        type: Optional
+      }]
+    }];
+  }, null);
+})();
+var TOKEN_LOGGER_WRITER_SERVICE = "TOKEN_LOGGER_WRITER_SERVICE";
+var NgxLoggerLevel;
+(function(NgxLoggerLevel2) {
+  NgxLoggerLevel2[NgxLoggerLevel2["TRACE"] = 0] = "TRACE";
+  NgxLoggerLevel2[NgxLoggerLevel2["DEBUG"] = 1] = "DEBUG";
+  NgxLoggerLevel2[NgxLoggerLevel2["INFO"] = 2] = "INFO";
+  NgxLoggerLevel2[NgxLoggerLevel2["LOG"] = 3] = "LOG";
+  NgxLoggerLevel2[NgxLoggerLevel2["WARN"] = 4] = "WARN";
+  NgxLoggerLevel2[NgxLoggerLevel2["ERROR"] = 5] = "ERROR";
+  NgxLoggerLevel2[NgxLoggerLevel2["FATAL"] = 6] = "FATAL";
+  NgxLoggerLevel2[NgxLoggerLevel2["OFF"] = 7] = "OFF";
+})(NgxLoggerLevel || (NgxLoggerLevel = {}));
+var DEFAULT_COLOR_SCHEME = ["purple", "teal", "gray", "gray", "red", "red", "red"];
+var NGXLoggerWriterService = class {
+  constructor(platformId) {
+    this.platformId = platformId;
+    this.prepareMetaStringFuncs = [this.getTimestampToWrite, this.getLevelToWrite, this.getFileDetailsToWrite, this.getContextToWrite];
+    this.isIE = isPlatformBrowser(platformId) && navigator && navigator.userAgent && !!(navigator.userAgent.indexOf("MSIE") !== -1 || navigator.userAgent.match(/Trident\//) || navigator.userAgent.match(/Edge\//));
+    this.logFunc = this.isIE ? this.logIE.bind(this) : this.logModern.bind(this);
+  }
+  getTimestampToWrite(metadata, config2) {
+    return metadata.timestamp;
+  }
+  getLevelToWrite(metadata, config2) {
+    return NgxLoggerLevel[metadata.level];
+  }
+  getFileDetailsToWrite(metadata, config2) {
+    return config2.disableFileDetails === true ? "" : `[${metadata.fileName}:${metadata.lineNumber}:${metadata.columnNumber}]`;
+  }
+  getContextToWrite(metadata, config2) {
+    return config2.context ? `{${config2.context}}` : "";
+  }
+  /** Generate a "meta" string that is displayed before the content sent to the log function */
+  prepareMetaString(metadata, config2) {
+    let metaString = "";
+    this.prepareMetaStringFuncs.forEach((prepareMetaStringFunc) => {
+      const metaItem = prepareMetaStringFunc(metadata, config2);
+      if (metaItem) {
+        metaString = metaString + " " + metaItem;
+      }
+    });
+    return metaString.trim();
+  }
+  /** Get the color to use when writing to console */
+  getColor(metadata, config2) {
+    const configColorScheme = config2.colorScheme ?? DEFAULT_COLOR_SCHEME;
+    if (metadata.level === NgxLoggerLevel.OFF) {
+      return void 0;
+    }
+    return configColorScheme[metadata.level];
+  }
+  /** Log to the console specifically for IE */
+  logIE(metadata, config2, metaString) {
+    const additional = metadata.additional || [];
+    switch (metadata.level) {
+      case NgxLoggerLevel.WARN:
+        console.warn(`${metaString} `, metadata.message, ...additional);
+        break;
+      case NgxLoggerLevel.ERROR:
+      case NgxLoggerLevel.FATAL:
+        console.error(`${metaString} `, metadata.message, ...additional);
+        break;
+      case NgxLoggerLevel.INFO:
+        console.info(`${metaString} `, metadata.message, ...additional);
+        break;
+      default:
+        console.log(`${metaString} `, metadata.message, ...additional);
+    }
+  }
+  /** Log to the console */
+  logModern(metadata, config2, metaString) {
+    const color = this.getColor(metadata, config2);
+    const additional = metadata.additional || [];
+    switch (metadata.level) {
+      case NgxLoggerLevel.WARN:
+        console.warn(`%c${metaString}`, `color:${color}`, metadata.message, ...additional);
+        break;
+      case NgxLoggerLevel.ERROR:
+      case NgxLoggerLevel.FATAL:
+        console.error(`%c${metaString}`, `color:${color}`, metadata.message, ...additional);
+        break;
+      case NgxLoggerLevel.INFO:
+        console.info(`%c${metaString}`, `color:${color}`, metadata.message, ...additional);
+        break;
+      //  Disabling console.trace since the stack trace is not helpful. it is showing the stack trace of
+      // the console.trace statement
+      // case NgxLoggerLevel.TRACE:
+      //   console.trace(`%c${metaString}`, `color:${color}`, message, ...additional);
+      //   break;
+      case NgxLoggerLevel.DEBUG:
+        console.debug(`%c${metaString}`, `color:${color}`, metadata.message, ...additional);
+        break;
+      default:
+        console.log(`%c${metaString}`, `color:${color}`, metadata.message, ...additional);
+    }
+  }
+  /** Write the content sent to the log function to the console */
+  writeMessage(metadata, config2) {
+    const metaString = this.prepareMetaString(metadata, config2);
+    this.logFunc(metadata, config2, metaString);
+  }
+};
+NGXLoggerWriterService.\u0275fac = function NGXLoggerWriterService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLoggerWriterService)(\u0275\u0275inject(PLATFORM_ID));
+};
+NGXLoggerWriterService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLoggerWriterService,
+  factory: NGXLoggerWriterService.\u0275fac
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLoggerWriterService, [{
+    type: Injectable
+  }], function() {
+    return [{
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [PLATFORM_ID]
+      }]
+    }];
+  }, null);
+})();
+var NGXLogger = class {
+  constructor(config2, configEngineFactory, metadataService, ruleService, mapperService, writerService, serverService) {
+    this.metadataService = metadataService;
+    this.ruleService = ruleService;
+    this.mapperService = mapperService;
+    this.writerService = writerService;
+    this.serverService = serverService;
+    this.configEngine = configEngineFactory.provideConfigEngine(config2);
+  }
+  /** Get a readonly access to the level configured for the NGXLogger */
+  get level() {
+    return this.configEngine.level;
+  }
+  /** Get a readonly access to the serverLogLevel configured for the NGXLogger */
+  get serverLogLevel() {
+    return this.configEngine.serverLogLevel;
+  }
+  trace(message, ...additional) {
+    this._log(NgxLoggerLevel.TRACE, message, additional);
+  }
+  debug(message, ...additional) {
+    this._log(NgxLoggerLevel.DEBUG, message, additional);
+  }
+  info(message, ...additional) {
+    this._log(NgxLoggerLevel.INFO, message, additional);
+  }
+  log(message, ...additional) {
+    this._log(NgxLoggerLevel.LOG, message, additional);
+  }
+  warn(message, ...additional) {
+    this._log(NgxLoggerLevel.WARN, message, additional);
+  }
+  error(message, ...additional) {
+    this._log(NgxLoggerLevel.ERROR, message, additional);
+  }
+  fatal(message, ...additional) {
+    this._log(NgxLoggerLevel.FATAL, message, additional);
+  }
+  /** @deprecated customHttpHeaders is now part of the config, this should be updated via @see updateConfig */
+  setCustomHttpHeaders(headers) {
+    const config2 = this.getConfigSnapshot();
+    config2.customHttpHeaders = headers;
+    this.updateConfig(config2);
+  }
+  /** @deprecated customHttpParams is now part of the config, this should be updated via @see updateConfig */
+  setCustomParams(params) {
+    const config2 = this.getConfigSnapshot();
+    config2.customHttpParams = params;
+    this.updateConfig(config2);
+  }
+  /** @deprecated withCredentials is now part of the config, this should be updated via @see updateConfig */
+  setWithCredentialsOptionValue(withCredentials) {
+    const config2 = this.getConfigSnapshot();
+    config2.withCredentials = withCredentials;
+    this.updateConfig(config2);
+  }
+  /**
+   * Register a INGXLoggerMonitor that will be trigger when a log is either written or sent to server
+   *
+   * There is only one monitor, registering one will overwrite the last one if there was one
+   * @param monitor
+   */
+  registerMonitor(monitor) {
+    this._loggerMonitor = monitor;
+  }
+  /** Set config of logger
+   *
+   * Warning : This overwrites all the config, if you want to update only one property, you should use @see getConfigSnapshot before
+   */
+  updateConfig(config2) {
+    this.configEngine.updateConfig(config2);
+  }
+  partialUpdateConfig(partialConfig) {
+    this.configEngine.partialUpdateConfig(partialConfig);
+  }
+  /** Get config of logger */
+  getConfigSnapshot() {
+    return this.configEngine.getConfig();
+  }
+  /**
+   * Flush the serveur queue
+   */
+  flushServerQueue() {
+    this.serverService.flushQueue(this.getConfigSnapshot());
+  }
+  _log(level, message, additional = []) {
+    const config2 = this.configEngine.getConfig();
+    const shouldCallWriter = this.ruleService.shouldCallWriter(level, config2, message, additional);
+    const shouldCallServer = this.ruleService.shouldCallServer(level, config2, message, additional);
+    const shouldCallMonitor = this.ruleService.shouldCallMonitor(level, config2, message, additional);
+    if (!shouldCallWriter && !shouldCallServer && !shouldCallMonitor) {
+      return;
+    }
+    const metadata = this.metadataService.getMetadata(level, config2, message, additional);
+    this.mapperService.getLogPosition(config2, metadata).pipe(take(1)).subscribe((logPosition) => {
+      if (logPosition) {
+        metadata.fileName = logPosition.fileName;
+        metadata.lineNumber = logPosition.lineNumber;
+        metadata.columnNumber = logPosition.columnNumber;
+      }
+      if (shouldCallMonitor && this._loggerMonitor) {
+        this._loggerMonitor.onLog(metadata, config2);
+      }
+      if (shouldCallWriter) {
+        this.writerService.writeMessage(metadata, config2);
+      }
+      if (shouldCallServer) {
+        this.serverService.sendToServer(metadata, config2);
+      }
+    });
+  }
+};
+NGXLogger.\u0275fac = function NGXLogger_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || NGXLogger)(\u0275\u0275inject(TOKEN_LOGGER_CONFIG), \u0275\u0275inject(TOKEN_LOGGER_CONFIG_ENGINE_FACTORY), \u0275\u0275inject(TOKEN_LOGGER_METADATA_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_RULES_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_MAPPER_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_WRITER_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_SERVER_SERVICE));
+};
+NGXLogger.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: NGXLogger,
+  factory: NGXLogger.\u0275fac,
+  providedIn: "root"
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NGXLogger, [{
+    type: Injectable,
+    args: [{
+      providedIn: "root"
+    }]
+  }], function() {
+    return [{
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_CONFIG]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_CONFIG_ENGINE_FACTORY]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_METADATA_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_RULES_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_MAPPER_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_WRITER_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_SERVER_SERVICE]
+      }]
+    }];
+  }, null);
+})();
+var CustomNGXLoggerService = class {
+  constructor(logger, configEngineFactory, metadataService, ruleService, mapperService, writerService, serverService) {
+    this.logger = logger;
+    this.configEngineFactory = configEngineFactory;
+    this.metadataService = metadataService;
+    this.ruleService = ruleService;
+    this.mapperService = mapperService;
+    this.writerService = writerService;
+    this.serverService = serverService;
+  }
+  /**
+   * Create an instance of a logger
+   * @deprecated this function does not have all the features, @see getNewInstance for every params available
+   * @param config
+   * @param serverService
+   * @param logMonitor
+   * @param mapperService
+   * @returns
+   */
+  create(config2, serverService, logMonitor, mapperService) {
+    return this.getNewInstance({
+      config: config2,
+      serverService,
+      logMonitor,
+      mapperService
+    });
+  }
+  /**
+   * Get a new instance of NGXLogger
+   * @param params list of optional params to use when creating an instance of NGXLogger
+   * @returns the new instance of NGXLogger
+   */
+  getNewInstance(params) {
+    const logger = new NGXLogger(params?.config ?? this.logger.getConfigSnapshot(), params?.configEngineFactory ?? this.configEngineFactory, params?.metadataService ?? this.metadataService, params?.ruleService ?? this.ruleService, params?.mapperService ?? this.mapperService, params?.writerService ?? this.writerService, params?.serverService ?? this.serverService);
+    if (params?.partialConfig) {
+      logger.partialUpdateConfig(params.partialConfig);
+    }
+    if (params?.logMonitor) {
+      logger.registerMonitor(params.logMonitor);
+    }
+    return logger;
+  }
+};
+CustomNGXLoggerService.\u0275fac = function CustomNGXLoggerService_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || CustomNGXLoggerService)(\u0275\u0275inject(NGXLogger), \u0275\u0275inject(TOKEN_LOGGER_CONFIG_ENGINE_FACTORY), \u0275\u0275inject(TOKEN_LOGGER_METADATA_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_RULES_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_MAPPER_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_WRITER_SERVICE), \u0275\u0275inject(TOKEN_LOGGER_SERVER_SERVICE));
+};
+CustomNGXLoggerService.\u0275prov = /* @__PURE__ */ \u0275\u0275defineInjectable({
+  token: CustomNGXLoggerService,
+  factory: CustomNGXLoggerService.\u0275fac,
+  providedIn: "root"
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CustomNGXLoggerService, [{
+    type: Injectable,
+    args: [{
+      providedIn: "root"
+    }]
+  }], function() {
+    return [{
+      type: NGXLogger
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_CONFIG_ENGINE_FACTORY]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_METADATA_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_RULES_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_MAPPER_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_WRITER_SERVICE]
+      }]
+    }, {
+      type: void 0,
+      decorators: [{
+        type: Inject,
+        args: [TOKEN_LOGGER_SERVER_SERVICE]
+      }]
+    }];
+  }, null);
+})();
+var LoggerModule = class _LoggerModule {
+  static forRoot(config2, customProvider) {
+    if (!customProvider) {
+      customProvider = {};
+    }
+    if (!customProvider.configProvider) {
+      customProvider.configProvider = {
+        provide: TOKEN_LOGGER_CONFIG,
+        useValue: config2 || {}
+      };
+    } else {
+      if (customProvider.configProvider.provide !== TOKEN_LOGGER_CONFIG) {
+        throw new Error(`Wrong injection token for configProvider, it should be ${TOKEN_LOGGER_CONFIG} and you used ${customProvider.configProvider.provide}`);
+      }
+    }
+    if (!customProvider.configEngineFactoryProvider) {
+      customProvider.configEngineFactoryProvider = {
+        provide: TOKEN_LOGGER_CONFIG_ENGINE_FACTORY,
+        useClass: NGXLoggerConfigEngineFactory
+      };
+    } else {
+      if (customProvider.configEngineFactoryProvider.provide !== TOKEN_LOGGER_CONFIG_ENGINE_FACTORY) {
+        throw new Error(`Wrong injection token for configEngineFactoryProvider, it should be '${TOKEN_LOGGER_CONFIG_ENGINE_FACTORY}' and you used '${customProvider.configEngineFactoryProvider.provide}'`);
+      }
+    }
+    if (!customProvider.metadataProvider) {
+      customProvider.metadataProvider = {
+        provide: TOKEN_LOGGER_METADATA_SERVICE,
+        useClass: NGXLoggerMetadataService
+      };
+    } else {
+      if (customProvider.metadataProvider.provide !== TOKEN_LOGGER_METADATA_SERVICE) {
+        throw new Error(`Wrong injection token for metadataProvider, it should be '${TOKEN_LOGGER_METADATA_SERVICE}' and you used '${customProvider.metadataProvider.provide}'`);
+      }
+    }
+    if (!customProvider.ruleProvider) {
+      customProvider.ruleProvider = {
+        provide: TOKEN_LOGGER_RULES_SERVICE,
+        useClass: NGXLoggerRulesService
+      };
+    } else {
+      if (customProvider.ruleProvider.provide !== TOKEN_LOGGER_RULES_SERVICE) {
+        throw new Error(`Wrong injection token for ruleProvider, it should be '${TOKEN_LOGGER_RULES_SERVICE}' and you used '${customProvider.ruleProvider.provide}'`);
+      }
+    }
+    if (!customProvider.mapperProvider) {
+      customProvider.mapperProvider = {
+        provide: TOKEN_LOGGER_MAPPER_SERVICE,
+        useClass: NGXLoggerMapperService
+      };
+    } else {
+      if (customProvider.mapperProvider.provide !== TOKEN_LOGGER_MAPPER_SERVICE) {
+        throw new Error(`Wrong injection token for mapperProvider, it should be '${TOKEN_LOGGER_MAPPER_SERVICE}' and you used '${customProvider.mapperProvider.provide}'`);
+      }
+    }
+    if (!customProvider.writerProvider) {
+      customProvider.writerProvider = {
+        provide: TOKEN_LOGGER_WRITER_SERVICE,
+        useClass: NGXLoggerWriterService
+      };
+    } else {
+      if (customProvider.writerProvider.provide !== TOKEN_LOGGER_WRITER_SERVICE) {
+        throw new Error(`Wrong injection token for writerProvider, it should be '${TOKEN_LOGGER_WRITER_SERVICE}' and you used '${customProvider.writerProvider.provide}'`);
+      }
+    }
+    if (!customProvider.serverProvider) {
+      customProvider.serverProvider = {
+        provide: TOKEN_LOGGER_SERVER_SERVICE,
+        useClass: NGXLoggerServerService
+      };
+    } else {
+      if (customProvider.serverProvider.provide !== TOKEN_LOGGER_SERVER_SERVICE) {
+        throw new Error(`Wrong injection token for serverProvider, it should be '${TOKEN_LOGGER_SERVER_SERVICE}' and you used '${customProvider.writerProvider.provide}'`);
+      }
+    }
+    return {
+      ngModule: _LoggerModule,
+      providers: [NGXLogger, customProvider.configProvider, customProvider.configEngineFactoryProvider, customProvider.metadataProvider, customProvider.ruleProvider, customProvider.mapperProvider, customProvider.writerProvider, customProvider.serverProvider, CustomNGXLoggerService]
+    };
+  }
+  static forChild() {
+    return {
+      ngModule: _LoggerModule
+    };
+  }
+};
+LoggerModule.\u0275fac = function LoggerModule_Factory(__ngFactoryType__) {
+  return new (__ngFactoryType__ || LoggerModule)();
+};
+LoggerModule.\u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({
+  type: LoggerModule
+});
+LoggerModule.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({
+  imports: [[CommonModule]]
+});
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(LoggerModule, [{
+    type: NgModule,
+    args: [{
+      imports: [CommonModule]
+    }]
+  }], null, null);
+})();
+
 // projects/fasten-connect-stitch-element/src/app/app.component.ts
 var _c0 = ["stitchModalButton"];
 var _c1 = ["stitchModal"];
@@ -32623,8 +34101,9 @@ function AppComponent_span_5_Template(rf, ctx) {
   }
 }
 var AppComponent = class _AppComponent {
-  constructor(host) {
+  constructor(host, logger) {
     this.host = host;
+    this.logger = logger;
     this.publicId = "";
     this.externalId = "";
     this.reconnectOrgConnectionId = null;
@@ -32635,10 +34114,10 @@ var AppComponent = class _AppComponent {
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
   ngOnInit() {
-    console.log("ngOnInit", this.encodeOptionsAsQueryStringParameters());
+    this.logger.debug("ngOnInit", this.encodeOptionsAsQueryStringParameters());
   }
   ngOnChanges(changes) {
-    console.log("ngOnChanges", changes, this.encodeOptionsAsQueryStringParameters());
+    this.logger.debug("ngOnChanges", changes, this.encodeOptionsAsQueryStringParameters());
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //HELPERS
@@ -32663,7 +34142,7 @@ var AppComponent = class _AppComponent {
     return params.toString();
   }
   showStitchModal() {
-    console.log("showStitchModal", this.encodeOptionsAsQueryStringParameters());
+    this.logger.debug("showStitchModal", this.encodeOptionsAsQueryStringParameters());
     this.stitchIframeEmbed.nativeElement.src = environment.embed_endpoint_base + "?" + this.encodeOptionsAsQueryStringParameters();
     this.stitchModal.nativeElement.showModal();
     this.registerDialogCloseOnBackdropClick();
@@ -32691,12 +34170,12 @@ var AppComponent = class _AppComponent {
   // postMessage registration, listen to events from the child/iframe window
   receivePostMessage(event) {
     let payload = JSON.parse(event.data);
-    console.log("bubbling up event to listeners (messageBusCallback)", payload);
+    this.logger.debug("bubbling up event to listeners (messageBusCallback)", payload);
     this.messageBusCallback.emit(event);
   }
   static {
     this.\u0275fac = function AppComponent_Factory(__ngFactoryType__) {
-      return new (__ngFactoryType__ || _AppComponent)(\u0275\u0275directiveInject(ElementRef));
+      return new (__ngFactoryType__ || _AppComponent)(\u0275\u0275directiveInject(ElementRef), \u0275\u0275directiveInject(NGXLogger));
     };
   }
   static {
@@ -32745,7 +34224,7 @@ var AppComponent = class _AppComponent {
   }
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 23 });
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 24 });
 })();
 
 // projects/fasten-connect-stitch-element/src/app/app.module.ts
@@ -32765,7 +34244,13 @@ var AppModule = class _AppModule {
     this.\u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({ type: _AppModule });
   }
   static {
-    this.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({ imports: [BrowserModule] });
+    this.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({ imports: [
+      BrowserModule,
+      LoggerModule.forRoot({
+        level: NgxLoggerLevel.DEBUG,
+        context: "stitch-element"
+      })
+    ] });
   }
 };
 
