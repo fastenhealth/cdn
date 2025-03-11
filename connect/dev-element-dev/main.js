@@ -32635,6 +32635,7 @@ var AppComponent = class _AppComponent {
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
   ngOnInit() {
+    console.log("ngOnInit", this.encodeOptionsAsQueryStringParameters());
   }
   ngOnChanges(changes) {
     console.log("ngOnChanges", changes, this.encodeOptionsAsQueryStringParameters());
@@ -32761,7 +32762,7 @@ var AppModule = class _AppModule {
     };
   }
   static {
-    this.\u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({ type: _AppModule, bootstrap: [AppComponent] });
+    this.\u0275mod = /* @__PURE__ */ \u0275\u0275defineNgModule({ type: _AppModule });
   }
   static {
     this.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({ imports: [BrowserModule] });
