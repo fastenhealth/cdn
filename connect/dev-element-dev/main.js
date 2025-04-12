@@ -34107,7 +34107,7 @@ var AppComponent = class _AppComponent {
     this.publicId = "";
     this.externalId = "";
     this.reconnectOrgConnectionId = null;
-    this.anonymousVaultProfile = false;
+    this.searchOnly = false;
     this.staticBackdrop = false;
     this.messageBusCallback = new EventEmitter();
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
@@ -34133,8 +34133,8 @@ var AppComponent = class _AppComponent {
     if (this.reconnectOrgConnectionId) {
       params = params.set("reconnect-org-connection-id", this.reconnectOrgConnectionId);
     }
-    if (this.anonymousVaultProfile) {
-      params = params.set("anonymous-vault-profile", this.anonymousVaultProfile.toString());
+    if (this.searchOnly) {
+      params = params.set("search-only", this.searchOnly.toString());
     }
     if (this.staticBackdrop) {
       params = params.set("static-backdrop", this.staticBackdrop.toString());
@@ -34197,7 +34197,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], anonymousVaultProfile: [0, "anonymous-vault-profile", "anonymousVaultProfile"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"] }, outputs: { messageBusCallback: "messageBusCallback" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "border-none", "p-0", "backdrop:backdrop-blur", "w-full", "max-w-[440px]", "min-h-[600px]", "bg-white", "rounded-lg", "shadow-lg"], ["src", \u0275\u0275trustConstantResourceUrl`https://embed.connect-dev.fastenhealth.com`, 1, "border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], searchOnly: [0, "search-only", "searchOnly"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"] }, outputs: { messageBusCallback: "messageBusCallback" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "block", "text-white", "bg-blue-700", "hover:bg-blue-800", "focus:ring-4", "focus:outline-none", "focus:ring-blue-300", "font-medium", "rounded-lg", "text-sm", "px-5", "py-2.5", "text-center", "dark:bg-blue-600", "dark:hover:bg-blue-700", "dark:focus:ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "border-none", "p-0", "backdrop:backdrop-blur", "w-full", "max-w-[440px]", "min-h-[600px]", "bg-white", "rounded-lg", "shadow-lg"], ["src", \u0275\u0275trustConstantResourceUrl`https://embed.connect-dev.fastenhealth.com`, 1, "border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();

@@ -116,7 +116,7 @@
 <body x-data="pageData()">
 
 <nav class="z-100 flex shrink-0 grow-0 justify-around gap-4 border-t border-gray-200 bg-white/50 p-2.5 shadow-lg backdrop-blur-lg  fixed top-2/4 -translate-y-2/4 right-6 min-h-[auto] min-w-[64px] flex-col rounded-lg border">
-  <button @click="toggleAnonymousVaultProfile" :class="{ 'bg-indigo-50 text-indigo-600': anonymousVaultProfile, 'text-gray-700 hover:bg-gray-100': !anonymousVaultProfile }" class="flex aspect-square min-h-[32px] w-16 flex-col items-center justify-center gap-1 rounded-md p-1.5 ">
+  <button @click="toggleSearchOnly" :class="{ 'bg-indigo-50 text-indigo-600': searchOnly, 'text-gray-700 hover:bg-gray-100': !searchOnly }" class="flex aspect-square min-h-[32px] w-16 flex-col items-center justify-center gap-1 rounded-md p-1.5 ">
     <!-- HeroIcon - Search -->
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 shrink-0">
       <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
@@ -183,7 +183,7 @@
     </form>
     <p class="footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
   </div>
-  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :anonymous-vault-profile="anonymousVaultProfile" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId"></fasten-stitch-element>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId"></fasten-stitch-element>
 
 <!--  <fasten-stitch-element-->
 <!--    external-id="1235-123412-123123$^#*@(!"-->
@@ -211,7 +211,7 @@
 
   export function pageData() {
     return {
-      anonymousVaultProfile: false,
+      searchOnly: false,
       publicId: 'public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu',
       staticBackdrop: false,
       reconnectOrgConnectionId: "",
@@ -219,8 +219,8 @@
       toggleStaticBackdrop() {
         this.staticBackdrop = !this.staticBackdrop;
       },
-      toggleAnonymousVaultProfile() {
-        this.anonymousVaultProfile = !this.anonymousVaultProfile;
+      toggleSearchOnly() {
+        this.searchOnly = !this.searchOnly;
       },
       toggleReconnectOrgConnectionId() {
         this.reconnectOrgConnectionId = this.reconnectOrgConnectionId ? "" : "c2f0358c-f330-49ed-b32f-8018296873a2";
