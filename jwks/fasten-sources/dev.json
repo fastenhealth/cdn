@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+        "kty": "RSA",
+        "e": "AQAB",
+        "use": "sig",
+        "kid": "dev-1",
+        "alg": "RS512",
+        "n": "tB6o1AvkmVB_n92znRNTdH31WjmNCYCOWLW1E2-0O2boL1IPEgmZoWczgthcH_TipST1FkHemtJkO9TZ3vSCTg50HF4Zr0qePNw1prWqyrEJ3_GlR-1BaSOCGjoY9pOlAAz1S0EH4kqv3WHFKnLawQI3DvKxQ-BawU-zQUho3QCuQMeju3EABvuMZs9ubVX8VlSlkga6LqmXani8u8XohU5pMnVVRSD-X_1oxev7Ma3cBm_GSds5exjh6Nd5cmOLQ79cReHHNeL94vBdf0w7mqeGstYnMjlDDXUJDb64SpxBgMHNjFX30Bjqcc3zrrWviUt2vYPjcPsRFJDjKVP-mIMvrjMKBIbwUzcvWM-X-ZF3HR-T8gjxyZr6OSGZt1_PxPnhL6ZSEr5hyYIa_WdKjpcLoCh9XeBxrIw7D6neJhcAOSuiE1of91IgiyKaEecL3QJsC_hqf0FUaWi4UbeDrILiWWlglhWMYo1eeD4pQbCmC8TyQlHXtFUB-UuAZHgjg3grIU3VBPHN1BAoVmKp8FllHdqQwlDYPRRQ-s5iY57Ub9X_NCzRKrZleIw0hr91ioPkCKQakiCQPxjyuO4GC3innSz0jVaAnfFMUrVUVb68Cx28TwgAwg4AziPvMpWvz0fMMnzWsqbJPK-TsgttAQuM4kfd6l-T5T7FS5gxLUE"
+    }
+  ]
+}
