@@ -1031,7 +1031,14 @@ class FastenStitchComponent {
       this.errorMessage = 'Could not register Fasten Connect installation using id. Please contact the developer of this app.';
       console.log("Invalid Fasten Connect registration", err);
     });
+    this.orgConnectionCallback.emit({
+      error: "initializing-fasten-stitch"
+    });
     this.messageBus.orgConnectionCallbackSubject.subscribe(orgConnectionCallbackData => {
+      if (!orgConnectionCallbackData) {
+        console.warn("filter empty orgConnectionCallbackData");
+        return;
+      }
       console.log("bubbling up event", orgConnectionCallbackData);
       this.orgConnectionCallback.emit(orgConnectionCallbackData);
     });
