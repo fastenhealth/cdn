@@ -863,9 +863,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 2560);
 /* harmony import */ var flowbite__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! flowbite */ 8422);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../constants */ 4854);
-/* harmony import */ var _utils_connect_helper__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/connect-helper */ 7968);
-/* harmony import */ var _services_connect_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/connect.service */ 4543);
-/* harmony import */ var _services_message_bus_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/message-bus.service */ 5983);
+/* harmony import */ var _services_message_bus_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/message-bus.service */ 5983);
+/* harmony import */ var _utils_connect_helper__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/connect-helper */ 7968);
+/* harmony import */ var _services_connect_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/connect.service */ 4543);
+
 
 
 
@@ -1050,7 +1051,7 @@ class FastenStitchComponent {
       this.stitchModalButton.nativeElement.replaceChildren(childSpan); // Component needs to be added here
       this.connectApi.getOrgConnectionById(this.publicId, this.reconnectOrgConnectionId).subscribe(orgConnection => {
         console.log("Reconnect Org Connection", orgConnection);
-        (0,_utils_connect_helper__WEBPACK_IMPORTED_MODULE_2__.ConnectHelper)(this.connectApi, this.messageBus, {
+        (0,_utils_connect_helper__WEBPACK_IMPORTED_MODULE_3__.ConnectHelper)(this.connectApi, this.messageBus, {
           catalog_brand_id: orgConnection.catalog_brand_id,
           catalog_endpoint_id: orgConnection.catalog_endpoint_id,
           catalog_portal_id: orgConnection.catalog_portal_id,
@@ -1080,7 +1081,7 @@ class FastenStitchComponent {
   }
 }
 FastenStitchComponent.ɵfac = function FastenStitchComponent_Factory(t) {
-  return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_5__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_3__.ConnectService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_4__.MessageBusService));
+  return new (t || FastenStitchComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_angular_core__WEBPACK_IMPORTED_MODULE_5__.ElementRef), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_connect_service__WEBPACK_IMPORTED_MODULE_4__.ConnectService), _angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdirectiveInject"](_services_message_bus_service__WEBPACK_IMPORTED_MODULE_2__.MessageBusService));
 };
 FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵdefineComponent"]({
   type: FastenStitchComponent,
@@ -1107,6 +1108,7 @@ FastenStitchComponent.ɵcmp = /*@__PURE__*/_angular_core__WEBPACK_IMPORTED_MODUL
   outputs: {
     orgConnectionCallback: "orgConnectionCallback"
   },
+  features: [_angular_core__WEBPACK_IMPORTED_MODULE_5__["ɵɵProvidersFeature"]([_services_message_bus_service__WEBPACK_IMPORTED_MODULE_2__.MessageBusService])],
   ngContentSelectors: _c2,
   decls: 11,
   vars: 3,
