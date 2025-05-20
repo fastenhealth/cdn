@@ -39822,13 +39822,14 @@ var MessageBusService = class _MessageBusService {
     eventPayload.api_mode = this.configService.systemConfig$.apiMode;
     eventPayload.data = this.configService.vaultProfileConfig$.connectedPatientAccounts?.map((account) => {
       return {
+        connection_status: account.connection_status,
         org_connection_id: account.org_connection_id,
         platform_type: account.platform_type,
         brand_id: account.brand?.id,
         portal_id: account.portal?.id,
         endpoint_id: account.endpoint?.id
       };
-    }) || {};
+    }) || [];
     eventPayload.event_type = EventTypes.EventTypeWidgetComplete;
     this.messageBusSubject.next(eventPayload);
   }
