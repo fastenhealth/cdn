@@ -325,34 +325,126 @@ video {
 [hidden]:where(:not([hidden=until-found])) {
   display: none;
 }
+.fhtw-fixed {
+  position: fixed;
+}
+.fhtw-right-6 {
+  right: 1.5rem;
+}
 .fhtw-block {
   display: block;
+}
+.fhtw-flex {
+  display: flex;
+}
+.fhtw-aspect-square {
+  aspect-ratio: 1 / 1;
+}
+.fhtw-h-16 {
+  height: 4rem;
+}
+.fhtw-h-6 {
+  height: 1.5rem;
+}
+.fhtw-min-h-\[32px\] {
+  min-height: 32px;
 }
 .fhtw-min-h-\[600px\] {
   min-height: 600px;
 }
+.fhtw-min-h-\[auto\] {
+  min-height: auto;
+}
+.fhtw-w-16 {
+  width: 4rem;
+}
+.fhtw-w-6 {
+  width: 1.5rem;
+}
 .fhtw-w-full {
   width: 100%;
+}
+.fhtw-min-w-\[64px\] {
+  min-width: 64px;
 }
 .fhtw-max-w-\[440px\] {
   max-width: 440px;
 }
+.fhtw-shrink-0 {
+  flex-shrink: 0;
+}
+.fhtw-grow-0 {
+  flex-grow: 0;
+}
+.-fhtw-translate-y-2\/4 {
+  --tw-translate-y: -50%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.fhtw-flex-col {
+  flex-direction: column;
+}
+.fhtw-items-center {
+  align-items: center;
+}
+.fhtw-justify-center {
+  justify-content: center;
+}
+.fhtw-justify-around {
+  justify-content: space-around;
+}
+.fhtw-gap-1 {
+  gap: 0.25rem;
+}
+.fhtw-gap-4 {
+  gap: 1rem;
+}
 .fhtw-rounded-lg {
   border-radius: 0.5rem;
 }
+.fhtw-rounded-md {
+  border-radius: 0.375rem;
+}
+.fhtw-border-t {
+  border-top-width: 1px;
+}
 .fhtw-border-none {
   border-style: none;
+}
+.fhtw-border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity, 1));
 }
 .fhtw-bg-blue-700 {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity, 1));
 }
+.fhtw-bg-fuchsia-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(253 244 255 / var(--tw-bg-opacity, 1));
+}
+.fhtw-bg-gray-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+.fhtw-bg-indigo-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(238 242 255 / var(--tw-bg-opacity, 1));
+}
 .fhtw-bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
+.fhtw-bg-white\/50 {
+  background-color: rgb(255 255 255 / 0.5);
+}
 .fhtw-p-0 {
   padding: 0px;
+}
+.fhtw-p-1\.5 {
+  padding: 0.375rem;
+}
+.fhtw-p-2\.5 {
+  padding: 0.625rem;
 }
 .fhtw-px-5 {
   padding-left: 1.25rem;
@@ -369,8 +461,24 @@ video {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+.fhtw-text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
 .fhtw-font-medium {
   font-weight: 500;
+}
+.fhtw-text-fuchsia-900 {
+  --tw-text-opacity: 1;
+  color: rgb(112 26 117 / var(--tw-text-opacity, 1));
+}
+.fhtw-text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
+}
+.fhtw-text-indigo-600 {
+  --tw-text-opacity: 1;
+  color: rgb(79 70 229 / var(--tw-text-opacity, 1));
 }
 .fhtw-text-white {
   --tw-text-opacity: 1;
@@ -384,6 +492,11 @@ video {
     var(--tw-ring-shadow, 0 0 #0000),
     var(--tw-shadow);
 }
+.fhtw-backdrop-blur-lg {
+  --tw-backdrop-blur: blur(16px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
 .backdrop\:fhtw-backdrop-blur::backdrop {
   --tw-backdrop-blur: blur(8px);
   -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
@@ -392,6 +505,10 @@ video {
 .hover\:fhtw-bg-blue-800:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(30 64 175 / var(--tw-bg-opacity, 1));
+}
+.hover\:fhtw-bg-gray-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
 .focus\:fhtw-outline-none:focus {
   outline: 2px solid transparent;
