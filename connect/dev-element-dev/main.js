@@ -39865,11 +39865,19 @@ var VaultProfileConfig = class {
     let pendingIndex = this.pendingPatientAccounts?.findIndex((pendingAccount) => {
       return pendingAccount.brand.id == brand_id && pendingAccount.portal.id == portal_id && pendingAccount.endpoint.id == endpoint_id;
     });
-    if (pendingIndex != -1) {
+    if (pendingIndex !== void 0 && pendingIndex !== null && pendingIndex > -1) {
       let pendingAccount = this.pendingPatientAccounts?.splice(pendingIndex, 1)[0];
       this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: pendingAccount.brand, portal: pendingAccount.portal, endpoint: pendingAccount.endpoint });
     } else {
-      console.error("NOT SUPPORTED: could not find the brand, portal, endpoint information by ID");
+      console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
+      this.connectedPatientAccounts?.push({
+        org_connection_id,
+        connection_status,
+        platform_type,
+        brand: { id: brand_id, name: "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
+        portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
+        endpoint: { id: endpoint_id, platform_type }
+      });
     }
   }
   addAvailableRecordLocatorAccount(recordLocatorFacility) {
