@@ -1,2 +1,2 @@
-import "./main-4HBKDCP4.js";
+import "./main-BULRTZFR.js";
 import "./polyfills-EONH2QZO.js";
