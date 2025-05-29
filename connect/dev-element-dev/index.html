@@ -111,6 +111,8 @@
 
     }
   </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+
 <link rel="stylesheet" href="styles.css"></head>
 <body x-data="pageData()">
 
@@ -155,6 +157,15 @@
     <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> Show via JS </small>
   </button>
 
+  <button @click="toggleTefcaMode" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': tefcaMode, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !tefcaMode }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5 fhtw-text-gray-700 hover:fhtw-bg-gray-100">
+    <!-- HeroIcon - beaker-->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+    </svg>
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> TEFCA </small>
+  </button>
+
   <hr class=""/>
 
   <button @click="toggleError" :class="{ 'fhtw-bg-fuchsia-50 fhtw-text-fuchsia-900': publicId == 'invalid_config_public_id', 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': publicId != 'invalid_config_public_id' }" class="fhtw-flex fhtw-h-16 fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-text-fuchsia-900">
@@ -182,7 +193,7 @@
     </form>
     <p class="fhtw-footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
   </div>
-  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId"></fasten-stitch-element>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId"></fasten-stitch-element>
 
 
   <h1>RECONNECT ELEMENT</h1>
@@ -215,6 +226,7 @@
   export function pageData() {
     return {
       searchOnly: false,
+      tefcaMode: false,
       publicId: 'public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu',
       staticBackdrop: false,
       reconnectOrgConnectionId: "",
@@ -224,6 +236,9 @@
       },
       toggleSearchOnly() {
         this.searchOnly = !this.searchOnly;
+      },
+      toggleTefcaMode() {
+        this.tefcaMode = !this.tefcaMode;
       },
       toggleReconnectOrgConnectionId() {
         this.reconnectOrgConnectionId = this.reconnectOrgConnectionId ? "" : "c2f0358c-f330-49ed-b32f-8018296873a2";
