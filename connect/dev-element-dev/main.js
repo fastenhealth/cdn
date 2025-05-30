@@ -39755,9 +39755,9 @@ var ConfigService = class _ConfigService {
     updatedVaultProfile.addConnectedAccount(connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id);
     this.vaultProfileConfig = updatedVaultProfile;
   }
-  vaultProfileAddAvailableRecordLocatorAccount(recordLocatorFacility) {
+  vaultProfileAddAvailableRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addAvailableRecordLocatorAccount(recordLocatorFacility);
+    updatedVaultProfile.addPendingAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //Setter
@@ -39852,11 +39852,11 @@ var MessageBusService = class _MessageBusService {
 
 // projects/shared-library/src/lib/models/config/vault-profile-config.ts
 var VaultProfileConfig = class {
-  addPendingAccount(brand, portal, endpoint) {
+  addPendingAccount(brand, portal, endpoint, vaultProfileConnectionId) {
     if (!this.pendingPatientAccounts) {
       this.pendingPatientAccounts = [];
     }
-    this.pendingPatientAccounts?.push({ brand, portal, endpoint });
+    this.pendingPatientAccounts?.push({ brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId });
   }
   addConnectedAccount(org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id) {
     if (!this.connectedPatientAccounts) {
