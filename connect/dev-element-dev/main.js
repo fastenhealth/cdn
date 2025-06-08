@@ -22135,33 +22135,33 @@ function interpolation4(lView, prefix, v0, i0, v1, i1, v2, i2, v3, suffix) {
   incrementBindingIndex(4);
   return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + suffix : NO_CHANGE;
 }
-function interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix) {
+function interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix) {
   const bindingIndex = getBindingIndex();
   let different = bindingUpdated4(lView, bindingIndex, v0, v1, v2, v3);
-  different = bindingUpdated(lView, bindingIndex + 4, v4) || different;
+  different = bindingUpdated(lView, bindingIndex + 4, v42) || different;
   incrementBindingIndex(5);
-  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v4) + suffix : NO_CHANGE;
+  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v42) + suffix : NO_CHANGE;
 }
-function interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix) {
+function interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix) {
   const bindingIndex = getBindingIndex();
   let different = bindingUpdated4(lView, bindingIndex, v0, v1, v2, v3);
-  different = bindingUpdated2(lView, bindingIndex + 4, v4, v5) || different;
+  different = bindingUpdated2(lView, bindingIndex + 4, v42, v5) || different;
   incrementBindingIndex(6);
-  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v4) + i4 + renderStringify(v5) + suffix : NO_CHANGE;
+  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v42) + i4 + renderStringify(v5) + suffix : NO_CHANGE;
 }
-function interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix) {
+function interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix) {
   const bindingIndex = getBindingIndex();
   let different = bindingUpdated4(lView, bindingIndex, v0, v1, v2, v3);
-  different = bindingUpdated3(lView, bindingIndex + 4, v4, v5, v6) || different;
+  different = bindingUpdated3(lView, bindingIndex + 4, v42, v5, v6) || different;
   incrementBindingIndex(7);
-  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v4) + i4 + renderStringify(v5) + i5 + renderStringify(v6) + suffix : NO_CHANGE;
+  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v42) + i4 + renderStringify(v5) + i5 + renderStringify(v6) + suffix : NO_CHANGE;
 }
-function interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix) {
+function interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix) {
   const bindingIndex = getBindingIndex();
   let different = bindingUpdated4(lView, bindingIndex, v0, v1, v2, v3);
-  different = bindingUpdated4(lView, bindingIndex + 4, v4, v5, v6, v7) || different;
+  different = bindingUpdated4(lView, bindingIndex + 4, v42, v5, v6, v7) || different;
   incrementBindingIndex(8);
-  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v4) + i4 + renderStringify(v5) + i5 + renderStringify(v6) + i6 + renderStringify(v7) + suffix : NO_CHANGE;
+  return different ? prefix + renderStringify(v0) + i0 + renderStringify(v1) + i1 + renderStringify(v2) + i2 + renderStringify(v3) + i3 + renderStringify(v42) + i4 + renderStringify(v5) + i5 + renderStringify(v6) + i6 + renderStringify(v7) + suffix : NO_CHANGE;
 }
 function \u0275\u0275attributeInterpolate1(attrName, prefix, v0, suffix, sanitizer, namespace) {
   const lView = getLView();
@@ -22203,9 +22203,9 @@ function \u0275\u0275attributeInterpolate4(attrName, prefix, v0, i0, v1, i1, v2,
   }
   return \u0275\u0275attributeInterpolate4;
 }
-function \u0275\u0275attributeInterpolate5(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix, sanitizer, namespace) {
+function \u0275\u0275attributeInterpolate5(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix, sanitizer, namespace) {
   const lView = getLView();
-  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tNode = getSelectedTNode();
     elementAttributeInternal(tNode, lView, attrName, interpolatedValue, sanitizer, namespace);
@@ -22213,9 +22213,9 @@ function \u0275\u0275attributeInterpolate5(attrName, prefix, v0, i0, v1, i1, v2,
   }
   return \u0275\u0275attributeInterpolate5;
 }
-function \u0275\u0275attributeInterpolate6(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix, sanitizer, namespace) {
+function \u0275\u0275attributeInterpolate6(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix, sanitizer, namespace) {
   const lView = getLView();
-  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tNode = getSelectedTNode();
     elementAttributeInternal(tNode, lView, attrName, interpolatedValue, sanitizer, namespace);
@@ -22223,9 +22223,9 @@ function \u0275\u0275attributeInterpolate6(attrName, prefix, v0, i0, v1, i1, v2,
   }
   return \u0275\u0275attributeInterpolate6;
 }
-function \u0275\u0275attributeInterpolate7(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix, sanitizer, namespace) {
+function \u0275\u0275attributeInterpolate7(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix, sanitizer, namespace) {
   const lView = getLView();
-  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tNode = getSelectedTNode();
     elementAttributeInternal(tNode, lView, attrName, interpolatedValue, sanitizer, namespace);
@@ -22233,9 +22233,9 @@ function \u0275\u0275attributeInterpolate7(attrName, prefix, v0, i0, v1, i1, v2,
   }
   return \u0275\u0275attributeInterpolate7;
 }
-function \u0275\u0275attributeInterpolate8(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix, sanitizer, namespace) {
+function \u0275\u0275attributeInterpolate8(attrName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix, sanitizer, namespace) {
   const lView = getLView();
-  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tNode = getSelectedTNode();
     elementAttributeInternal(tNode, lView, attrName, interpolatedValue, sanitizer, namespace);
@@ -22886,24 +22886,24 @@ function \u0275\u0275classMapInterpolate4(prefix, v0, i0, v1, i1, v2, i2, v3, su
   const interpolatedValue = interpolation4(lView, prefix, v0, i0, v1, i1, v2, i2, v3, suffix);
   checkStylingMap(keyValueArraySet, classStringParser, interpolatedValue, true);
 }
-function \u0275\u0275classMapInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix) {
+function \u0275\u0275classMapInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   checkStylingMap(keyValueArraySet, classStringParser, interpolatedValue, true);
 }
-function \u0275\u0275classMapInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix) {
+function \u0275\u0275classMapInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   checkStylingMap(keyValueArraySet, classStringParser, interpolatedValue, true);
 }
-function \u0275\u0275classMapInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix) {
+function \u0275\u0275classMapInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   checkStylingMap(keyValueArraySet, classStringParser, interpolatedValue, true);
 }
-function \u0275\u0275classMapInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix) {
+function \u0275\u0275classMapInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   checkStylingMap(keyValueArraySet, classStringParser, interpolatedValue, true);
 }
 function \u0275\u0275classMapInterpolateV(values) {
@@ -24939,9 +24939,9 @@ function \u0275\u0275propertyInterpolate4(propName, prefix, v0, i0, v1, i1, v2, 
   }
   return \u0275\u0275propertyInterpolate4;
 }
-function \u0275\u0275propertyInterpolate5(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix, sanitizer) {
+function \u0275\u0275propertyInterpolate5(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix, sanitizer) {
   const lView = getLView();
-  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tView = getTView();
     const tNode = getSelectedTNode();
@@ -24950,9 +24950,9 @@ function \u0275\u0275propertyInterpolate5(propName, prefix, v0, i0, v1, i1, v2, 
   }
   return \u0275\u0275propertyInterpolate5;
 }
-function \u0275\u0275propertyInterpolate6(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix, sanitizer) {
+function \u0275\u0275propertyInterpolate6(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix, sanitizer) {
   const lView = getLView();
-  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tView = getTView();
     const tNode = getSelectedTNode();
@@ -24961,9 +24961,9 @@ function \u0275\u0275propertyInterpolate6(propName, prefix, v0, i0, v1, i1, v2, 
   }
   return \u0275\u0275propertyInterpolate6;
 }
-function \u0275\u0275propertyInterpolate7(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix, sanitizer) {
+function \u0275\u0275propertyInterpolate7(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix, sanitizer) {
   const lView = getLView();
-  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tView = getTView();
     const tNode = getSelectedTNode();
@@ -24972,9 +24972,9 @@ function \u0275\u0275propertyInterpolate7(propName, prefix, v0, i0, v1, i1, v2, 
   }
   return \u0275\u0275propertyInterpolate7;
 }
-function \u0275\u0275propertyInterpolate8(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix, sanitizer) {
+function \u0275\u0275propertyInterpolate8(propName, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix, sanitizer) {
   const lView = getLView();
-  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   if (interpolatedValue !== NO_CHANGE) {
     const tView = getTView();
     const tNode = getSelectedTNode();
@@ -25067,24 +25067,24 @@ function \u0275\u0275styleMapInterpolate4(prefix, v0, i0, v1, i1, v2, i2, v3, su
   const interpolatedValue = interpolation4(lView, prefix, v0, i0, v1, i1, v2, i2, v3, suffix);
   \u0275\u0275styleMap(interpolatedValue);
 }
-function \u0275\u0275styleMapInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix) {
+function \u0275\u0275styleMapInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   \u0275\u0275styleMap(interpolatedValue);
 }
-function \u0275\u0275styleMapInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix) {
+function \u0275\u0275styleMapInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   \u0275\u0275styleMap(interpolatedValue);
 }
-function \u0275\u0275styleMapInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix) {
+function \u0275\u0275styleMapInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   \u0275\u0275styleMap(interpolatedValue);
 }
-function \u0275\u0275styleMapInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix) {
+function \u0275\u0275styleMapInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   \u0275\u0275styleMap(interpolatedValue);
 }
 function \u0275\u0275styleMapInterpolateV(values) {
@@ -25116,27 +25116,27 @@ function \u0275\u0275stylePropInterpolate4(prop, prefix, v0, i0, v1, i1, v2, i2,
   checkStylingProperty(prop, interpolatedValue, valueSuffix, false);
   return \u0275\u0275stylePropInterpolate4;
 }
-function \u0275\u0275stylePropInterpolate5(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix, valueSuffix) {
+function \u0275\u0275stylePropInterpolate5(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix, valueSuffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolatedValue = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   checkStylingProperty(prop, interpolatedValue, valueSuffix, false);
   return \u0275\u0275stylePropInterpolate5;
 }
-function \u0275\u0275stylePropInterpolate6(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix, valueSuffix) {
+function \u0275\u0275stylePropInterpolate6(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix, valueSuffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolatedValue = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   checkStylingProperty(prop, interpolatedValue, valueSuffix, false);
   return \u0275\u0275stylePropInterpolate6;
 }
-function \u0275\u0275stylePropInterpolate7(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix, valueSuffix) {
+function \u0275\u0275stylePropInterpolate7(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix, valueSuffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolatedValue = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   checkStylingProperty(prop, interpolatedValue, valueSuffix, false);
   return \u0275\u0275stylePropInterpolate7;
 }
-function \u0275\u0275stylePropInterpolate8(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix, valueSuffix) {
+function \u0275\u0275stylePropInterpolate8(prop, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix, valueSuffix) {
   const lView = getLView();
-  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolatedValue = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   checkStylingProperty(prop, interpolatedValue, valueSuffix, false);
   return \u0275\u0275stylePropInterpolate8;
 }
@@ -25200,33 +25200,33 @@ function \u0275\u0275textInterpolate4(prefix, v0, i0, v1, i1, v2, i2, v3, suffix
   }
   return \u0275\u0275textInterpolate4;
 }
-function \u0275\u0275textInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix) {
+function \u0275\u0275textInterpolate5(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix) {
   const lView = getLView();
-  const interpolated = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, suffix);
+  const interpolated = interpolation5(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, suffix);
   if (interpolated !== NO_CHANGE) {
     textBindingInternal(lView, getSelectedIndex(), interpolated);
   }
   return \u0275\u0275textInterpolate5;
 }
-function \u0275\u0275textInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix) {
+function \u0275\u0275textInterpolate6(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix) {
   const lView = getLView();
-  const interpolated = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, suffix);
+  const interpolated = interpolation6(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, suffix);
   if (interpolated !== NO_CHANGE) {
     textBindingInternal(lView, getSelectedIndex(), interpolated);
   }
   return \u0275\u0275textInterpolate6;
 }
-function \u0275\u0275textInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix) {
+function \u0275\u0275textInterpolate7(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix) {
   const lView = getLView();
-  const interpolated = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, suffix);
+  const interpolated = interpolation7(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, suffix);
   if (interpolated !== NO_CHANGE) {
     textBindingInternal(lView, getSelectedIndex(), interpolated);
   }
   return \u0275\u0275textInterpolate7;
 }
-function \u0275\u0275textInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix) {
+function \u0275\u0275textInterpolate8(prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix) {
   const lView = getLView();
-  const interpolated = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v4, i4, v5, i5, v6, i6, v7, suffix);
+  const interpolated = interpolation8(lView, prefix, v0, i0, v1, i1, v2, i2, v3, i3, v42, i4, v5, i5, v6, i6, v7, suffix);
   if (interpolated !== NO_CHANGE) {
     textBindingInternal(lView, getSelectedIndex(), interpolated);
   }
@@ -25693,11 +25693,11 @@ function \u0275\u0275pipeBind3(index, slotOffset, v1, v2, v3) {
   const pipeInstance = load(lView, adjustedIndex);
   return isPure(lView, adjustedIndex) ? pureFunction3Internal(lView, getBindingRoot(), slotOffset, pipeInstance.transform, v1, v2, v3, pipeInstance) : pipeInstance.transform(v1, v2, v3);
 }
-function \u0275\u0275pipeBind4(index, slotOffset, v1, v2, v3, v4) {
+function \u0275\u0275pipeBind4(index, slotOffset, v1, v2, v3, v42) {
   const adjustedIndex = index + HEADER_OFFSET;
   const lView = getLView();
   const pipeInstance = load(lView, adjustedIndex);
-  return isPure(lView, adjustedIndex) ? pureFunction4Internal(lView, getBindingRoot(), slotOffset, pipeInstance.transform, v1, v2, v3, v4, pipeInstance) : pipeInstance.transform(v1, v2, v3, v4);
+  return isPure(lView, adjustedIndex) ? pureFunction4Internal(lView, getBindingRoot(), slotOffset, pipeInstance.transform, v1, v2, v3, v42, pipeInstance) : pipeInstance.transform(v1, v2, v3, v42);
 }
 function \u0275\u0275pipeBindV(index, slotOffset, values) {
   const adjustedIndex = index + HEADER_OFFSET;
@@ -38629,6 +38629,61 @@ var ImageFallbackDirective = class _ImageFallbackDirective {
 // projects/shared-library/src/lib/services/config.service.ts
 var import_lodash = __toESM(require_lodash());
 
+// node_modules/uuid/dist/esm-browser/rng.js
+var getRandomValues;
+var rnds8 = new Uint8Array(16);
+function rng() {
+  if (!getRandomValues) {
+    getRandomValues = typeof crypto !== "undefined" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto !== "undefined" && typeof msCrypto.getRandomValues === "function" && msCrypto.getRandomValues.bind(msCrypto);
+    if (!getRandomValues) {
+      throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");
+    }
+  }
+  return getRandomValues(rnds8);
+}
+
+// node_modules/uuid/dist/esm-browser/regex.js
+var regex_default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
+
+// node_modules/uuid/dist/esm-browser/validate.js
+function validate(uuid) {
+  return typeof uuid === "string" && regex_default.test(uuid);
+}
+var validate_default = validate;
+
+// node_modules/uuid/dist/esm-browser/stringify.js
+var byteToHex = [];
+for (i = 0; i < 256; ++i) {
+  byteToHex.push((i + 256).toString(16).substr(1));
+}
+var i;
+function stringify2(arr) {
+  var offset = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : 0;
+  var uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
+  if (!validate_default(uuid)) {
+    throw TypeError("Stringified UUID is invalid");
+  }
+  return uuid;
+}
+var stringify_default = stringify2;
+
+// node_modules/uuid/dist/esm-browser/v4.js
+function v4(options, buf, offset) {
+  options = options || {};
+  var rnds = options.random || (options.rng || rng)();
+  rnds[6] = rnds[6] & 15 | 64;
+  rnds[8] = rnds[8] & 63 | 128;
+  if (buf) {
+    offset = offset || 0;
+    for (var i = 0; i < 16; ++i) {
+      buf[offset + i] = rnds[i];
+    }
+    return buf;
+  }
+  return stringify_default(rnds);
+}
+var v4_default = v4;
+
 // node_modules/vlq/dist/vlq.es.js
 var charToInteger = {};
 var integerToChar = {};
@@ -39743,7 +39798,8 @@ var ConfigService = class _ConfigService {
   }
   vaultProfileAddPendingAccount(brand, portal, endpoint) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addPendingAccount(brand, portal, endpoint);
+    let externalState = v4_default();
+    updatedVaultProfile.addPendingAccount(externalState, brand, portal, endpoint);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   vaultProfileAddConnectedAccount(connectedAccount) {
@@ -39752,12 +39808,13 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   vaultProfileAddAvailableRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addPendingAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
+    let externalState = v4_default();
+    updatedVaultProfile.addPendingAccount(externalState, recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //Setter
@@ -39852,22 +39909,20 @@ var MessageBusService = class _MessageBusService {
 
 // projects/shared-library/src/lib/models/config/vault-profile-config.ts
 var VaultProfileConfig = class {
-  addPendingAccount(brand, portal, endpoint, vaultProfileConnectionId) {
+  addPendingAccount(externalState, brand, portal, endpoint, vaultProfileConnectionId) {
     if (!this.pendingPatientAccounts) {
-      this.pendingPatientAccounts = [];
+      this.pendingPatientAccounts = {};
     }
-    this.pendingPatientAccounts?.push({ brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId });
+    this.pendingPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
-  addConnectedAccount(org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
-    let pendingIndex = this.pendingPatientAccounts?.findIndex((pendingAccount) => {
-      return pendingAccount.brand.id == brand_id && pendingAccount.portal.id == portal_id && pendingAccount.endpoint.id == endpoint_id;
-    });
-    if (pendingIndex !== void 0 && pendingIndex !== null && pendingIndex > -1) {
-      let pendingAccount = this.pendingPatientAccounts?.splice(pendingIndex, 1)[0];
-      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: pendingAccount.brand, portal: pendingAccount.portal, endpoint: pendingAccount.endpoint });
+    let foundPendingPatientAccount = this.pendingPatientAccounts?.[external_state];
+    if (foundPendingPatientAccount) {
+      delete this.pendingPatientAccounts[external_state];
+      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundPendingPatientAccount.brand, portal: foundPendingPatientAccount.portal, endpoint: foundPendingPatientAccount.endpoint });
     } else {
       console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
       console.warn("pendingAccounts", this.pendingPatientAccounts, "connectionParams", org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
