@@ -39811,10 +39811,16 @@ var ConfigService = class _ConfigService {
     updatedVaultProfile.addConnectedAccount(connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id);
     this.vaultProfileConfig = updatedVaultProfile;
   }
-  vaultProfileAddAvailableRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
+  vaultProfileAddPendingRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
     let externalState = v4_default();
     updatedVaultProfile.addPendingAccount(externalState, recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
+    this.vaultProfileConfig = updatedVaultProfile;
+  }
+  vaultProfileAddDiscoveredRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
+    let updatedVaultProfile = this.vaultProfileConfig$;
+    let externalState = v4_default();
+    updatedVaultProfile.addDiscoveredAccount(externalState, recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //Setter
@@ -39915,14 +39921,24 @@ var VaultProfileConfig = class {
     }
     this.pendingPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
+  addDiscoveredAccount(externalState, brand, portal, endpoint, vaultProfileConnectionId) {
+    if (!this.discoveredPatientAccounts) {
+      this.discoveredPatientAccounts = {};
+    }
+    this.discoveredPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
+  }
   addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
     let foundPendingPatientAccount = this.pendingPatientAccounts?.[external_state];
+    let foundDiscoveredPatientAccount = this.discoveredPatientAccounts?.[external_state];
     if (foundPendingPatientAccount) {
       delete this.pendingPatientAccounts[external_state];
       this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundPendingPatientAccount.brand, portal: foundPendingPatientAccount.portal, endpoint: foundPendingPatientAccount.endpoint });
+    } else if (foundDiscoveredPatientAccount) {
+      delete this.discoveredPatientAccounts[external_state];
+      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundDiscoveredPatientAccount.brand, portal: foundDiscoveredPatientAccount.portal, endpoint: foundDiscoveredPatientAccount.endpoint });
     } else {
       console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
       console.warn("pendingAccounts", this.pendingPatientAccounts, "connectionParams", org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
