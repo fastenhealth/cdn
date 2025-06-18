@@ -38469,7 +38469,7 @@ var EventTypes;
   EventTypes2["EventTypeConnectionSuccess"] = "patient.connection_success";
   EventTypes2["EventTypeConnectionFailed"] = "patient.connection_failed";
 })(EventTypes || (EventTypes = {}));
-var ConnectWindowTimeout = 2 * 60 * 1e3;
+var ConnectWindowTimeout = 20 * 60 * 1e3;
 
 // projects/shared-library/src/lib/pipes/safe-html.pipe.ts
 var SafeHtmlPipe = class _SafeHtmlPipe {
