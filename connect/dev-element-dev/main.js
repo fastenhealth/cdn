@@ -40138,7 +40138,7 @@ var AppComponent = class _AppComponent {
     };
   }
   static {
-    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AppComponent, selectors: [["fasten-stitch-element"]], viewQuery: function AppComponent_Query(rf, ctx) {
+    this.\u0275cmp = /* @__PURE__ */ \u0275\u0275defineComponent({ type: _AppComponent, selectors: [["fasten-stitch-element-internal"]], viewQuery: function AppComponent_Query(rf, ctx) {
       if (rf & 1) {
         \u0275\u0275viewQuery(_c0, 5);
         \u0275\u0275viewQuery(_c1, 5);
@@ -40183,7 +40183,7 @@ var AppComponent = class _AppComponent {
   }
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 25 });
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 29 });
 })();
 
 // projects/fasten-connect-stitch-element/src/app/app.module.ts
