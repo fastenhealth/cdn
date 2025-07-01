@@ -38450,6 +38450,12 @@ var ApiMode;
   ApiMode2["Live"] = "live";
   ApiMode2["Test"] = "test";
 })(ApiMode || (ApiMode = {}));
+var WidgetMode;
+(function(WidgetMode2) {
+  WidgetMode2["SearchOnly"] = "search-only";
+  WidgetMode2["Connect"] = "connect";
+  WidgetMode2["Tefca"] = "tefca";
+})(WidgetMode || (WidgetMode = {}));
 var ConnectionStatus;
 (function(ConnectionStatus2) {
   ConnectionStatus2["Authorized"] = "authorized";
@@ -40030,14 +40036,14 @@ var AppComponent = class _AppComponent {
     this.logger = logger;
     this.publicId = "";
     this.externalId = "";
-    this.reconnectOrgConnectionId = null;
-    this.searchOnly = true;
-    this.tefcaMode = false;
     this.staticBackdrop = false;
-    this.searchQuery = "";
+    this.reconnectOrgConnectionId = null;
     this.brandId = "";
     this.portalId = "";
     this.endpointId = "";
+    this.searchQuery = "";
+    this.searchOnly = true;
+    this.tefcaMode = false;
     this.externalEventBus = new EventEmitter();
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
@@ -40150,7 +40156,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], searchOnly: [0, "search-only", "searchOnly"], tefcaMode: [0, "tefca-mode", "tefcaMode"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], searchQuery: [0, "search-query", "searchQuery"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchOnly: [0, "search-only", "searchOnly"], tefcaMode: [0, "tefca-mode", "tefcaMode"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();
