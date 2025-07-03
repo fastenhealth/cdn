@@ -1429,6 +1429,8 @@ class ConnectService {
         (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.timeout)(popupTimeoutMins * 60 * 1000), //popup timeout (mins) * 60 seconds * 1000 ms
         //make sure we're only listening to events from the "opened" window.
         (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.filter)((event) => event.source == openedWindow), 
+        //only allow messages from the fasten connect API
+        (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.filter)((event) => event.origin == 'https://api.connect-dev.fastenhealth.com' || event.origin == 'https://api.connect.fastenhealth.com'), 
         //after filtering, we should only have one event to handle.
         (0,rxjs__WEBPACK_IMPORTED_MODULE_7__.first)(), (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.map)((event) => {
             console.log(`received postMessage notification from popup window & sending acknowledgment`);
