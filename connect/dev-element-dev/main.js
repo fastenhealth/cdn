@@ -38474,6 +38474,7 @@ var EventTypes;
   EventTypes2["EventTypeConnectionPending"] = "patient.connection_pending";
   EventTypes2["EventTypeConnectionSuccess"] = "patient.connection_success";
   EventTypes2["EventTypeConnectionFailed"] = "patient.connection_failed";
+  EventTypes2["EventTypeSearchQuery"] = "search.query";
 })(EventTypes || (EventTypes = {}));
 var ConnectWindowTimeout = 20 * 60 * 1e3;
 
@@ -39907,6 +39908,20 @@ var MessageBusService = class _MessageBusService {
     let eventPayload = new MessageBusEventPayload();
     eventPayload.api_mode = this.configService.systemConfig$.apiMode;
     eventPayload.event_type = EventTypes.EventTypeWidgetClose;
+    this.messageBusSubject.next(eventPayload);
+  }
+  //this event is published when a widget search is performed
+  publishSearchQuery(query, state, external_id) {
+    console.log("DEBUG: TESTING FIRING");
+    let eventPayload = new MessageBusEventPayload();
+    eventPayload.api_mode = this.configService.systemConfig$.apiMode;
+    eventPayload.event_type = EventTypes.EventTypeSearchQuery;
+    eventPayload.data = {
+      query,
+      timestamp: Date.now(),
+      state,
+      external_id
+    };
     this.messageBusSubject.next(eventPayload);
   }
   static {
