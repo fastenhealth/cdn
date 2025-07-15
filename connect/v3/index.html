@@ -193,7 +193,7 @@
     </form>
     <p class="fhtw-footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
   </div>
-  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId"></fasten-stitch-element>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId" event-types="search.query"></fasten-stitch-element>
 
 
   <h1>RECONNECT ELEMENT</h1>
@@ -207,7 +207,9 @@
 
 <script type="application/javascript">
   const el = document.querySelector('fasten-stitch-element');
-  el.addEventListener('orgConnectionCallback', (event) => console.log("HOST PAGE EVENT DETECTED", event.detail));
+  el.addEventListener('eventBus', (event) => {
+    console.warn("Event received from fasten-stitch-element:", event.detail);
+  });
 
 
   window.addEventListener('DOMContentLoaded',function () {
@@ -257,5 +259,5 @@
   }
 
 </script>
-<script src="polyfills-EONH2QZO.js" type="module"></script><script src="main-D6KRE2LJ.js" type="module"></script></body>
+<script src="polyfills-EONH2QZO.js" type="module"></script><script src="main-JY5PTSGR.js" type="module"></script></body>
 </html>
