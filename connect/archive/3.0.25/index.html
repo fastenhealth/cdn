@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en" data-beasties-container>
+<head>
+  <meta charset="utf-8">
+  <title>Share Your Medical Record</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <style>
+    fasten-stitch-element > button {
+      background-color: green !important;
+      margin-left: 180px !important;
+    }
+  </style>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f3f4f7, #e2e6ea);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url("https://plus.unsplash.com/premium_photo-1673953510197-0950d951c6d9?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjF8fG1lZGljYWx8ZW58MHx8MHx8fDA%3D");
+      background-size: auto 120%;
+    }
+
+    .fhtw-share-wrapper {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .fhtw-share-container {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .fhtw-share-container > h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .fhtw-share-container > p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+      color: #555;
+    }
+
+    .fhtw-share-container > form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fhtw-share-container > form > input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    /*.button {*/
+    /*  display: inline-block;*/
+    /*  background-color: #007bff;*/
+    /*  color: white;*/
+    /*  text-decoration: none;*/
+    /*  font-size: 16px;*/
+    /*  font-weight: bold;*/
+    /*  padding: 12px 20px;*/
+    /*  border-radius: 8px;*/
+    /*  transition: background-color 0.3s, transform 0.2s;*/
+    /*  cursor: pointer;*/
+    /*  border: none;*/
+    /*}*/
+
+    /*.button:hover {*/
+    /*  background-color: #0056b3;*/
+    /*  transform: scale(1.05);*/
+    /*}*/
+
+    .fhtw-share-container > .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    @media (max-width: 480px) {
+      .fhtw-share-container > h1 {
+        font-size: 24px;
+      }
+
+      .fhtw-share-container > p {
+        font-size: 14px;
+      }
+
+      .fhtw-share-container > input {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+<style>*,:before,:after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }.fhtw-fixed{position:fixed}.fhtw-right-6{right:1.5rem}.fhtw-flex{display:flex}.fhtw-aspect-square{aspect-ratio:1 / 1}.fhtw-h-16{height:4rem}.fhtw-h-6{height:1.5rem}.fhtw-min-h-\[32px\]{min-height:32px}.fhtw-min-h-\[auto\]{min-height:auto}.fhtw-w-16{width:4rem}.fhtw-w-6{width:1.5rem}.fhtw-min-w-\[64px\]{min-width:64px}.fhtw-shrink-0{flex-shrink:0}.fhtw-grow-0{flex-grow:0}.fhtw-flex-col{flex-direction:column}.fhtw-items-center{align-items:center}.fhtw-justify-center{justify-content:center}.fhtw-justify-around{justify-content:space-around}.fhtw-gap-1{gap:.25rem}.fhtw-gap-4{gap:1rem}.fhtw-rounded-lg{border-radius:.5rem}.fhtw-rounded-md{border-radius:.375rem}.fhtw-border-t{border-top-width:1px}.fhtw-border-gray-200{--tw-border-opacity:1;border-color:rgb(229 231 235 / var(--tw-border-opacity, 1))}.fhtw-bg-white\/50{background-color:#ffffff80}.fhtw-p-1\.5{padding:.375rem}.fhtw-p-2\.5{padding:.625rem}.fhtw-text-center{text-align:center}.fhtw-text-xs{font-size:.75rem;line-height:1rem}.fhtw-font-medium{font-weight:500}.fhtw-text-fuchsia-900{--tw-text-opacity:1;color:rgb(112 26 117 / var(--tw-text-opacity, 1))}.fhtw-text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.fhtw-shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}.fhtw-backdrop-blur-lg{--tw-backdrop-blur:blur(16px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.hover\:fhtw-bg-gray-100:hover{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}</style><link rel="stylesheet" href="styles-2VFTXC2W.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-2VFTXC2W.css"></noscript></head>
+<body x-data="pageData()">
+
+<nav class="fhtw-z-100 fhtw-flex fhtw-shrink-0 fhtw-grow-0 fhtw-justify-around fhtw-gap-4 fhtw-border-t fhtw-border-gray-200 fhtw-bg-white/50 fhtw-p-2.5 fhtw-shadow-lg fhtw-backdrop-blur-lg  fhtw-fixed top-2/4 -translate-y-2/4 fhtw-right-6 fhtw-min-h-[auto] fhtw-min-w-[64px] fhtw-flex-col fhtw-rounded-lg border">
+  <button @click="toggleSearchOnly" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': searchOnly, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !searchOnly }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5 ">
+    <!-- HeroIcon - Search -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+    </svg>
+
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> Search </small>
+  </button>
+
+  <button @click="toggleReconnectOrgConnectionId" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': !!reconnectOrgConnectionId, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !!!reconnectOrgConnectionId }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5">
+    <!-- HeroIcon - arrow-path-rounded-square -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"/>
+    </svg>
+
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> Reconnect </small>
+  </button>
+
+  <button @click="toggleStaticBackdrop" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': staticBackdrop, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !staticBackdrop }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5">
+    <!-- HeroIcon - x-circle -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+    </svg>
+
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> Backdrop </small>
+  </button>
+
+  <button @click="toggleShow" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5 fhtw-text-gray-700 hover:fhtw-bg-gray-100">
+    <!-- HeroIcon - power-->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"/>
+    </svg>
+
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> Show via JS </small>
+  </button>
+
+  <button @click="toggleTefcaMode" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': tefcaMode, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !tefcaMode }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5 fhtw-text-gray-700 hover:fhtw-bg-gray-100">
+    <!-- HeroIcon - beaker-->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+    </svg>
+
+    <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> TEFCA </small>
+  </button>
+
+  <hr class>
+
+  <button @click="toggleError" :class="{ 'fhtw-bg-fuchsia-50 fhtw-text-fuchsia-900': publicId == 'invalid_config_public_id', 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': publicId != 'invalid_config_public_id' }" class="fhtw-flex fhtw-h-16 fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-text-fuchsia-900">
+    <!-- HeroIcon - exclamation-circle -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+    </svg>
+
+
+    <small classname="fhtw-text-xs fhtw-font-medium">Error</small>
+  </button>
+</nav>
+
+<div class="fhtw-share-wrapper">
+  <div class="fhtw-share-container">
+    <h1>Acme Labs - Study Enrollment</h1>
+    <p>Acme Labs empowers patients like you to securely share your medical records. By contributing, you play a vital role in advancing healthcare and innovation.</p>
+    <form action="#" method="POST">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="date" name="birthdate" placeholder="Date of Birth" required>
+      <input type="text" name="zipcode" placeholder="Zip Code" required>
+      <input type="email" name="email" placeholder="Email Address" required>
+      <input type="tel" name="phone" placeholder="Phone Number">
+
+    </form>
+    <p class="fhtw-footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
+  </div>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId" event-types="search.query"></fasten-stitch-element>
+
+
+  <h1>RECONNECT ELEMENT</h1>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" search-only="true" reconnect-org-connection-id="c2f0358c-f330-49ed-b32f-8018296873a2"></fasten-stitch-element>
+
+<!--  <fasten-stitch-element-->
+<!--    external-id="1235-123412-123123$^#*@(!"-->
+<!--    public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu"-->
+<!--  ></fasten-stitch-element>-->
+</div>
+
+<script type="application/javascript">
+  const el = document.querySelector('fasten-stitch-element');
+  el.addEventListener('eventBus', (event) => {
+    console.warn("Event received from fasten-stitch-element:", event.detail);
+  });
+
+
+  window.addEventListener('DOMContentLoaded',function () {
+    //your code here
+    // document.querySelector('fasten-stitch').show();
+  });
+</script>
+
+
+<script type="module">
+  import alpinejs from 'https://cdn.skypack.dev/alpinejs@v3.13.4';
+
+  alpinejs.data('pageData', pageData);
+  alpinejs.start();
+
+  export function pageData() {
+    return {
+      searchOnly: false,
+      tefcaMode: false,
+      publicId: 'public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu',
+      staticBackdrop: false,
+      reconnectOrgConnectionId: "",
+
+      toggleStaticBackdrop() {
+        this.staticBackdrop = !this.staticBackdrop;
+      },
+      toggleSearchOnly() {
+        this.searchOnly = !this.searchOnly;
+      },
+      toggleTefcaMode() {
+        this.tefcaMode = !this.tefcaMode;
+      },
+      toggleReconnectOrgConnectionId() {
+        this.reconnectOrgConnectionId = this.reconnectOrgConnectionId ? "" : "c2f0358c-f330-49ed-b32f-8018296873a2";
+      },
+      toggleShow() {
+        document.querySelector('fasten-stitch-element').show();
+      },
+      toggleError() {
+        if(this.publicId === 'invalid_config_public_id') {
+          this.publicId = 'public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu';
+        } else {
+          this.publicId = 'invalid_config_public_id';
+        }
+      }
+    }
+  }
+
+</script>
+<script src="polyfills-EONH2QZO.js" type="module"></script><script src="main-JY5PTSGR.js" type="module"></script></body>
+</html>
