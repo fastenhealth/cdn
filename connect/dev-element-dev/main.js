@@ -39915,7 +39915,7 @@ var MessageBusService = class _MessageBusService {
     if (!this.configService.systemConfig$.eventTypes?.includes(EventTypes.EventTypeSearchQuery)) {
       return;
     }
-    if (!query) {
+    if (!query?.trim()) {
       return;
     }
     let eventPayload = new MessageBusEventPayload();
