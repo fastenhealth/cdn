@@ -38476,6 +38476,11 @@ var EventTypes;
   EventTypes2["EventTypeConnectionFailed"] = "patient.connection_failed";
   EventTypes2["EventTypeSearchQuery"] = "search.query";
 })(EventTypes || (EventTypes = {}));
+var SDKMode;
+(function(SDKMode2) {
+  SDKMode2["None"] = "none";
+  SDKMode2["ReactNative"] = "react-native";
+})(SDKMode || (SDKMode = {}));
 var CommunicationEntity;
 (function(CommunicationEntity2) {
   CommunicationEntity2["PrimaryWebView"] = "FASTEN_CONNECT_PRIMARY_WEBVIEW";
@@ -39769,7 +39774,8 @@ LoggerModule.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({
 // projects/shared-library/src/lib/services/config.service.ts
 var defaultSystemConfig = {
   publicId: "",
-  apiMode: ApiMode.Test
+  apiMode: ApiMode.Test,
+  sdkMode: SDKMode.None
 };
 var ConfigService = class _ConfigService {
   constructor(logger) {
