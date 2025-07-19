@@ -38476,6 +38476,13 @@ var EventTypes;
   EventTypes2["EventTypeConnectionFailed"] = "patient.connection_failed";
   EventTypes2["EventTypeSearchQuery"] = "search.query";
 })(EventTypes || (EventTypes = {}));
+var CommunicationEntity;
+(function(CommunicationEntity2) {
+  CommunicationEntity2["PrimaryWebView"] = "FASTEN_CONNECT_PRIMARY_WEBVIEW";
+  CommunicationEntity2["ModalWebView"] = "FASTEN_CONNECT_MODAL_WEBVIEW";
+  CommunicationEntity2["ReactNativeComponent"] = "FASTEN_CONNECT_REACT_WEBVIEW";
+  CommunicationEntity2["External"] = "FASTEN_CONNECT_EXTERNAL";
+})(CommunicationEntity || (CommunicationEntity = {}));
 var ConnectWindowTimeout = 20 * 60 * 1e3;
 
 // projects/shared-library/src/lib/pipes/safe-html.pipe.ts
