@@ -39959,8 +39959,6 @@ var VaultProfileConfig = class {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
-    console.log("!!!!!! find connected account in array", external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
-    console.log("!!!!!! find connected account in array", JSON.stringify(this.pendingPatientAccounts));
     let foundPendingPatientAccount = this.pendingPatientAccounts?.[external_state];
     let foundDiscoveredPatientAccount = this.discoveredPatientAccounts?.[external_state];
     if (foundPendingPatientAccount) {
