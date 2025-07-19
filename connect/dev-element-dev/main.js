@@ -40147,7 +40147,7 @@ var AppComponent = class _AppComponent {
   // postMessage registration, listen to events from the child/iframe window
   receivePostMessage(event) {
     if (event.source !== this.stitchIframeEmbed.nativeElement.contentWindow) {
-      this.logger.debug("ignoring message from unknown source, may be from another iframe");
+      this.logger.debug("ignoring message from unknown source, may be from another iframe", event);
       return;
     }
     let payload = JSON.parse(event.data);
