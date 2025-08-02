@@ -39924,7 +39924,7 @@ var MessageBusService = class _MessageBusService {
     this.messageBusSubject.next(eventPayload);
   }
   //this event is published when a widget search is performed
-  publishSearchQuery(query, locations, external_id) {
+  publishSearchQuery(query, locations, external_id, total_results) {
     if (!this.configService.systemConfig$.eventTypes?.includes(EventTypes.EventTypeSearchQuery)) {
       return;
     }
@@ -39939,6 +39939,9 @@ var MessageBusService = class _MessageBusService {
       timestamp: Date.now(),
       filter: {
         locations: locations || []
+      },
+      results: {
+        total: total_results
       },
       external_id
     };
