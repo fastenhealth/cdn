@@ -7681,7 +7681,7 @@ function handleReset(reset, on, ...args) {
       reset();
     }
   });
-  return on(...args).subscribe(onSubscriber);
+  return innerFrom(on(...args)).subscribe(onSubscriber);
 }
 
 // node_modules/rxjs/dist/esm/internal/operators/shareReplay.js
@@ -38466,6 +38466,12 @@ var ConnectMode;
   ConnectMode2["Redirect"] = "redirect";
   ConnectMode2["Popup"] = "popup";
 })(ConnectMode || (ConnectMode = {}));
+var SourceCredentialType;
+(function(SourceCredentialType2) {
+  SourceCredentialType2["SourceCredentialTypeSmartOnFhir"] = "smart_on_fhir";
+  SourceCredentialType2["SourceCredentialTypeTefcaDirect"] = "tefca_direct";
+  SourceCredentialType2["SourceCredentialTypeTefcaFacilitated"] = "tefca_facilitated";
+})(SourceCredentialType || (SourceCredentialType = {}));
 var EventTypes;
 (function(EventTypes2) {
   EventTypes2["EventTypeWidgetConfigError"] = "widget.config_error";
@@ -38504,7 +38510,7 @@ var SafeHtmlPipe = class _SafeHtmlPipe {
     };
   }
   static {
-    this.\u0275pipe = /* @__PURE__ */ \u0275\u0275definePipe({ name: "safeHtml", type: _SafeHtmlPipe, pure: true, standalone: false });
+    this.\u0275pipe = /* @__PURE__ */ \u0275\u0275definePipe({ name: "safeHtml", type: _SafeHtmlPipe, pure: true });
   }
 };
 
@@ -38590,7 +38596,7 @@ var StateNamePipe = class _StateNamePipe {
     };
   }
   static {
-    this.\u0275pipe = /* @__PURE__ */ \u0275\u0275definePipe({ name: "stateName", type: _StateNamePipe, pure: true, standalone: false });
+    this.\u0275pipe = /* @__PURE__ */ \u0275\u0275definePipe({ name: "stateName", type: _StateNamePipe, pure: true });
   }
 };
 
@@ -38641,7 +38647,7 @@ var ImageFallbackDirective = class _ImageFallbackDirective {
           return ctx.loadFallbackOnError();
         });
       }
-    }, inputs: { imageFallback: "imageFallback" }, standalone: false });
+    }, inputs: { imageFallback: "imageFallback" } });
   }
 };
 
@@ -39828,7 +39834,7 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   vaultProfileAddPendingRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
@@ -39971,7 +39977,7 @@ var VaultProfileConfig = class {
     }
     this.discoveredPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
-  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
@@ -39979,10 +39985,10 @@ var VaultProfileConfig = class {
     let foundDiscoveredPatientAccount = this.discoveredPatientAccounts?.[external_state];
     if (foundPendingPatientAccount) {
       delete this.pendingPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundPendingPatientAccount.brand, portal: foundPendingPatientAccount.portal, endpoint: foundPendingPatientAccount.endpoint });
+      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundPendingPatientAccount.brand, portal: foundPendingPatientAccount.portal, endpoint: foundPendingPatientAccount.endpoint, vault_profile_connection_id, patient_auth_type });
     } else if (foundDiscoveredPatientAccount) {
       delete this.discoveredPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundDiscoveredPatientAccount.brand, portal: foundDiscoveredPatientAccount.portal, endpoint: foundDiscoveredPatientAccount.endpoint });
+      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundDiscoveredPatientAccount.brand, portal: foundDiscoveredPatientAccount.portal, endpoint: foundDiscoveredPatientAccount.endpoint, vault_profile_connection_id, patient_auth_type });
     } else {
       console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
       console.warn("pendingAccounts", this.pendingPatientAccounts, "connectionParams", org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
@@ -39990,6 +39996,8 @@ var VaultProfileConfig = class {
         org_connection_id,
         connection_status,
         platform_type,
+        vault_profile_connection_id,
+        patient_auth_type,
         brand: { id: brand_id, name: "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
         portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
         endpoint: { id: endpoint_id, platform_type }
@@ -40081,6 +40089,7 @@ var AppComponent = class _AppComponent {
     this.endpointId = "";
     this.searchQuery = "";
     this.searchOnly = true;
+    this.showSplash = false;
     this.tefcaMode = false;
     this.eventTypes = "";
     this.externalEventBus = new EventEmitter();
@@ -40111,6 +40120,9 @@ var AppComponent = class _AppComponent {
       params = params.set("search-only", this.searchOnly.toString());
       if (this.searchQuery) {
         params = params.set("search-query", this.searchQuery);
+      }
+      if (this.showSplash) {
+        params = params.set("show-splash", this.showSplash.toString());
       }
     }
     if (this.brandId) {
@@ -40169,8 +40181,9 @@ var AppComponent = class _AppComponent {
     let payload = JSON.parse(event.data);
     this.logger.debug("bubbling up event to listeners (eventBus)", payload);
     if (payload.event_type == EventTypes.EventTypeWidgetClose) {
-      this.logger.debug("received EventTypeWidgetClose event, closing modal");
+      this.logger.debug("received EventTypeWidgetClose event, closing modal, skipping event bubbling");
       this.hideStitchModalExt();
+      return;
     }
     this.externalEventBus.emit(event);
   }
@@ -40198,7 +40211,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchOnly: [0, "search-only", "searchOnly"], tefcaMode: [0, "tefca-mode", "tefcaMode"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchOnly: [0, "search-only", "searchOnly"], showSplash: [0, "show-splash", "showSplash"], tefcaMode: [0, "tefca-mode", "tefcaMode"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();
