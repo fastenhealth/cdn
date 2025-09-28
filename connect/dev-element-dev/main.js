@@ -39837,6 +39837,26 @@ var ConfigService = class _ConfigService {
     updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type);
     this.vaultProfileConfig = updatedVaultProfile;
   }
+  // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
+  vaultProfileAuthorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus) {
+    let updatedVaultProfile = this.vaultProfileConfig$;
+    let isUpdated = updatedVaultProfile.authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus);
+    if (!isUpdated) {
+      this.logger.warn("Could not find TEFCA Direct account by connection id:", vaultProfileConnectionId);
+      return;
+    }
+    this.vaultProfileConfig = updatedVaultProfile;
+  }
+  //this is used when we were unable to generate an org_connection_id for a TEFCA Direct account.
+  vaultProfileRevokeTefcaDirectConnectedAccount(vaultProfileConnectionId) {
+    let updatedVaultProfile = this.vaultProfileConfig$;
+    let isUpdated = updatedVaultProfile.revokeTefcaDirectConnectedAccount(vaultProfileConnectionId);
+    if (!isUpdated) {
+      this.logger.warn("Could not find TEFCA Direct account by connection id:", vaultProfileConnectionId);
+      return;
+    }
+    this.vaultProfileConfig = updatedVaultProfile;
+  }
   vaultProfileAddPendingRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
     let externalState = vaultProfileConnectionId;
@@ -39845,8 +39865,7 @@ var ConfigService = class _ConfigService {
   }
   vaultProfileAddDiscoveredRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    let externalState = vaultProfileConnectionId;
-    updatedVaultProfile.addDiscoveredAccount(externalState, recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
+    updatedVaultProfile.addDiscoveredAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //Setter
@@ -39971,11 +39990,12 @@ var VaultProfileConfig = class {
     }
     this.pendingPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
-  addDiscoveredAccount(externalState, brand, portal, endpoint, vaultProfileConnectionId) {
+  //discovered accounts do not require a unique external state for matching, because they already have a unique identifier (vaultProfileConnectionId)
+  addDiscoveredAccount(brand, portal, endpoint, vaultProfileConnectionId) {
     if (!this.discoveredPatientAccounts) {
       this.discoveredPatientAccounts = {};
     }
-    this.discoveredPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
+    this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
   addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type) {
     if (!this.connectedPatientAccounts) {
@@ -40003,6 +40023,27 @@ var VaultProfileConfig = class {
         endpoint: { id: endpoint_id, platform_type }
       });
     }
+  }
+  // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
+  authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus) {
+    let ndx = this.connectedPatientAccounts?.findIndex((acc) => acc.vault_profile_connection_id === vaultProfileConnectionId);
+    if (ndx === void 0 || ndx < 0) {
+      return false;
+    }
+    let existingAccount = this.connectedPatientAccounts[ndx];
+    existingAccount.connection_status = connectionStatus;
+    existingAccount.org_connection_id = orgConnectionId;
+    this.connectedPatientAccounts[ndx] = existingAccount;
+    return true;
+  }
+  //this is used when we were unable to generate an org_connection_id for a TEFCA Direct account.
+  revokeTefcaDirectConnectedAccount(vaultProfileConnectionId) {
+    let ndx = this.connectedPatientAccounts?.findIndex((acc) => acc.vault_profile_connection_id === vaultProfileConnectionId);
+    if (ndx === void 0 || ndx < 0) {
+      return false;
+    }
+    this.connectedPatientAccounts.splice(ndx, 1);
+    return true;
   }
 };
 
@@ -40158,6 +40199,7 @@ var AppComponent = class _AppComponent {
   }
   hideStitchModalExt() {
     this.stitchModal.nativeElement.close();
+    this.stitchIframeEmbed.nativeElement.src = "about:blank";
   }
   //event handler for backdrop click
   registerDialogCloseOnBackdropClick() {
@@ -40169,6 +40211,7 @@ var AppComponent = class _AppComponent {
       var isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
       if (!isInDialog) {
         this.stitchModal.nativeElement.close();
+        this.stitchIframeEmbed.nativeElement.src = "about:blank";
       }
     });
   }
