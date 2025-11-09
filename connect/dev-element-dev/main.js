@@ -38466,6 +38466,11 @@ var ConnectMode;
   ConnectMode2["Redirect"] = "redirect";
   ConnectMode2["Popup"] = "popup";
 })(ConnectMode || (ConnectMode = {}));
+var CspType;
+(function(CspType2) {
+  CspType2["ClearCsp"] = "clear_csp";
+  CspType2["IdmeCsp"] = "idme_csp";
+})(CspType || (CspType = {}));
 var SourceCredentialType;
 (function(SourceCredentialType2) {
   SourceCredentialType2["SourceCredentialTypeSmartOnFhir"] = "smart_on_fhir";
