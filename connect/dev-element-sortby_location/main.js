@@ -40203,6 +40203,7 @@ var AppComponent = class _AppComponent {
     if (this.staticBackdrop) {
       params = params.set("static-backdrop", this.staticBackdrop.toString());
     }
+    this.logger.debug("encodeOptionsAsQueryStringParameters", params.toString());
     return params.toString();
   }
   showStitchModal() {
