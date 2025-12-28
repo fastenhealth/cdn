@@ -39839,7 +39839,7 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
@@ -39940,7 +39940,9 @@ var MessageBusService = class _MessageBusService {
         platform_type: account.platform_type,
         brand_id: account.brand?.id,
         portal_id: account.portal?.id,
-        endpoint_id: account.endpoint?.id
+        endpoint_id: account.endpoint?.id,
+        scope: account.scope,
+        consent_expires_at: account.consent_expires_at
       };
     }) || [];
     eventPayload.event_type = EventTypes.EventTypeWidgetComplete;
@@ -40002,7 +40004,7 @@ var VaultProfileConfig = class {
     }
     this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
-  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
@@ -40025,7 +40027,9 @@ var VaultProfileConfig = class {
         patient_auth_type,
         brand: { id: brand_id, name: "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
         portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
-        endpoint: { id: endpoint_id, platform_type }
+        endpoint: { id: endpoint_id, platform_type },
+        scope,
+        consent_expires_at
       });
     }
   }
