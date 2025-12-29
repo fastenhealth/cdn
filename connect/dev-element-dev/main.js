@@ -40012,7 +40012,18 @@ var VaultProfileConfig = class {
     let foundDiscoveredPatientAccount = this.discoveredPatientAccounts?.[external_state];
     if (foundPendingPatientAccount) {
       delete this.pendingPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundPendingPatientAccount.brand, portal: foundPendingPatientAccount.portal, endpoint: foundPendingPatientAccount.endpoint, vault_profile_connection_id, patient_auth_type });
+      this.connectedPatientAccounts?.push({
+        org_connection_id,
+        connection_status,
+        platform_type,
+        brand: foundPendingPatientAccount.brand,
+        portal: foundPendingPatientAccount.portal,
+        endpoint: foundPendingPatientAccount.endpoint,
+        vault_profile_connection_id,
+        patient_auth_type,
+        scope,
+        consent_expires_at
+      });
     } else if (foundDiscoveredPatientAccount) {
       delete this.discoveredPatientAccounts[external_state];
       this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundDiscoveredPatientAccount.brand, portal: foundDiscoveredPatientAccount.portal, endpoint: foundDiscoveredPatientAccount.endpoint, vault_profile_connection_id, patient_auth_type });
