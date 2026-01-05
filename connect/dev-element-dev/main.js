@@ -40159,6 +40159,7 @@ var AppComponent = class _AppComponent {
     this.searchOnly = true;
     this.showSplash = false;
     this.tefcaMode = false;
+    this.tefcaCspPromptForce = false;
     this.eventTypes = "";
     this.externalEventBus = new EventEmitter();
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
@@ -40211,6 +40212,9 @@ var AppComponent = class _AppComponent {
     if (this.tefcaMode) {
       params = params.set("tefca-mode", this.tefcaMode.toString());
       params = params.set("search-only", false.toString());
+      if (this.tefcaCspPromptForce) {
+        params = params.set("tefca-csp-prompt-force", this.tefcaCspPromptForce.toString());
+      }
     }
     if (this.eventTypes) {
       params = params.set("event-types", this.eventTypes);
@@ -40288,7 +40292,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchSortBy: [0, "search-sort-by", "searchSortBy"], searchSortByOpts: [0, "search-sort-by-opts", "searchSortByOpts"], searchOnly: [0, "search-only", "searchOnly"], showSplash: [0, "show-splash", "showSplash"], tefcaMode: [0, "tefca-mode", "tefcaMode"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchSortBy: [0, "search-sort-by", "searchSortBy"], searchSortByOpts: [0, "search-sort-by-opts", "searchSortByOpts"], searchOnly: [0, "search-only", "searchOnly"], showSplash: [0, "show-splash", "showSplash"], tefcaMode: [0, "tefca-mode", "tefcaMode"], tefcaCspPromptForce: [0, "tefca-csp-prompt-force", "tefcaCspPromptForce"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-min-h-[600px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none", 2, "width", "100%", "min-height", "800px"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();
