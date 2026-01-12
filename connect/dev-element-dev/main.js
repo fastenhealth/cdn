@@ -39839,13 +39839,13 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at, connectedAccount.tefca_directory_id);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
-  vaultProfileAuthorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus) {
+  vaultProfileAuthorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus, tefcaDirectoryId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    let isUpdated = updatedVaultProfile.authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus);
+    let isUpdated = updatedVaultProfile.authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus, tefcaDirectoryId);
     if (!isUpdated) {
       this.logger.warn("Could not find TEFCA Direct account by connection id:", vaultProfileConnectionId);
       return;
@@ -39942,7 +39942,8 @@ var MessageBusService = class _MessageBusService {
         portal_id: account.portal?.id,
         endpoint_id: account.endpoint?.id,
         scope: account.scope,
-        consent_expires_at: account.consent_expires_at
+        consent_expires_at: account.consent_expires_at,
+        tefca_directory_id: account.tefca_directory_id
       };
     }) || [];
     eventPayload.event_type = EventTypes.EventTypeWidgetComplete;
@@ -40004,7 +40005,7 @@ var VaultProfileConfig = class {
     }
     this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
-  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
@@ -40022,11 +40023,22 @@ var VaultProfileConfig = class {
         vault_profile_connection_id,
         patient_auth_type,
         scope,
-        consent_expires_at
+        consent_expires_at,
+        tefca_directory_id
       });
     } else if (foundDiscoveredPatientAccount) {
       delete this.discoveredPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({ org_connection_id, connection_status, platform_type, brand: foundDiscoveredPatientAccount.brand, portal: foundDiscoveredPatientAccount.portal, endpoint: foundDiscoveredPatientAccount.endpoint, vault_profile_connection_id, patient_auth_type });
+      this.connectedPatientAccounts?.push({
+        org_connection_id,
+        connection_status,
+        platform_type,
+        brand: foundDiscoveredPatientAccount.brand,
+        portal: foundDiscoveredPatientAccount.portal,
+        endpoint: foundDiscoveredPatientAccount.endpoint,
+        vault_profile_connection_id,
+        patient_auth_type,
+        tefca_directory_id
+      });
     } else {
       console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
       console.warn("pendingAccounts", this.pendingPatientAccounts, "connectionParams", org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
@@ -40040,12 +40052,13 @@ var VaultProfileConfig = class {
         portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
         endpoint: { id: endpoint_id, platform_type },
         scope,
-        consent_expires_at
+        consent_expires_at,
+        tefca_directory_id
       });
     }
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
-  authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus) {
+  authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus, tefcaDirectoryId) {
     let ndx = this.connectedPatientAccounts?.findIndex((acc) => acc.vault_profile_connection_id === vaultProfileConnectionId);
     if (ndx === void 0 || ndx < 0) {
       return false;
@@ -40053,6 +40066,9 @@ var VaultProfileConfig = class {
     let existingAccount = this.connectedPatientAccounts[ndx];
     existingAccount.connection_status = connectionStatus;
     existingAccount.org_connection_id = orgConnectionId;
+    if (tefcaDirectoryId) {
+      existingAccount.tefca_directory_id = tefcaDirectoryId;
+    }
     this.connectedPatientAccounts[ndx] = existingAccount;
     return true;
   }
