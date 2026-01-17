@@ -40064,6 +40064,9 @@ var VaultProfileConfig = class {
     }
   }
   addConnectedRecordLocatorAccount(recordLocatorFacilityConnected, vault_profile_connection_id) {
+    if (!this.connectedPatientAccounts) {
+      this.connectedPatientAccounts = [];
+    }
     this.connectedPatientAccounts?.push({
       org_connection_id: recordLocatorFacilityConnected.org_connection_id,
       connection_status: "connected",
