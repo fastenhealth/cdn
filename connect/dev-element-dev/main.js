@@ -39873,6 +39873,12 @@ var ConfigService = class _ConfigService {
     updatedVaultProfile.addDiscoveredAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
+  //this can only be used after the account has been connected via a
+  vaultProfileAddConnectedRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
+    let updatedVaultProfile = this.vaultProfileConfig$;
+    updatedVaultProfile.addConnectedAccount(vaultProfileConnectionId, recordLocatorFacility.org_connection_id, "connected", "tefca", recordLocatorFacility.brand?.id, recordLocatorFacility.portal?.id, recordLocatorFacility.endpoint?.id, vaultProfileConnectionId, recordLocatorFacility.patient_authorization_type, "", "", recordLocatorFacility.facility_id);
+    this.vaultProfileConfig = updatedVaultProfile;
+  }
   //Setter
   set searchConfig(value) {
     const mergedSettings = (0, import_lodash.merge)({}, this.searchConfigSubject.getValue(), value);
