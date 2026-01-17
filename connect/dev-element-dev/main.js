@@ -39873,10 +39873,10 @@ var ConfigService = class _ConfigService {
     updatedVaultProfile.addDiscoveredAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
-  //this can only be used after the account has been connected via a
+  //this can only be used after the RLS account has been previously connected
   vaultProfileAddConnectedRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(vaultProfileConnectionId, recordLocatorFacility.org_connection_id, "connected", "tefca", recordLocatorFacility.brand?.id, recordLocatorFacility.portal?.id, recordLocatorFacility.endpoint?.id, vaultProfileConnectionId, recordLocatorFacility.patient_authorization_type, "", "", recordLocatorFacility.facility_id);
+    updatedVaultProfile.addConnectedRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //Setter
@@ -40062,6 +40062,21 @@ var VaultProfileConfig = class {
         tefca_directory_id
       });
     }
+  }
+  addConnectedRecordLocatorAccount(recordLocatorFacilityConnected, vault_profile_connection_id) {
+    this.connectedPatientAccounts?.push({
+      org_connection_id: recordLocatorFacilityConnected.org_connection_id,
+      connection_status: "connected",
+      platform_type: "tefca",
+      brand: recordLocatorFacilityConnected.brand,
+      portal: recordLocatorFacilityConnected.portal,
+      endpoint: recordLocatorFacilityConnected.endpoint,
+      vault_profile_connection_id,
+      patient_auth_type: recordLocatorFacilityConnected.patient_authorization_type,
+      scope: "",
+      consent_expires_at: "",
+      tefca_directory_id: recordLocatorFacilityConnected.facility_id
+    });
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
   authorizeTefcaDirectConnectedAccount(vaultProfileConnectionId, orgConnectionId, connectionStatus, tefcaDirectoryId) {
