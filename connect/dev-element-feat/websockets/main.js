@@ -40258,6 +40258,7 @@ var AppComponent = class _AppComponent {
       params = params.set("static-backdrop", this.staticBackdrop.toString());
     }
     params = params.set("connect-mode", "websocket");
+    this.logger.debug("element environment", environment.name);
     this.logger.debug("encodeOptionsAsQueryStringParameters", params.toString());
     return params.toString();
   }
