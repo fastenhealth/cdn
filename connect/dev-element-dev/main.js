@@ -38118,6 +38118,7 @@ var VERSION3 = new Version("19.2.1");
 // projects/fasten-connect-stitch-element/src/environments/environment.ts
 var environment = {
   name: "development",
+  connect_base_domain: "connect-dev.fastenhealth.com",
   embed_endpoint_base: "https://embed.connect-dev.fastenhealth.com"
 };
 
@@ -38465,6 +38466,7 @@ var ConnectMode;
 (function(ConnectMode2) {
   ConnectMode2["Redirect"] = "redirect";
   ConnectMode2["Popup"] = "popup";
+  ConnectMode2["Websocket"] = "websocket";
 })(ConnectMode || (ConnectMode = {}));
 var CspType;
 (function(CspType2) {
@@ -40262,6 +40264,7 @@ var AppComponent = class _AppComponent {
     if (this.staticBackdrop) {
       params = params.set("static-backdrop", this.staticBackdrop.toString());
     }
+    params = params.set("connect-mode", "websocket");
     this.logger.debug("encodeOptionsAsQueryStringParameters", params.toString());
     return params.toString();
   }
