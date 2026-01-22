@@ -14397,7 +14397,7 @@ function getOrCreateComponentTView(def) {
   }
   return tView;
 }
-function createLView(parentLView, tView, context2, flags, host, tHostNode, environment3, renderer, injector, embeddedViewInjector, hydrationInfo) {
+function createLView(parentLView, tView, context2, flags, host, tHostNode, environment2, renderer, injector, embeddedViewInjector, hydrationInfo) {
   const lView = tView.blueprint.slice();
   lView[HOST] = host;
   lView[FLAGS] = flags | 4 | 128 | 8 | 64 | 1024;
@@ -14408,7 +14408,7 @@ function createLView(parentLView, tView, context2, flags, host, tHostNode, envir
   ngDevMode && tView.declTNode && parentLView && assertTNodeForLView(tView.declTNode, parentLView);
   lView[PARENT] = lView[DECLARATION_VIEW] = parentLView;
   lView[CONTEXT] = context2;
-  lView[ENVIRONMENT] = environment3 || parentLView && parentLView[ENVIRONMENT];
+  lView[ENVIRONMENT] = environment2 || parentLView && parentLView[ENVIRONMENT];
   ngDevMode && assertDefined(lView[ENVIRONMENT], "LViewEnvironment is required");
   lView[RENDERER] = renderer || parentLView && parentLView[RENDERER];
   ngDevMode && assertDefined(lView[RENDERER], "Renderer is required");
@@ -15495,8 +15495,8 @@ function runEffectsInView(view) {
 }
 var MAXIMUM_REFRESH_RERUNS$1 = 100;
 function detectChangesInternal(lView, notifyErrorHandler = true, mode = 0) {
-  const environment3 = lView[ENVIRONMENT];
-  const rendererFactory = environment3.rendererFactory;
+  const environment2 = lView[ENVIRONMENT];
+  const rendererFactory = environment2.rendererFactory;
   const checkNoChangesMode = !!ngDevMode && isInCheckNoChangesMode();
   if (!checkNoChangesMode) {
     rendererFactory.begin?.();
@@ -17623,10 +17623,10 @@ var ComponentFactory = class extends ComponentFactory$1 {
       );
       const rootTView = createTView(0, null, null, 1, 0, null, null, null, null, [tAttributes], null);
       const rootViewInjector = createRootViewInjector(cmpDef, environmentInjector || this.ngModule, injector);
-      const environment3 = createRootLViewEnvironment(rootViewInjector);
-      const hostRenderer = environment3.rendererFactory.createRenderer(null, cmpDef);
+      const environment2 = createRootLViewEnvironment(rootViewInjector);
+      const hostRenderer = environment2.rendererFactory.createRenderer(null, cmpDef);
       const hostElement = rootSelectorOrNode ? locateHostElement(hostRenderer, rootSelectorOrNode, cmpDef.encapsulation, rootViewInjector) : createHostElement(cmpDef, hostRenderer);
-      const rootLView = createLView(null, rootTView, null, 512 | getInitialLViewFlagsFromDef(cmpDef), null, null, environment3, hostRenderer, rootViewInjector, null, retrieveHydrationInfo(
+      const rootLView = createLView(null, rootTView, null, 512 | getInitialLViewFlagsFromDef(cmpDef), null, null, environment2, hostRenderer, rootViewInjector, null, retrieveHydrationInfo(
         hostElement,
         rootViewInjector,
         true
@@ -40087,23 +40087,6 @@ var VaultProfileConfig = class {
 
 // projects/shared-library/src/lib/models/message-bus/message-bus-event-payload.ts
 var MessageBusEventPayload = class {
-};
-
-// projects/fasten-connect-stitch-embed/src/environments/environment.dev2.ts
-var connect_base_domain = "workspace.fastenhealth.com";
-var environment2 = {
-  name: "development2",
-  //specify the lighthouse base that we're going to use to authenticate against all our source/providers. Must not have trailing slash
-  lighthouse_api_endpoint_base: "https://lighthouse.fastenhealth.com",
-  connect_base_domain,
-  //used to specify the api server that we're going to use (can be relative or absolute). Must not have trailing slash
-  // connect_api_endpoint_base: 'https://api.connect-dev.fastenhealth.com/v1',
-  // if relative, must start with /
-  connect_api_endpoint_base: `https://api.${connect_base_domain}/v1`,
-  connect_api_jwt_issuer_host: `https://api.${connect_base_domain}/v1`,
-  connect_api_websocket_base: `wss://websocket.${connect_base_domain}/v1`,
-  //JWKS for JWT verification
-  jwks_uri: "https://cdn.fastenhealth.com/jwks/fasten-connect/dev.json"
 };
 
 // projects/shared-library/src/lib/utils/base64.ts
