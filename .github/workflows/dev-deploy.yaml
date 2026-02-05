@@ -1,0 +1,50 @@
+name: Dev-Deploy
+
+on:
+  push:
+    branches: [cloudfront]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-s3:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      deployments: write
+
+    env:
+      AWS_REGION: us-east-1
+      DEPLOY_BUCKET: fasten-connect-cdn-dev-fastenconnectcdndev0d9d046f-ew0v8ycw5vh0
+      CLOUDFRONT_ID: E43CMUP0VF6FM
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::545217748721:role/fasten-connect-cdn-gh-s3-dev-deploy-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload CDN assets to S3
+        run: |
+          aws s3 sync images/ "s3://$DEPLOY_BUCKET/images/" --delete
+
+      - name: Bust CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
+
+      - uses: chrnorm/deployment-action@v2
+        name: Create GitHub deployment
+        id: deployment
+        with:
+          token: "${{ github.token }}"
+          environment: dev
+          initial-status: success

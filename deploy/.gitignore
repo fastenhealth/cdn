@@ -1,0 +1,41 @@
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Go ---
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+infra/vendor/
+
+# Compiled Go binary
+fasten-connect-portal-deploy-cdk
+infra/fasten-connect-portal-deploy-cdk
+
+# --- CDK / build output ---
+cdk.out/
+cdk.context.json
+infra/cdk.out/
+
+# --- Node / JS (don’t care; ignore TS infra entirely) ---
+infraTS/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- AWS creds / env files ---
+.env
+.env.*
+**/.aws/
+
+# --- LocalStack ---
+.localstack/

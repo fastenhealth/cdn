@@ -1,0 +1,24 @@
+services:
+  localstack:
+    # LocalStack is used for local/integration testing without AWS credentials.
+    #
+    # Note: CloudFront support can vary by LocalStack version/edition. If you
+    # don't see "cloudfront" in `/_localstack/health`, LocalStack won't be able
+    # to create CloudFront resources for this project.
+    container_name: localstack-main
+    image: localstack/localstack:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - AWS_DEFAULT_REGION=us-east-1
+      # Only enable what we need for this repo.
+      - SERVICES=cloudfront,cloudformation,route53,acm,iam,sts,s3,ssm
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+
