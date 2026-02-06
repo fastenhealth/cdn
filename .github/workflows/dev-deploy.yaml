@@ -2,7 +2,7 @@ name: Dev-Deploy
 
 on:
   push:
-    branches: [cloudfront]
+    branches: [cloud-front-dev-ready]
   workflow_dispatch:
 
 concurrency:
@@ -20,8 +20,8 @@ jobs:
 
     env:
       AWS_REGION: us-east-1
-      DEPLOY_BUCKET: cdn-dev-cdndevd19d6ae1-dpcafrrhknm3
-      CLOUDFRONT_ID: E46B0FCMVKZ8A
+      DEPLOY_BUCKET: cdn-dev-cdndevd19d6ae1-o7wfoaf1dm4u
+      CLOUDFRONT_ID: E2K8V8GC6OC61N
 
     steps:
       - name: Checkout code

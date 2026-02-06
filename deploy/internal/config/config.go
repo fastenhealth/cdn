@@ -14,8 +14,8 @@ type Config struct {
 	HostedZoneID string // Route53 hosted zone ID (e.g. Z123...)
 	ZoneName     string // Route53 zone name (e.g. example.com). Required because CDK cant derive it from zone-id at synth time.
 	CertArn      string // existing ACM certificate ARN (must be in us-east-1)
-	GithubRepo   string // existing ACM certificate ARN (must be in us-east-1)
-	AccountID    string // existing ACM certificate ARN (must be in us-east-1)
+	GithubRepo   string // Github repo to deploy to
+	AccountID    string // Account Id
 
 	// Optional:
 	Environment string // dev, staging, or prod (default: dev)
