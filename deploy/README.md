@@ -35,17 +35,14 @@ We need to host the SPA directly in AWS so we can control access, headers, and d
 
 ---
 
--git-repo=cdn \
- -account-id=545217748721 \
-
 ## Parameters
 
 | Flag          | Required | Description                                | Example                                     |
 | ------------- | -------- | ------------------------------------------ | ------------------------------------------- |
-| `-dest-host`  | Yes      | Public hostname users visit                | `portal.connect-dev.fastenhealth.com`       |
+| `-dest-host`  | Yes      | Public hostname users visit                | `cdn-dev.workspace.fastenhealth.com`        |
 | `-zone-id`    | Yes      | Route53 hosted zone ID                     | `Z0506726U7MA5EL64JZ0`                      |
-| `-zone-name`  | Yes      | Route53 zone name                          | `connect-dev.fastenhealth.com`              |
-| `-git-rep`    | yes      | Git Repo Name                              | `cdn`                                       |
+| `-zone-name`  | Yes      | Route53 zone name                          | `connect-dev.workspace.fastenhealth.com`    |
+| `-git-repo`   | yes      | Git Repo Name                              | `cdn`                                       |
 | `-account-id` | Yes      | AWS Account ID                             | `123456789012`                              |
 | `-cert-arn`   | Yes      | ACM certificate ARN (must be in us-east-1) | `arn:aws:acm:us-east-1:123:certificate/abc` |
 | `-env`        | No       | Environment name                           | `dev` (default), `prod`                     |
@@ -105,11 +102,11 @@ cdk bootstrap aws://YOUR_ACCOUNT_ID/us-east-1
 ```bash
 cd deploy
 cdk deploy --app "go run . \
-  -dest-host=cdn-dev.fastenhealth.com \
+  -dest-host=cdn-dev.workspace.fastenhealth.com \
   -zone-id=Z0506726U7MA5EL64JZ0 \
   -zone-name=workspace.fastenhealth.com \
   -git-repo=cdn \
-  -account-id=545217748721 \
+  -account-id=123456789012 \
   -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/37ca85c0-3666-47e4-b519-f7c2b5203821 \
   -env=dev"
 ```
@@ -119,7 +116,7 @@ cdk deploy --app "go run . \
 ### 6. Verify
 
 ```bash
-curl -I https://portal-test.workspace.fastenhealth.com
+curl -I https://cdn-dev.workspace.fastenhealth.com
 ```
 
 Expected headers:
@@ -147,22 +144,22 @@ Example:
 cd infra
 cdk deploy --app "go run . \
   -env=dev \
-  -dest-host=cdn-dev.fastenhealth.com \
+  -dest-host=cdn-dev.workspace.fastenhealth.com \
   -zone-id=Z0506726U7MA5EL64JZ0 \
   -zone-name=workspace.fastenhealth.com \
   -git-repo=cdn \
-  -account-id=545217748721 \
+  -account-id=123456789012 \
   -cert-arn=arn:aws:acm:us-east-1:DEV_ACCOUNT:certificate/DEV_CERT"
 
 
 # PROD
 cdk deploy --app "go run . \
   -env=prod \
-  -dest-host=cdn-dev.fastenhealth.com \
+  -dest-host=cdn-dev.workspace.fastenhealth.com \
   -zone-id=Z_PROD \
   -zone-name=workspace.fastenhealth.com \
   -git-repo=cdn \
-  -account-id=545217748721 \
+  -account-id=123456789012 \
   -cert-arn=arn:aws:acm:us-east-1:PROD_ACCOUNT:certificate/PROD_CERT"
 ```
 
@@ -204,10 +201,10 @@ go test -v ./... -run LocalStack
 ```bash
 cd infra
 cdk destroy --app "go run . \
-  -dest-host=cdn-dev.fastenhealth.com \
+  -dest-host=cdn-dev.workspace.fastenhealth.com \
   -zone-id=Z0506726U7MA5EL64JZ0 \
   -zone-name=workspace.fastenhealth.com \
-  -cert-arn=arn:aws:acm:us-east-1:545217748721:certificate/3a7e9635-c6ac-42fa-9b3b-339d850c9e2c \
+  -cert-arn=arn:aws:acm:us-east-1:123456789012:certificate/3a7e9635-c6ac-42fa-9b3b-339d850c9e2c \
   -env=dev"
 ```
 
