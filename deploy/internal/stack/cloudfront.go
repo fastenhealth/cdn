@@ -1,7 +1,7 @@
 package stack
 
 import (
-	"fasten-connect-portal-deploy-cdk/internal/config"
+	"cdn-deploy-cdk/internal/config"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awscertificatemanager"

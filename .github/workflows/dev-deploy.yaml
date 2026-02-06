@@ -20,8 +20,8 @@ jobs:
 
     env:
       AWS_REGION: us-east-1
-      DEPLOY_BUCKET: fasten-connect-cdn-dev-fastenconnectcdndev0d9d046f-ew0v8ycw5vh0
-      CLOUDFRONT_ID: E43CMUP0VF6FM
+      DEPLOY_BUCKET: cdn-dev-cdndevd19d6ae1-dpcafrrhknm3
+      CLOUDFRONT_ID: E46B0FCMVKZ8A
 
     steps:
       - name: Checkout code
@@ -30,7 +30,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::545217748721:role/fasten-connect-cdn-gh-s3-dev-deploy-role
+          role-to-assume: arn:aws:iam::545217748721:role/cdn-gh-s3-dev-deploy-role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload CDN assets to S3

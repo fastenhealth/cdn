@@ -16,8 +16,8 @@ vendor/
 infra/vendor/
 
 # Compiled Go binary
-fasten-connect-portal-deploy-cdk
-infra/fasten-connect-portal-deploy-cdk
+cdn-deploy-cdk
+infra/cdn-deploy-cdk
 
 # --- CDK / build output ---
 cdk.out/

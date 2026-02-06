@@ -73,7 +73,7 @@ func (c *Config) Validate() error {
 
 // StackName returns a consistent stack name based on environment.
 func (c *Config) StackName() string {
-	return fmt.Sprintf("fasten-connect-portal-%s", c.Environment)
+	return fmt.Sprintf("cdn-%s", c.Environment)
 }
 
 func isValidEnvironment(env string) bool {

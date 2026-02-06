@@ -1,7 +1,7 @@
 package stack
 
 import (
-	"fasten-connect-portal-deploy-cdk/internal/config"
+	"cdn-deploy-cdk/internal/config"
 	"fmt"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
@@ -17,7 +17,7 @@ func NewStaticSite(app constructs.Construct, cfg *config.Config) awscdk.Stack {
 	stackName := cfg.StackName()
 
 	stack := awscdk.NewStack(app, &stackName, &awscdk.StackProps{
-		Description: jsii.String(fmt.Sprintf("CDK Deploy - Fasten Connect Portal %s hosted on CloudFront (backed by S3 Bucket)", cfg.Environment)),
+		Description: jsii.String(fmt.Sprintf("CDK Deploy - CDN %s hosted on CloudFront (backed by S3 Bucket)", cfg.Environment)),
 		Env: &awscdk.Environment{
 			Region: jsii.String(cloudFrontRegion),
 		},
@@ -29,7 +29,7 @@ func NewStaticSite(app constructs.Construct, cfg *config.Config) awscdk.Stack {
 	// 2. Import existing ACM certificate (must be pre-provisioned in us-east-1)
 	cert := importCertificate(stack, cfg)
 
-	// 3. S3 origin bucket where the portal assets will live
+	// 3. S3 origin bucket where the cdn assets will live
 	bucket := newContentBucket(stack, cfg)
 
 	// 4. IAM role for GitHub Actions deployments with access to the S3 bucket

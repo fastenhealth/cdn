@@ -1,4 +1,4 @@
-module fasten-connect-portal-deploy-cdk
+module cdn-deploy-cdk
 
 go 1.23.10
 

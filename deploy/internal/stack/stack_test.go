@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"fasten-connect-portal-deploy-cdk/internal/config"
-	"fasten-connect-portal-deploy-cdk/internal/stack"
+	"cdn-deploy-cdk/internal/config"
+	"cdn-deploy-cdk/internal/stack"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/jsii-runtime-go"
@@ -28,7 +28,7 @@ const (
 	cachingOptimizedPolicy   = "658327ea-f89d-4fab-a63d-7e88639e58f6"
 	hstsMaxAgeSec            = 31536000.0
 	testCertArn              = "arn:aws:acm:us-east-1:123456789012:certificate/test-cert-id"
-	githubRepoConditionValue = "repo:fastenhealth/fasten-connect-portal:*"
+	githubRepoConditionValue = "repo:fastenhealth/cdn:*"
 	githubAudience           = "sts.amazonaws.com"
 )
 
@@ -206,7 +206,7 @@ func TestIamRole_WithValidConfig_ShouldRestrictGitHubOidc(t *testing.T) {
 	//setup
 	cfg := testConfig()
 	resources := synthTemplate(t, cfg)
-	expectedName := fmt.Sprintf("fasten-connect-portal-gh-s3-%s-deploy-role", cfg.Environment)
+	expectedName := fmt.Sprintf("cdn-gh-s3-%s-deploy-role", cfg.Environment)
 	var props map[string]any
 	for _, r := range resources {
 		res := r.(map[string]any)

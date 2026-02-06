@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"fasten-connect-portal-deploy-cdk/internal/config"
-	"fasten-connect-portal-deploy-cdk/internal/stack"
+	"cdn-deploy-cdk/internal/config"
+	"cdn-deploy-cdk/internal/stack"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 )
