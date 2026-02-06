@@ -30,7 +30,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::410145376638:role/cdn-gh-s3-dev-deploy-role
+          role-to-assume: arn:aws:iam::545217748721:role/cdn-gh-s3-dev-deploy-role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload CDN assets to S3
