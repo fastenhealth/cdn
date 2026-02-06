@@ -18,32 +18,37 @@ We need to host the SPA directly in AWS so we can control access, headers, and d
 
 ## Dependencies
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Go | 1.23+ | https://go.dev/dl/ |
-| AWS CDK CLI | 2.x | `npm install -g aws-cdk` |
-| AWS CLI | 2.x | https://aws.amazon.com/cli/ |
-| Docker | (for LocalStack tests) | https://docker.com |
+| Tool        | Version                | Install                     |
+| ----------- | ---------------------- | --------------------------- |
+| Go          | 1.23+                  | https://go.dev/dl/          |
+| AWS CDK CLI | 2.x                    | `npm install -g aws-cdk`    |
+| AWS CLI     | 2.x                    | https://aws.amazon.com/cli/ |
+| Docker      | (for LocalStack tests) | https://docker.com          |
 
 ### Go modules (in `infra/go.mod`)
 
-| Module | Version |
-|--------|---------|
-| `github.com/aws/aws-cdk-go/awscdk/v2` | v2.235.1 |
-| `github.com/aws/constructs-go/constructs/v10` | v10.4.5 |
-| `github.com/aws/jsii-runtime-go` | v1.125.0 |
+| Module                                        | Version  |
+| --------------------------------------------- | -------- |
+| `github.com/aws/aws-cdk-go/awscdk/v2`         | v2.235.1 |
+| `github.com/aws/constructs-go/constructs/v10` | v10.4.5  |
+| `github.com/aws/jsii-runtime-go`              | v1.125.0 |
 
 ---
 
+-git-repo=cdn \
+ -account-id=545217748721 \
+
 ## Parameters
 
-| Flag | Required | Description | Example |
-|------|----------|-------------|---------|
-| `-dest-host` | Yes | Public hostname users visit | `portal.connect-dev.fastenhealth.com` |
-| `-zone-id` | Yes | Route53 hosted zone ID | `Z0506726U7MA5EL64JZ0` |
-| `-zone-name` | Yes | Route53 zone name | `connect-dev.fastenhealth.com` |
-| `-cert-arn` | Yes | ACM certificate ARN (must be in us-east-1) | `arn:aws:acm:us-east-1:123:certificate/abc` |
-| `-env` | No | Environment name | `dev` (default), `prod` |
+| Flag          | Required | Description                                | Example                                     |
+| ------------- | -------- | ------------------------------------------ | ------------------------------------------- |
+| `-dest-host`  | Yes      | Public hostname users visit                | `portal.connect-dev.fastenhealth.com`       |
+| `-zone-id`    | Yes      | Route53 hosted zone ID                     | `Z0506726U7MA5EL64JZ0`                      |
+| `-zone-name`  | Yes      | Route53 zone name                          | `connect-dev.fastenhealth.com`              |
+| `-git-rep`    | yes      | Git Repo Name                              | `cdn`                                       |
+| `-account-id` | Yes      | AWS Account ID                             | `123456789012`                              |
+| `-cert-arn`   | Yes      | ACM certificate ARN (must be in us-east-1) | `arn:aws:acm:us-east-1:123:certificate/abc` |
+| `-env`        | No       | Environment name                           | `dev` (default), `prod`                     |
 
 After deploy the stack outputs `SiteBucketName` so you know where to upload the portal build artifacts (for example with `aws s3 sync dist/ s3://BUCKET-NAME/`) and `GitHubDeployRoleArn` for the GitHub Actions OIDC role.
 
@@ -100,12 +105,15 @@ cdk bootstrap aws://YOUR_ACCOUNT_ID/us-east-1
 ```bash
 cd deploy
 cdk deploy --app "go run . \
-  -dest-host=portal.connect-dev.fastenhealth.com \
-  -zone-id=Z031839828MM3LVGUGN1X \
-  -zone-name=connect-dev.fastenhealth.com \
+  -dest-host=cdn-dev.fastenhealth.com \
+  -zone-id=Z0506726U7MA5EL64JZ0 \
+  -zone-name=workspace.fastenhealth.com \
+  -git-repo=cdn \
+  -account-id=545217748721 \
   -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/37ca85c0-3666-47e4-b519-f7c2b5203821 \
   -env=dev"
 ```
+
 `cdk deploy` prints an `Outputs:` section; copy the `SiteBucketName` value and publish your build (e.g. `aws s3 sync dist/ s3://BUCKET/`).
 
 ### 6. Verify
@@ -115,6 +123,7 @@ curl -I https://portal-test.workspace.fastenhealth.com
 ```
 
 Expected headers:
+
 ```
 strict-transport-security: max-age=31536000; includeSubDomains; preload
 x-content-type-options: nosniff
@@ -138,17 +147,22 @@ Example:
 cd infra
 cdk deploy --app "go run . \
   -env=dev \
-  -dest-host=portal.connect-dev.fastenhealth.com \
-  -zone-id=Z_DEV \
-  -zone-name=connect-dev.fastenhealth.com \
+  -dest-host=cdn-dev.fastenhealth.com \
+  -zone-id=Z0506726U7MA5EL64JZ0 \
+  -zone-name=workspace.fastenhealth.com \
+  -git-repo=cdn \
+  -account-id=545217748721 \
   -cert-arn=arn:aws:acm:us-east-1:DEV_ACCOUNT:certificate/DEV_CERT"
+
 
 # PROD
 cdk deploy --app "go run . \
   -env=prod \
-  -dest-host=portal.connect.fastenhealth.com \
+  -dest-host=cdn-dev.fastenhealth.com \
   -zone-id=Z_PROD \
-  -zone-name=connect.fastenhealth.com \
+  -zone-name=workspace.fastenhealth.com \
+  -git-repo=cdn \
+  -account-id=545217748721 \
   -cert-arn=arn:aws:acm:us-east-1:PROD_ACCOUNT:certificate/PROD_CERT"
 ```
 
@@ -190,7 +204,7 @@ go test -v ./... -run LocalStack
 ```bash
 cd infra
 cdk destroy --app "go run . \
-  -dest-host=portal-test.workspace.fastenhealth.com \
+  -dest-host=cdn-dev.fastenhealth.com \
   -zone-id=Z0506726U7MA5EL64JZ0 \
   -zone-name=workspace.fastenhealth.com \
   -cert-arn=arn:aws:acm:us-east-1:545217748721:certificate/3a7e9635-c6ac-42fa-9b3b-339d850c9e2c \
@@ -221,10 +235,10 @@ docker-compose.yml               # LocalStack for local testing
 
 ## Troubleshooting
 
-| Error | Fix |
-|-------|-----|
-| `SSM parameter /cdk-bootstrap/... not found` | Run `cdk bootstrap` first |
+| Error                                                                | Fix                                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `SSM parameter /cdk-bootstrap/... not found`                         | Run `cdk bootstrap` first                                     |
 | `Need to perform AWS calls for account X, but credentials are for Y` | Wrong AWS profile, run `aws sts get-caller-identity` to check |
-| `iam:GetRole AccessDenied` | Your role lacks IAM permissions, need admin to bootstrap |
-| `Certificate stuck pending` | DNS validation CNAME not added, check Route53 |
-| `NoSuchHostedZone` | Zone ID doesn't exist in this account |
+| `iam:GetRole AccessDenied`                                           | Your role lacks IAM permissions, need admin to bootstrap      |
+| `Certificate stuck pending`                                          | DNS validation CNAME not added, check Route53                 |
+| `NoSuchHostedZone`                                                   | Zone ID doesn't exist in this account                         |
