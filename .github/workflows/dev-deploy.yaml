@@ -37,6 +37,9 @@ jobs:
         run: |
           aws s3 sync images/ "s3://$DEPLOY_BUCKET/images/" --delete
 
+          # Upload root index.html
+          aws s3 cp index.html "s3://$DEPLOY_BUCKET/index.html"
+
       - name: Bust CloudFront Cache
         run: |
           aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
