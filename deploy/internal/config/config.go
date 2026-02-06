@@ -14,6 +14,8 @@ type Config struct {
 	HostedZoneID string // Route53 hosted zone ID (e.g. Z123...)
 	ZoneName     string // Route53 zone name (e.g. example.com). Required because CDK cant derive it from zone-id at synth time.
 	CertArn      string // existing ACM certificate ARN (must be in us-east-1)
+	GithubRepo   string // existing ACM certificate ARN (must be in us-east-1)
+	AccountID    string // existing ACM certificate ARN (must be in us-east-1)
 
 	// Optional:
 	Environment string // dev, staging, or prod (default: dev)
@@ -28,6 +30,9 @@ func ParseFlags() (*Config, error) {
 	flag.StringVar(&cfg.ZoneName, "zone-name", "", "Route53 zone name (e.g. example.com)")
 	flag.StringVar(&cfg.Environment, "env", "dev", "Deployment environment (dev|staging|prod) (default: dev)")
 	flag.StringVar(&cfg.CertArn, "cert-arn", "", "Existing ACM certificate ARN (required; must be in us-east-1)")
+	flag.StringVar(&cfg.GithubRepo, "git-repo", "", "Github Repo Name")
+	flag.StringVar(&cfg.AccountID, "account-id", "", "Aws Account ID")
+
 	flag.Parse()
 
 	if err := cfg.Validate(); err != nil {
@@ -63,6 +68,13 @@ func (c *Config) Validate() error {
 	if c.CertArn == "" {
 		errs = append(errs, "cert-arn is required")
 	}
+	if c.GithubRepo == "" {
+		errs = append(errs, "git-repo is required")
+	}
+
+	if c.AccountID == "" {
+		errs = append(errs, "account-id is required")
+	}
 
 	if len(errs) > 0 {
 		return errors.New(strings.Join(errs, "; "))
@@ -73,7 +85,7 @@ func (c *Config) Validate() error {
 
 // StackName returns a consistent stack name based on environment.
 func (c *Config) StackName() string {
-	return fmt.Sprintf("cdn-%s", c.Environment)
+	return fmt.Sprintf("%s-%s", c.GithubRepo, c.Environment)
 }
 
 func isValidEnvironment(env string) bool {

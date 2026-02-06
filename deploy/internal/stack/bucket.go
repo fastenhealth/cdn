@@ -12,7 +12,7 @@ import (
 
 // newContentBucket provisions a private bucket that stores the SPA assets.
 func newContentBucket(scope constructs.Construct, cfg *config.Config) awss3.Bucket {
-	bucket := awss3.NewBucket(scope, jsii.String(fmt.Sprintf("cdn-%s", cfg.Environment)), &awss3.BucketProps{
+	bucket := awss3.NewBucket(scope, jsii.String(fmt.Sprintf("%s-%s", cfg.GithubRepo, cfg.Environment)), &awss3.BucketProps{
 		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
 		Encryption:        awss3.BucketEncryption_S3_MANAGED,
 		Versioned:         jsii.Bool(false),

@@ -20,6 +20,22 @@ func newCloudFrontDistribution(scope constructs.Construct, cfg *config.Config, c
 		OriginAccessIdentity: awscloudfront.NewOriginAccessIdentity(scope, jsii.String("OriginAccessIdentity"), nil),
 	})
 
+	// Custom cache policy with 1-week TTL
+	// cachePolicy := awscloudfront.NewCachePolicy(scope, jsii.String("OneWeekCachePolicy"), &awscloudfront.CachePolicyProps{
+	// 	CachePolicyName: jsii.String("OneWeekStaticAssets"),
+
+	// 	DefaultTtl: awscdk.Duration_Days(jsii.Number(7)),
+	// 	MaxTtl:     awscdk.Duration_Days(jsii.Number(30)),
+	// 	MinTtl:     awscdk.Duration_Seconds(jsii.Number(0)),
+
+	// 	EnableAcceptEncodingGzip:   jsii.Bool(true),
+	// 	EnableAcceptEncodingBrotli: jsii.Bool(true),
+
+	// 	HeaderBehavior:      awscloudfront.CacheHeaderBehavior_None(),
+	// 	CookieBehavior:      awscloudfront.CacheCookieBehavior_None(),
+	// 	QueryStringBehavior: awscloudfront.CacheQueryStringBehavior_None(),
+	// })
+
 	return awscloudfront.NewDistribution(scope, jsii.String("Distribution"), &awscloudfront.DistributionProps{
 		DomainNames: &[]*string{
 			jsii.String(cfg.DestHost),
