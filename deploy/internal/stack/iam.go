@@ -22,6 +22,7 @@ const (
 // newGitHubDeployRole provisions an IAM role for GitHub Actions deployments.
 func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket awss3.IBucket) awsiam.Role {
 	roleName := fmt.Sprintf("%s-gh-s3-%s-deploy-role", cfg.GithubRepo, cfg.Environment)
+
 	conditions := map[string]any{
 		"StringLike": map[string]any{
 			"token.actions.githubusercontent.com:sub": fmt.Sprintf("repo:fastenhealth/%s:*", cfg.GithubRepo),
@@ -32,6 +33,7 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 	}
 
 	federatedPrinciple := fmt.Sprintf("arn:aws:iam::%s:oidc-provider/token.actions.githubusercontent.com", cfg.AccountID)
+
 	role := awsiam.NewRole(scope, jsii.String("GitHubDeployRole"), &awsiam.RoleProps{
 		RoleName:    jsii.String(roleName),
 		Description: jsii.String("Allows GitHub Actions to sync the Fasten Connect Cdn assets to S3"),
@@ -43,6 +45,19 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 	})
 
 	bucket.GrantReadWrite(role, nil)
+
+	// CloudFront invalidation permissions
+	role.AddToPolicy(awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Effect: awsiam.Effect_ALLOW,
+		Actions: &[]*string{
+			jsii.String("cloudfront:CreateInvalidation"),
+			jsii.String("cloudfront:GetDistribution"),
+			jsii.String("cloudfront:ListInvalidations"),
+		},
+		Resources: &[]*string{
+			jsii.String("*"),
+		},
+	}))
 
 	awscdk.NewCfnOutput(scope, jsii.String(githubRoleOutputName), &awscdk.CfnOutputProps{
 		Value: role.RoleArn(),
