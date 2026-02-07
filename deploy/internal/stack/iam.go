@@ -21,7 +21,7 @@ const (
 
 // newGitHubDeployRole provisions an IAM role for GitHub Actions deployments.
 func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket awss3.IBucket) awsiam.Role {
-	roleName := fmt.Sprintf("%s-gh-s3-%s-deploy-role", cfg.GithubRepo, cfg.Environment)
+	roleName := fmt.Sprintf("fasten-connect-%s-gh-s3-%s-deploy-role", cfg.GithubRepo, cfg.Environment)
 
 	conditions := map[string]any{
 		"StringLike": map[string]any{

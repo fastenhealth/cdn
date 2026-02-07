@@ -3,7 +3,6 @@ package stack
 import (
 	"cdn-deploy-cdk/internal/config"
 	"fmt"
-
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -23,9 +22,6 @@ func NewStaticSite(app constructs.Construct, cfg *config.Config) awscdk.Stack {
 		},
 	})
 
-	// 1. Route53 hosted zone (for DNS alias records)
-	zone := lookupHostedZone(stack, cfg)
-
 	// 2. Import existing ACM certificate (must be pre-provisioned in us-east-1)
 	cert := importCertificate(stack, cfg)
 
@@ -38,8 +34,9 @@ func NewStaticSite(app constructs.Construct, cfg *config.Config) awscdk.Stack {
 	// 5. CloudFront distribution (S3 origin + dest-host alias + headers)
 	dist := newCloudFrontDistribution(stack, cfg, cert, bucket)
 
-	// 6. DNS: dest-host -> CloudFront
-	newAliasRecords(stack, zone, cfg.DestHost, dist)
+	awscdk.NewCfnOutput(stack, jsii.String("CdnCloudFrontDistributionDomainName"), &awscdk.CfnOutputProps{
+		Value: dist.DistributionDomainName(),
+	})
 
 	return stack
 }

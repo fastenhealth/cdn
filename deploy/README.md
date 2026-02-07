@@ -38,11 +38,9 @@ We need to host the SPA directly in AWS so we can control access, headers, and d
 ## Parameters
 
 | Flag          | Required | Description                                | Example                                     |
-| ------------- | -------- | ------------------------------------------ | ------------------------------------------- |
+| ------------- |----------| ------------------------------------------ | ------------------------------------------- |
 | `-dest-host`  | Yes      | Public hostname users visit                | `cdn-dev.workspace.fastenhealth.com`        |
-| `-zone-id`    | Yes      | Route53 hosted zone ID                     | `Z0506726U7MA5EL64JZ0`                      |
-| `-zone-name`  | Yes      | Route53 zone name                          | `connect-dev.workspace.fastenhealth.com`    |
-| `-git-repo`   | yes      | Git Repo Name                              | `cdn`                                       |
+| `-git-repo`   | No       | Git Repo Name                              | `cdn`                                       |
 | `-account-id` | Yes      | AWS Account ID                             | `123456789012`                              |
 | `-cert-arn`   | Yes      | ACM certificate ARN (must be in us-east-1) | `arn:aws:acm:us-east-1:123:certificate/abc` |
 | `-env`        | No       | Environment name                           | `dev` (default), `prod`                     |
@@ -102,16 +100,27 @@ cdk bootstrap aws://YOUR_ACCOUNT_ID/us-east-1
 ```bash
 cd deploy
 cdk deploy --app "go run . \
-  -dest-host=cdn-dev.workspace.fastenhealth.com \
-  -zone-id=Z0506726U7MA5EL64JZ0 \
-  -zone-name=workspace.fastenhealth.com \
-  -git-repo=cdn \
+  -dest-host=cdn-dev.fastenhealth.com \
   -account-id=123456789012 \
   -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/37ca85c0-3666-47e4-b519-f7c2b5203821 \
   -env=dev"
 ```
 
+```bash
+cd deploy
+cdk deploy --app "go run . \
+  -dest-host=cdn.fastenhealth.com \
+  -account-id=410145376638 \
+  -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/16343cad-7d3f-4434-930e-2c9445123d38 \
+  -env=prod"
+```
+
+
 `cdk deploy` prints an `Outputs:` section; copy the `SiteBucketName` value and publish your build (e.g. `aws s3 sync dist/ s3://BUCKET/`).
+
+
+
+
 
 ### 6. Verify
 

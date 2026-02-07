@@ -2,8 +2,6 @@ package stack
 
 import (
 	"cdn-deploy-cdk/internal/config"
-	"fmt"
-
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
 	"github.com/aws/constructs-go/constructs/v10"
@@ -12,7 +10,7 @@ import (
 
 // newContentBucket provisions a private bucket that stores the SPA assets.
 func newContentBucket(scope constructs.Construct, cfg *config.Config) awss3.Bucket {
-	bucket := awss3.NewBucket(scope, jsii.String(fmt.Sprintf("%s-%s", cfg.GithubRepo, cfg.Environment)), &awss3.BucketProps{
+	bucket := awss3.NewBucket(scope, jsii.String(cfg.StackName()), &awss3.BucketProps{
 		BlockPublicAccess: awss3.BlockPublicAccess_BLOCK_ALL(),
 		Encryption:        awss3.BucketEncryption_S3_MANAGED,
 		Versioned:         jsii.Bool(false),

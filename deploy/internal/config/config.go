@@ -10,12 +10,10 @@ import (
 // Config holds deployment parameters for the CloudFront stack.
 type Config struct {
 	// Required:
-	DestHost     string // public hostname (e.g. docs.example.com)
-	HostedZoneID string // Route53 hosted zone ID (e.g. Z123...)
-	ZoneName     string // Route53 zone name (e.g. example.com). Required because CDK cant derive it from zone-id at synth time.
-	CertArn      string // existing ACM certificate ARN (must be in us-east-1)
-	GithubRepo   string // Github repo to deploy to
-	AccountID    string // Account Id
+	DestHost   string // public hostname (e.g. docs.example.com)
+	CertArn    string // existing ACM certificate ARN (must be in us-east-1)
+	GithubRepo string // Github repo to deploy to
+	AccountID  string // Account Id
 
 	// Optional:
 	Environment string // dev, staging, or prod (default: dev)
@@ -26,11 +24,9 @@ func ParseFlags() (*Config, error) {
 	cfg := &Config{}
 
 	flag.StringVar(&cfg.DestHost, "dest-host", "", "Destination hostname (public) (e.g. docs.example.com)")
-	flag.StringVar(&cfg.HostedZoneID, "zone-id", "", "Route53 hosted zone ID")
-	flag.StringVar(&cfg.ZoneName, "zone-name", "", "Route53 zone name (e.g. example.com)")
 	flag.StringVar(&cfg.Environment, "env", "dev", "Deployment environment (dev|staging|prod) (default: dev)")
 	flag.StringVar(&cfg.CertArn, "cert-arn", "", "Existing ACM certificate ARN (required; must be in us-east-1)")
-	flag.StringVar(&cfg.GithubRepo, "git-repo", "", "Github Repo Name")
+	flag.StringVar(&cfg.GithubRepo, "git-repo", "cdn", "Github Repo Name")
 	flag.StringVar(&cfg.AccountID, "account-id", "", "Aws Account ID")
 
 	flag.Parse()
@@ -57,14 +53,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, "dest-host is required")
 	}
 
-	if c.HostedZoneID == "" {
-		errs = append(errs, "zone-id is required")
-	}
-
-	if c.ZoneName == "" {
-		errs = append(errs, "zone-name is required")
-	}
-
 	if c.CertArn == "" {
 		errs = append(errs, "cert-arn is required")
 	}
@@ -85,7 +73,7 @@ func (c *Config) Validate() error {
 
 // StackName returns a consistent stack name based on environment.
 func (c *Config) StackName() string {
-	return fmt.Sprintf("%s-%s", c.GithubRepo, c.Environment)
+	return fmt.Sprintf("fasten-connect-%s-%s", c.GithubRepo, c.Environment)
 }
 
 func isValidEnvironment(env string) bool {
