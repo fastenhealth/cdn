@@ -1,8 +1,8 @@
-name: Dev-Deploy
+name: Prod-Deploy
 
 on:
   push:
-    branches: [cloud-front-dev-ready]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -20,8 +20,8 @@ jobs:
 
     env:
       AWS_REGION: us-east-1
-      DEPLOY_BUCKET: cdn-dev-cdndevd19d6ae1-o7wfoaf1dm4u
-      CLOUDFRONT_ID: E2K8V8GC6OC61N
+      DEPLOY_BUCKET: fasten-connect-cdn-prod-fastenconnectcdnprod3e2a72-dal92whpt4os
+      CLOUDFRONT_ID: E3ZG0G4KWL8QY
 
     steps:
       - name: Checkout code
@@ -30,24 +30,27 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::545217748721:role/cdn-gh-s3-dev-deploy-role
+          role-to-assume: arn:aws:iam::410145376638:role/fasten-connect-cdn-gh-s3-prod-deploy-role
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload CDN assets to S3
         run: |
+          aws s3 sync connect/ "s3://$DEPLOY_BUCKET/connect/" --delete
           aws s3 sync images/ "s3://$DEPLOY_BUCKET/images/" --delete
+          aws s3 sync jwks/ "s3://$DEPLOY_BUCKET/jwks/" --delete
+          # do not sync the logos directory, this will be synced directly from the fasten-sources-gen repo
 
           # Upload root index.html
           aws s3 cp index.html "s3://$DEPLOY_BUCKET/index.html"
 
       - name: Bust CloudFront Cache
         run: |
-          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/*"
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_ID --paths "/connect/*" "/jwks/*" "/images/*"
 
       - uses: chrnorm/deployment-action@v2
         name: Create GitHub deployment
         id: deployment
         with:
           token: "${{ github.token }}"
-          environment: dev
+          environment: prod
           initial-status: success
