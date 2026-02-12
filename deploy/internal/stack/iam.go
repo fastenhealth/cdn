@@ -25,7 +25,10 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 
 	conditions := map[string]any{
 		"StringLike": map[string]any{
-			"token.actions.githubusercontent.com:sub": fmt.Sprintf("repo:fastenhealth/%s:*", cfg.GithubRepo),
+			"token.actions.githubusercontent.com:sub": []string{
+				fmt.Sprintf("repo:fastenhealth/%s:*", cfg.GithubRepo),
+				"repo:fastenhealth/fasten-sources-gen:*", //allow
+			},
 		},
 		"StringEquals": map[string]any{
 			"token.actions.githubusercontent.com:aud": githubActionsAudience,
