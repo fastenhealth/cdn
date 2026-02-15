@@ -62,14 +62,39 @@ func newCloudFrontDistribution(scope constructs.Construct, cfg *config.Config, c
 			ResponseHeadersPolicy: policy,
 			ViewerProtocolPolicy:  awscloudfront.ViewerProtocolPolicy_REDIRECT_TO_HTTPS,
 			CachePolicy:           awscloudfront.CachePolicy_CACHING_OPTIMIZED(), // use CloudFront default caching
+			OriginRequestPolicy:   awscloudfront.OriginRequestPolicy_CORS_S3_ORIGIN(),
 		},
 	})
 }
 
 // newSecurityHeadersPolicy creates a response headers policy enforcing
 // HSTS, X-Frame-Options, X-Content-Type-Options, and Referrer-Policy.
+// Allows all origins for CORS requests, including preflight requests, and adds security headers
 func newSecurityHeadersPolicy(scope constructs.Construct) awscloudfront.ResponseHeadersPolicy {
 	return awscloudfront.NewResponseHeadersPolicy(scope, jsii.String("SecurityHeaders"), &awscloudfront.ResponseHeadersPolicyProps{
+		Comment: jsii.String("Allows all origins for CORS requests, including preflight requests, and adds custom security headers"),
+		CorsBehavior: &awscloudfront.ResponseHeadersCorsBehavior{
+			AccessControlAllowCredentials: jsii.Bool(false),
+			AccessControlAllowHeaders: &[]*string{
+				jsii.String("*"),
+			},
+			AccessControlAllowMethods: &[]*string{
+				jsii.String("GET"),
+				jsii.String("HEAD"),
+				jsii.String("PUT"),
+				jsii.String("POST"),
+				jsii.String("PATCH"),
+				jsii.String("OPTIONS"),
+			},
+			AccessControlAllowOrigins: &[]*string{
+				jsii.String("*"),
+			},
+			AccessControlExposeHeaders: &[]*string{
+				jsii.String("*"),
+			},
+			AccessControlMaxAge: awscdk.Duration_Seconds(jsii.Number(600)),
+			OriginOverride:      jsii.Bool(true),
+		},
 		SecurityHeadersBehavior: &awscloudfront.ResponseSecurityHeadersBehavior{
 			StrictTransportSecurity: &awscloudfront.ResponseHeadersStrictTransportSecurity{
 				AccessControlMaxAge: awscdk.Duration_Days(jsii.Number(365)),
@@ -80,10 +105,11 @@ func newSecurityHeadersPolicy(scope constructs.Construct) awscloudfront.Response
 			ContentTypeOptions: &awscloudfront.ResponseHeadersContentTypeOptions{
 				Override: jsii.Bool(true),
 			},
-			FrameOptions: &awscloudfront.ResponseHeadersFrameOptions{
-				FrameOption: awscloudfront.HeadersFrameOption_SAMEORIGIN,
-				Override:    jsii.Bool(true),
-			},
+			// X-Frame-Options is intentionally left out to allow embedding the CDN in an iframe (e.g. for Fasten Connect integration)
+			//FrameOptions: &awscloudfront.ResponseHeadersFrameOptions{
+			//	FrameOption: awscloudfront.HeaderFrame,
+			//	Override:    jsii.Bool(true),
+			//},
 			ReferrerPolicy: &awscloudfront.ResponseHeadersReferrerPolicy{
 				ReferrerPolicy: awscloudfront.HeadersReferrerPolicy_NO_REFERRER,
 				Override:       jsii.Bool(true),
