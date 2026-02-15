@@ -38,7 +38,6 @@ jobs:
           aws s3 sync connect/ "s3://$DEPLOY_BUCKET/connect/" --delete
           aws s3 sync images/ "s3://$DEPLOY_BUCKET/images/" --delete
           aws s3 sync jwks/ "s3://$DEPLOY_BUCKET/jwks/" --delete
-          aws s3 sync logos/ "s3://$DEPLOY_BUCKET/logos/" --delete
           # do not sync the logos directory, this will be synced directly from the fasten-sources-gen repo
 
           # Upload root index.html
