@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"cdn-deploy-cdk/internal/common"
 	"cdn-deploy-cdk/internal/config"
 	"fmt"
 	"github.com/aws/aws-cdk-go/awscdk/v2"
@@ -38,5 +39,6 @@ func NewStaticSite(app constructs.Construct, cfg *config.Config) awscdk.Stack {
 		Value: dist.DistributionDomainName(),
 	})
 
+	common.ApplyTags(stack, cfg.Tags())
 	return stack
 }

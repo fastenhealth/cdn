@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"cdn-deploy-cdk/internal/common"
 	"cdn-deploy-cdk/internal/config"
 
 	"github.com/aws/aws-cdk-go/awscdk/v2"
@@ -36,7 +37,7 @@ func newCloudFrontDistribution(scope constructs.Construct, cfg *config.Config, c
 	// 	QueryStringBehavior: awscloudfront.CacheQueryStringBehavior_None(),
 	// })
 
-	return awscloudfront.NewDistribution(scope, jsii.String("Distribution"), &awscloudfront.DistributionProps{
+	distribution := awscloudfront.NewDistribution(scope, jsii.String("Distribution"), &awscloudfront.DistributionProps{
 		DomainNames: &[]*string{
 			jsii.String(cfg.DestHost),
 		},
@@ -65,6 +66,8 @@ func newCloudFrontDistribution(scope constructs.Construct, cfg *config.Config, c
 			OriginRequestPolicy:   awscloudfront.OriginRequestPolicy_CORS_S3_ORIGIN(),
 		},
 	})
+	common.ApplyTags(distribution, cfg.Tags())
+	return distribution
 }
 
 // newSecurityHeadersPolicy creates a response headers policy enforcing

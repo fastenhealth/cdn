@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"cdn-deploy-cdk/internal/common"
 	"fmt"
 
 	"cdn-deploy-cdk/internal/config"
@@ -35,7 +36,7 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 		},
 	}
 
-	federatedPrinciple := fmt.Sprintf("arn:aws:iam::%s:oidc-provider/token.actions.githubusercontent.com", cfg.AccountID)
+	federatedPrinciple := fmt.Sprintf("arn:aws:iam::%s:oidc-provider/token.actions.githubusercontent.com", *awscdk.Aws_ACCOUNT_ID())
 
 	role := awsiam.NewRole(scope, jsii.String("GitHubDeployRole"), &awsiam.RoleProps{
 		RoleName:    jsii.String(roleName),
@@ -66,5 +67,6 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 		Value: role.RoleArn(),
 	})
 
+	common.ApplyTags(role, cfg.Tags())
 	return role
 }

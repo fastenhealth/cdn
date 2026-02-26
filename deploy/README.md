@@ -68,15 +68,11 @@ aws --version     # should be 2.x
 
 ### 2. Configure AWS credentials
 
-```bash
-# Prefer AWS profiles/SSO so you don't paste credentials into your shell history.
-# Example (SSO):
-aws sso login --profile your-profile
-export AWS_PROFILE=your-profile
 
-# Verify
-aws sts get-caller-identity
-```
+> Do **not** commit AWS credentials or put real access keys into README/scripts.
+
+Follow the Fasten SSO AWS Credentials setup guide here: https://github.com/fastenhealth/hub/blob/main/INFRA_AWS_SETUP.md
+
 
 > Do **not** commit AWS credentials or put real access keys into README/scripts. Use `AWS_PROFILE` (recommended) or your normal credential chain.
 
@@ -96,21 +92,23 @@ cdk bootstrap aws://YOUR_ACCOUNT_ID/us-east-1
 ```
 
 ### 5. Deploy
+```bash
+aws sso login --profile dev-account
+```
+
 
 ```bash
 cd deploy
-cdk deploy --app "go run . \
+cdk deploy --profile dev-account  --app "go run . \
   -dest-host=cdn-dev.fastenhealth.com \
-  -account-id=123456789012 \
   -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/37ca85c0-3666-47e4-b519-f7c2b5203821 \
   -env=dev"
 ```
 
 ```bash
 cd deploy
-cdk deploy --app "go run . \
+cdk deploy --profile prod-account  --app "go run . \
   -dest-host=cdn.fastenhealth.com \
-  -account-id=410145376638 \
   -cert-arn=arn:aws:acm:us-east-1:410145376638:certificate/16343cad-7d3f-4434-930e-2c9445123d38 \
   -env=prod"
 ```

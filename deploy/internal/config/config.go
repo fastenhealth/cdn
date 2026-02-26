@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os/exec"
 	"strings"
 )
 
@@ -13,10 +14,11 @@ type Config struct {
 	DestHost   string // public hostname (e.g. docs.example.com)
 	CertArn    string // existing ACM certificate ARN (must be in us-east-1)
 	GithubRepo string // Github repo to deploy to
-	AccountID  string // Account Id
 
 	// Optional:
 	Environment string // dev, staging, or prod (default: dev)
+
+	cdkRepoSha string
 }
 
 // ParseFlags reads CLI flags and validates the configuration.
@@ -27,7 +29,6 @@ func ParseFlags() (*Config, error) {
 	flag.StringVar(&cfg.Environment, "env", "dev", "Deployment environment (dev|staging|prod) (default: dev)")
 	flag.StringVar(&cfg.CertArn, "cert-arn", "", "Existing ACM certificate ARN (required; must be in us-east-1)")
 	flag.StringVar(&cfg.GithubRepo, "git-repo", "cdn", "Github Repo Name")
-	flag.StringVar(&cfg.AccountID, "account-id", "", "Aws Account ID")
 
 	flag.Parse()
 
@@ -60,10 +61,6 @@ func (c *Config) Validate() error {
 		errs = append(errs, "git-repo is required")
 	}
 
-	if c.AccountID == "" {
-		errs = append(errs, "account-id is required")
-	}
-
 	if len(errs) > 0 {
 		return errors.New(strings.Join(errs, "; "))
 	}
@@ -82,4 +79,26 @@ func isValidEnvironment(env string) bool {
 		return true
 	}
 	return false
+}
+
+// Tags replicates the standard Terraform tags map.
+func (c *Config) Tags() map[string]string {
+	if c.cdkRepoSha == "" {
+		c.cdkRepoSha = "unknown"
+
+		cmd := exec.Command("git", "rev-parse", "--short", "HEAD")
+		output, err := cmd.Output()
+		if err == nil {
+			c.cdkRepoSha = strings.TrimSpace(string(output))
+		}
+	}
+
+	return map[string]string{
+		"app_name":     "fasten-connect-api",
+		"comp_name":    "cdn",
+		"env_name":     c.Environment,
+		"cdk":          "true",
+		"cdk_repo":     "https://github.com/fastenhealth/cdn",
+		"cdk_repo_sha": c.cdkRepoSha,
+	}
 }

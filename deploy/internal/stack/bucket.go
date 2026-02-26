@@ -1,6 +1,7 @@
 package stack
 
 import (
+	"cdn-deploy-cdk/internal/common"
 	"cdn-deploy-cdk/internal/config"
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
@@ -22,5 +23,6 @@ func newContentBucket(scope constructs.Construct, cfg *config.Config) awss3.Buck
 		Value: bucket.BucketName(),
 	})
 
+	common.ApplyTags(bucket, cfg.Tags())
 	return bucket
 }
