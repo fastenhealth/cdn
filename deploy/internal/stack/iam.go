@@ -29,6 +29,7 @@ func newGitHubDeployRole(scope constructs.Construct, cfg *config.Config, bucket 
 			"token.actions.githubusercontent.com:sub": []string{
 				fmt.Sprintf("repo:fastenhealth/%s:*", cfg.GithubRepo),
 				"repo:fastenhealth/fasten-sources-gen:*", //allow
+				"repo:fastenhealth/fasten-sources:*",     //allow
 			},
 		},
 		"StringEquals": map[string]any{
