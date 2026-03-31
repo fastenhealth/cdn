@@ -40021,7 +40021,7 @@ var VaultProfileConfig = class {
     let foundDiscoveredPatientAccount = this.discoveredPatientAccounts?.[external_state];
     if (foundPendingPatientAccount) {
       delete this.pendingPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({
+      this.upsertConnectedAccount({
         org_connection_id,
         connection_status,
         platform_type,
@@ -40036,7 +40036,7 @@ var VaultProfileConfig = class {
       });
     } else if (foundDiscoveredPatientAccount) {
       delete this.discoveredPatientAccounts[external_state];
-      this.connectedPatientAccounts?.push({
+      this.upsertConnectedAccount({
         org_connection_id,
         connection_status,
         platform_type,
@@ -40050,7 +40050,7 @@ var VaultProfileConfig = class {
     } else {
       console.warn("we may not know the brand, portal, endpoint information, so generating it with placeholders. Most likely this is a reconnect operation.");
       console.warn("pendingAccounts", this.pendingPatientAccounts, "connectionParams", org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id);
-      this.connectedPatientAccounts?.push({
+      this.upsertConnectedAccount({
         org_connection_id,
         connection_status,
         platform_type,
@@ -40069,7 +40069,7 @@ var VaultProfileConfig = class {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
-    this.connectedPatientAccounts?.push({
+    this.upsertConnectedAccount({
       org_connection_id: recordLocatorFacilityConnected.org_connection_id,
       connection_status: "connected",
       platform_type: "tefca",
@@ -40106,6 +40106,22 @@ var VaultProfileConfig = class {
     }
     this.connectedPatientAccounts.splice(ndx, 1);
     return true;
+  }
+  upsertConnectedAccount(account) {
+    if (!this.connectedPatientAccounts) {
+      this.connectedPatientAccounts = [];
+    }
+    const existingIndex = this.connectedPatientAccounts.findIndex((existingAccount) => {
+      if (account.vault_profile_connection_id && existingAccount.vault_profile_connection_id === account.vault_profile_connection_id) {
+        return true;
+      }
+      return !!account.org_connection_id && existingAccount.org_connection_id === account.org_connection_id;
+    });
+    if (existingIndex >= 0) {
+      this.connectedPatientAccounts[existingIndex] = __spreadValues(__spreadValues({}, this.connectedPatientAccounts[existingIndex]), account);
+      return;
+    }
+    this.connectedPatientAccounts.push(account);
   }
 };
 
