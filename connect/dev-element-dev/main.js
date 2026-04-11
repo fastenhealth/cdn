@@ -38478,6 +38478,7 @@ var SourceCredentialType;
   SourceCredentialType2["SourceCredentialTypeSmartOnFhir"] = "smart_on_fhir";
   SourceCredentialType2["SourceCredentialTypeTefcaDirect"] = "tefca_direct";
   SourceCredentialType2["SourceCredentialTypeTefcaFacilitated"] = "tefca_facilitated";
+  SourceCredentialType2["SourceCredentialTypeMedicareDirect"] = "medicare_direct";
 })(SourceCredentialType || (SourceCredentialType = {}));
 var EventTypes;
 (function(EventTypes2) {
@@ -39872,7 +39873,7 @@ var ConfigService = class _ConfigService {
   }
   vaultProfileAddDiscoveredRecordLocatorAccount(recordLocatorFacility, vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addDiscoveredAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId);
+    updatedVaultProfile.addDiscoveredAccount(recordLocatorFacility.brand, recordLocatorFacility.portal, recordLocatorFacility.endpoint, vaultProfileConnectionId, recordLocatorFacility.patient_authorization_type);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   //this can only be used after the RLS account has been previously connected
@@ -40007,11 +40008,11 @@ var VaultProfileConfig = class {
     this.pendingPatientAccounts[externalState] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
   }
   //discovered accounts do not require a unique external state for matching, because they already have a unique identifier (vaultProfileConnectionId)
-  addDiscoveredAccount(brand, portal, endpoint, vaultProfileConnectionId) {
+  addDiscoveredAccount(brand, portal, endpoint, vaultProfileConnectionId, patientAuthorizationType = SourceCredentialType.SourceCredentialTypeTefcaDirect) {
     if (!this.discoveredPatientAccounts) {
       this.discoveredPatientAccounts = {};
     }
-    this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId };
+    this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId, patient_auth_type: patientAuthorizationType };
   }
   addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id) {
     if (!this.connectedPatientAccounts) {
