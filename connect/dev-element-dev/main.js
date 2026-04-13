@@ -38118,8 +38118,8 @@ var VERSION3 = new Version("19.2.1");
 // projects/fasten-connect-stitch-element/src/environments/environment.ts
 var environment = {
   name: "development",
-  connect_base_domain: "connect-dev.fastenhealth.com",
-  embed_endpoint_base: "https://embed.connect-dev.fastenhealth.com"
+  connect_base_domain: "connect.fastenlabs.com",
+  embed_endpoint_base: "https://embed.connect.fastenlabs.com"
 };
 
 // node_modules/@angular/elements/fesm2022/elements.mjs
