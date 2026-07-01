@@ -39814,7 +39814,6 @@ var ConfigService = class _ConfigService {
   }
   //Getter
   get systemConfig$() {
-    this.logger.info("getting cached system settings:", this.systemConfigSubject.getValue());
     return this.systemConfigSubject.getValue();
   }
   //Setter
