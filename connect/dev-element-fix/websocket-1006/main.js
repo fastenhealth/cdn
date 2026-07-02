@@ -39815,7 +39815,6 @@ var ConfigService = class _ConfigService {
   }
   //Getter
   get systemConfig$() {
-    this.logger.info("getting cached system settings:", this.systemConfigSubject.getValue());
     return this.systemConfigSubject.getValue();
   }
   //Setter
@@ -40224,20 +40223,14 @@ var AppComponent = class _AppComponent {
     this.identityRequestUri = null;
     this.eventTypes = "";
     this.externalEventBus = new EventEmitter();
-    this.backdropClickRegistered = false;
     this.host.nativeElement.show = this.showStitchModalExt.bind(this);
     this.host.nativeElement.hide = this.hideStitchModalExt.bind(this);
   }
   ngOnInit() {
     this.logger.debug("ngOnInit", this.encodeOptionsAsQueryStringParameters());
   }
-  ngAfterViewInit() {
-    this.logger.info("stitch element view initialized, checking modal resume state");
-    this.restoreModalFromResumeState("after_view_init");
-  }
   ngOnChanges(changes) {
     this.logger.debug("ngOnChanges", changes, this.encodeOptionsAsQueryStringParameters());
-    this.restoreModalFromResumeState("input_change");
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //HELPERS
@@ -40300,72 +40293,10 @@ var AppComponent = class _AppComponent {
     this.logger.debug("encodeOptionsAsQueryStringParameters", params.toString());
     return params.toString();
   }
-  getInitialIframeSrc() {
-    return environment.embed_endpoint_base + "?" + this.encodeOptionsAsQueryStringParameters();
-  }
   showStitchModal() {
-    const resumeState = this.getSavedResumeState();
-    const iframeSrc = resumeState?.iframe_src || this.getInitialIframeSrc();
-    this.logger.info("show stitch modal requested", {
-      hasResumeState: !!resumeState,
-      iframeSrc
-    });
-    this.openModalWithIframeSrc(iframeSrc);
-    this.saveResumeState(iframeSrc);
-  }
-  openModalWithIframeSrc(iframeSrc, options = {}) {
-    const dialog = this.stitchModal.nativeElement;
-    const iframe = this.stitchIframeEmbed.nativeElement;
-    if (iframe.src !== iframeSrc) {
-      this.logger.info("updating stitch iframe src for modal open", {
-        reason: options.reason || "show",
-        previousSrc: iframe.src || "",
-        nextSrc: iframeSrc
-      });
-      iframe.src = iframeSrc;
-    } else {
-      this.logger.debug("stitch iframe src already matches modal open target", {
-        reason: options.reason || "show",
-        iframeSrc
-      });
-    }
-    if (dialog.open && options.forceTopLayer) {
-      this.logger.info("forcing stale stitch modal back into modal top layer", { reason: options.reason });
-      try {
-        dialog.close();
-        this.logger.info("closed stale stitch modal before resume reopen", { reason: options.reason });
-      } catch (err) {
-        this.logger.warn("failed to close stale stitch modal before resume reopen", { reason: options.reason, err });
-      }
-    }
-    if (!dialog.open) {
-      try {
-        dialog.showModal();
-        this.logger.info("stitch modal opened", {
-          reason: options.reason || "show",
-          forcedTopLayer: !!options.forceTopLayer
-        });
-      } catch (err) {
-        this.logger.warn("failed to open stitch modal during resume, retrying once", { reason: options.reason, err });
-        window.setTimeout(() => {
-          if (document.hidden) {
-            this.logger.warn("skipping stitch modal resume retry because document is hidden", { reason: options.reason });
-            return;
-          }
-          try {
-            if (dialog.open) {
-              dialog.close();
-            }
-            dialog.showModal();
-            this.logger.info("stitch modal opened on resume retry", { reason: options.reason });
-          } catch (retryErr) {
-            this.logger.warn("failed to open stitch modal during resume retry", { reason: options.reason, err: retryErr });
-          }
-        }, 100);
-      }
-    } else {
-      this.logger.debug("stitch modal already open after resume check", { reason: options.reason || "show" });
-    }
+    this.logger.debug("showStitchModal", this.encodeOptionsAsQueryStringParameters());
+    this.stitchIframeEmbed.nativeElement.src = environment.embed_endpoint_base + "?" + this.encodeOptionsAsQueryStringParameters();
+    this.stitchModal.nativeElement.showModal();
     this.registerDialogCloseOnBackdropClick();
   }
   // these functions can be called externally to show/hide the widget via javascript
@@ -40373,19 +40304,11 @@ var AppComponent = class _AppComponent {
     this.showStitchModal();
   }
   hideStitchModalExt() {
-    this.logger.info("hide stitch modal requested");
-    this.clearResumeState();
     this.stitchModal.nativeElement.close();
-    if (this.stitchIframeEmbed?.nativeElement) {
-      this.stitchIframeEmbed.nativeElement.src = "about:blank";
-    }
+    this.stitchIframeEmbed.nativeElement.src = "about:blank";
   }
   //event handler for backdrop click
   registerDialogCloseOnBackdropClick() {
-    if (this.backdropClickRegistered) {
-      return;
-    }
-    this.backdropClickRegistered = true;
     this.stitchModal.nativeElement.addEventListener("click", (event) => {
       if (this.staticBackdrop) {
         return;
@@ -40393,30 +40316,10 @@ var AppComponent = class _AppComponent {
       var rect = this.stitchModal.nativeElement.getBoundingClientRect();
       var isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
       if (!isInDialog) {
-        this.logger.info("closing stitch modal from backdrop click");
-        this.clearResumeState();
         this.stitchModal.nativeElement.close();
         this.stitchIframeEmbed.nativeElement.src = "about:blank";
       }
     });
-  }
-  onDocumentVisibilityChange() {
-    this.logger.info("stitch element visibilitychange received", { hidden: document.hidden });
-    if (!document.hidden) {
-      this.restoreModalFromResumeState("visibilitychange");
-    }
-  }
-  onResume() {
-    this.logger.info("stitch element resume event received");
-    this.restoreModalFromResumeState("resume");
-  }
-  onWindowFocus() {
-    this.logger.info("stitch element window focus received");
-    this.restoreModalFromResumeState("focus");
-  }
-  onPageShow() {
-    this.logger.info("stitch element pageshow received");
-    this.restoreModalFromResumeState("pageshow");
   }
   // postMessage registration, listen to events from the child/iframe window
   receivePostMessage(event) {
@@ -40426,215 +40329,12 @@ var AppComponent = class _AppComponent {
     }
     let payload = JSON.parse(event.data);
     this.logger.debug("bubbling up event to listeners (eventBus)", payload);
-    this.logger.info("stitch iframe event received", { eventType: payload.event_type });
     if (payload.event_type == EventTypes.EventTypeWidgetClose) {
       this.logger.debug("received EventTypeWidgetClose event, closing modal, skipping event bubbling");
       this.hideStitchModalExt();
       return;
     }
-    this.updateResumeStateFromWidgetEvent(payload);
     this.externalEventBus.emit(event);
-  }
-  updateResumeStateFromWidgetEvent(payload) {
-    if (payload.event_type == EventTypes.EventTypeConnectionPending) {
-      const connectData = payload.data;
-      if (connectData?.connect_mode == "websocket" && connectData.room_id) {
-        const iframeSrc = this.buildResumeIframeSrc(connectData);
-        this.logger.info("saving stitch modal webflow resume state", {
-          room_id: connectData.room_id,
-          external_state: connectData.external_state,
-          iframeSrc
-        });
-        this.saveResumeState(iframeSrc);
-      }
-      return;
-    }
-    if (payload.event_type == EventTypes.EventTypeConnectionSuccess || payload.event_type == EventTypes.EventTypeConnectionFailed || payload.event_type == EventTypes.EventTypeWidgetComplete || payload.event_type == EventTypes.EventTypeWidgetConfigError) {
-      this.logger.info("clearing stitch modal resume state after terminal widget event", { eventType: payload.event_type });
-      this.clearResumeState();
-    }
-  }
-  buildResumeIframeSrc(connectData) {
-    let params = new HttpParams({ fromString: this.encodeOptionsAsQueryStringParameters() });
-    params = params.set("connect-mode", "websocket");
-    params = params.set("resume-connection", "true");
-    params = params.set("room-id", connectData.room_id || "");
-    params = params.set("brand-id", connectData.brand_id || "");
-    params = params.set("portal-id", connectData.portal_id || "");
-    params = params.set("endpoint-id", connectData.endpoint_id || "");
-    if (connectData.external_id) {
-      params = params.set("external-id", connectData.external_id);
-    }
-    if (connectData.external_state) {
-      params = params.set("external-state", connectData.external_state);
-    }
-    if (connectData.org_connection_id) {
-      params = params.set("reconnect-org-connection-id", connectData.org_connection_id);
-    }
-    if (connectData.vault_profile_connection_id) {
-      params = params.set("vault-profile-connection-id", connectData.vault_profile_connection_id);
-    }
-    return environment.embed_endpoint_base + "?" + params.toString();
-  }
-  restoreModalFromResumeState(reason) {
-    this.logger.info("checking stitch modal resume state", { reason });
-    if (!this.stitchModal?.nativeElement || !this.stitchIframeEmbed?.nativeElement) {
-      this.logger.warn("cannot restore stitch modal yet because view children are unavailable", { reason });
-      return;
-    }
-    const resumeState = this.getSavedResumeState();
-    if (!resumeState?.modal_open) {
-      this.logger.info("no open stitch modal resume state found", { reason });
-      return;
-    }
-    this.logger.info("restoring stitch modal from saved webflow state", {
-      reason,
-      iframeSrc: resumeState.iframe_src
-    });
-    this.openModalWithIframeSrc(resumeState.iframe_src, {
-      forceTopLayer: reason !== "after_view_init",
-      reason
-    });
-    this.saveResumeState(resumeState.iframe_src);
-  }
-  saveResumeState(iframeSrc) {
-    const resumeState = {
-      version: 1,
-      modal_open: true,
-      iframe_src: iframeSrc,
-      updated_at: Date.now(),
-      options_key: this.getResumeOptionsKey()
-    };
-    try {
-      window.localStorage.setItem(this.getResumeStateStorageKey(), JSON.stringify(resumeState));
-      this.logger.info("saved stitch modal webflow resume state", {
-        storageKey: this.getResumeStateStorageKey(),
-        iframeSrc,
-        updatedAt: resumeState.updated_at
-      });
-    } catch (err) {
-      this.logger.warn("failed to save stitch modal webflow resume state", err);
-    }
-  }
-  getSavedResumeState() {
-    let rawState = null;
-    try {
-      rawState = window.localStorage.getItem(this.getResumeStateStorageKey()) || this.getMostRecentMatchingResumeState();
-      this.logger.info("read stitch modal webflow resume state", {
-        storageKey: this.getResumeStateStorageKey(),
-        foundState: !!rawState
-      });
-    } catch (err) {
-      this.logger.warn("failed to read stitch modal webflow resume state", err);
-      return null;
-    }
-    if (!rawState) {
-      return null;
-    }
-    try {
-      const parsedState = JSON.parse(rawState);
-      if (!this.isValidResumeState(parsedState)) {
-        this.logger.warn("discarding invalid stitch modal webflow resume state", {
-          storageKey: this.getResumeStateStorageKey(),
-          parsedState
-        });
-        this.clearResumeState();
-        return null;
-      }
-      this.logger.info("validated stitch modal webflow resume state", {
-        storageKey: this.getResumeStateStorageKey(),
-        ageMs: Date.now() - parsedState.updated_at,
-        iframeSrc: parsedState.iframe_src
-      });
-      return parsedState;
-    } catch (err) {
-      this.logger.warn("failed to parse stitch modal webflow resume state", err);
-      this.clearResumeState();
-      return null;
-    }
-  }
-  clearResumeState() {
-    try {
-      this.logger.info("clearing stitch modal webflow resume state", { storageKey: this.getResumeStateStorageKey() });
-      window.localStorage.removeItem(this.getResumeStateStorageKey());
-    } catch (err) {
-      this.logger.warn("failed to clear stitch modal webflow resume state", err);
-    }
-  }
-  getResumeStateStorageKey() {
-    return `${this.getResumeStateStorageKeyPrefix()}${this.getResumeOptionsKey()}`;
-  }
-  getResumeStateStorageKeyPrefix() {
-    return "fasten-connect-stitch-element.resume-state.v1.";
-  }
-  getResumeOptionsKey() {
-    return [
-      this.publicId || "",
-      this.externalId || "",
-      this.reconnectOrgConnectionId || "",
-      this.brandId || "",
-      this.portalId || "",
-      this.endpointId || ""
-    ].join("|");
-  }
-  getMostRecentMatchingResumeState() {
-    let newestState = null;
-    let candidateCount = 0;
-    let validCandidateCount = 0;
-    for (let i = 0; i < window.localStorage.length; i += 1) {
-      const storageKey = window.localStorage.key(i);
-      if (!storageKey?.startsWith(this.getResumeStateStorageKeyPrefix())) {
-        continue;
-      }
-      const rawState = window.localStorage.getItem(storageKey);
-      if (!rawState) {
-        continue;
-      }
-      candidateCount += 1;
-      try {
-        const parsedState = JSON.parse(rawState);
-        if (!this.isValidResumeState(parsedState)) {
-          this.logger.debug("ignoring non-matching stitch modal webflow resume candidate", { storageKey });
-          continue;
-        }
-        validCandidateCount += 1;
-        if (!newestState || parsedState.updated_at > newestState.updated_at) {
-          newestState = parsedState;
-        }
-      } catch (err) {
-        this.logger.warn("failed to parse candidate stitch modal webflow resume state", { storageKey, err });
-      }
-    }
-    this.logger.info("scanned stitch modal webflow resume state candidates", {
-      candidateCount,
-      validCandidateCount,
-      selected: !!newestState
-    });
-    return newestState ? JSON.stringify(newestState) : null;
-  }
-  isValidResumeState(resumeState) {
-    const ageMs = Date.now() - resumeState.updated_at;
-    if (resumeState.version !== 1 || !resumeState.modal_open || !resumeState.iframe_src || !resumeState.options_key || ageMs > ConnectWindowTimeout) {
-      this.logger.debug("stitch modal resume state failed basic validation", {
-        version: resumeState.version,
-        modalOpen: resumeState.modal_open,
-        hasIframeSrc: !!resumeState.iframe_src,
-        hasOptionsKey: !!resumeState.options_key,
-        ageMs
-      });
-      return false;
-    }
-    const [statePublicId, stateExternalId, stateReconnectOrgConnectionId, stateBrandId, statePortalId, stateEndpointId] = resumeState.options_key.split("|");
-    const fieldsMatch = this.resumeFieldMatchesCurrentValue(statePublicId, this.publicId) && this.resumeFieldMatchesCurrentValue(stateExternalId, this.externalId) && this.resumeFieldMatchesCurrentValue(stateReconnectOrgConnectionId, this.reconnectOrgConnectionId || "") && this.resumeFieldMatchesCurrentValue(stateBrandId, this.brandId || "") && this.resumeFieldMatchesCurrentValue(statePortalId, this.portalId || "") && this.resumeFieldMatchesCurrentValue(stateEndpointId, this.endpointId || "");
-    this.logger.debug("stitch modal resume state option match result", {
-      fieldsMatch,
-      stateOptionsKey: resumeState.options_key,
-      currentOptionsKey: this.getResumeOptionsKey()
-    });
-    return fieldsMatch;
-  }
-  resumeFieldMatchesCurrentValue(storedValue, currentValue) {
-    return !currentValue || !storedValue || storedValue === currentValue;
   }
   static {
     this.\u0275fac = function AppComponent_Factory(__ngFactoryType__) {
@@ -40656,17 +40356,7 @@ var AppComponent = class _AppComponent {
       }
     }, hostBindings: function AppComponent_HostBindings(rf, ctx) {
       if (rf & 1) {
-        \u0275\u0275listener("visibilitychange", function AppComponent_visibilitychange_HostBindingHandler() {
-          return ctx.onDocumentVisibilityChange();
-        }, false, \u0275\u0275resolveDocument)("resume", function AppComponent_resume_HostBindingHandler() {
-          return ctx.onResume();
-        }, false, \u0275\u0275resolveDocument)("resume", function AppComponent_resume_HostBindingHandler() {
-          return ctx.onResume();
-        }, false, \u0275\u0275resolveWindow)("focus", function AppComponent_focus_HostBindingHandler() {
-          return ctx.onWindowFocus();
-        }, false, \u0275\u0275resolveWindow)("pageshow", function AppComponent_pageshow_HostBindingHandler() {
-          return ctx.onPageShow();
-        }, false, \u0275\u0275resolveWindow)("message", function AppComponent_message_HostBindingHandler($event) {
+        \u0275\u0275listener("message", function AppComponent_message_HostBindingHandler($event) {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
@@ -40697,7 +40387,7 @@ var AppComponent = class _AppComponent {
   }
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 38 });
+  (typeof ngDevMode === "undefined" || ngDevMode) && \u0275setClassDebugInfo(AppComponent, { className: "AppComponent", filePath: "projects/fasten-connect-stitch-element/src/app/app.component.ts", lineNumber: 29 });
 })();
 
 // projects/fasten-connect-stitch-element/src/app/app.module.ts
