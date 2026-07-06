@@ -38503,6 +38503,7 @@ var CommunicationEntity;
   CommunicationEntity2["External"] = "FASTEN_CONNECT_EXTERNAL";
 })(CommunicationEntity || (CommunicationEntity = {}));
 var ConnectWindowTimeout = 20 * 60 * 1e3;
+var WebsocketHeartbeatInterval = 4 * 60 * 1e3;
 
 // projects/shared-library/src/lib/pipes/safe-html.pipe.ts
 var SafeHtmlPipe = class _SafeHtmlPipe {
