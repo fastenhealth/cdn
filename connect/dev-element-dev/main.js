@@ -38494,6 +38494,7 @@ var SDKMode;
 (function(SDKMode2) {
   SDKMode2["None"] = "none";
   SDKMode2["ReactNative"] = "react-native";
+  SDKMode2["Flutter"] = "flutter";
 })(SDKMode || (SDKMode = {}));
 var CommunicationEntity;
 (function(CommunicationEntity2) {
