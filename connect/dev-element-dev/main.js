@@ -39808,8 +39808,14 @@ var ConfigService = class _ConfigService {
    */
   //Setter
   set systemConfig(value) {
-    const mergedSettings = (0, import_lodash.merge)({}, this.systemConfigSubject.getValue(), value);
-    if (JSON.stringify(mergedSettings) !== JSON.stringify(this.systemConfigSubject.getValue())) {
+    const currentSettings = this.systemConfigSubject.getValue();
+    const mergedSettings = (0, import_lodash.merge)({}, currentSettings, value);
+    if (Object.prototype.hasOwnProperty.call(value, "org")) {
+      mergedSettings.org = value.org;
+    } else if (value.publicId !== void 0 && value.publicId !== currentSettings.publicId) {
+      mergedSettings.org = void 0;
+    }
+    if (JSON.stringify(mergedSettings) !== JSON.stringify(currentSettings)) {
       this.logger.info("updating system settings:", mergedSettings);
       this.systemConfigSubject.next(mergedSettings);
     }
