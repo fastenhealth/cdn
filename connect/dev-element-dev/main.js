@@ -39809,15 +39809,13 @@ var ConfigService = class _ConfigService {
   //Setter
   set systemConfig(value) {
     const currentSettings = this.systemConfigSubject.getValue();
-    const mergedSettings = (0, import_lodash.merge)({}, currentSettings, value);
-    if (Object.prototype.hasOwnProperty.call(value, "org")) {
-      mergedSettings.org = value.org;
-    } else if (value.publicId !== void 0 && value.publicId !== currentSettings.publicId) {
+    const mergedSettings = __spreadValues(__spreadValues({}, currentSettings), value);
+    if (!Object.prototype.hasOwnProperty.call(value, "org") && value.publicId !== void 0 && value.publicId !== currentSettings.publicId) {
       mergedSettings.org = void 0;
     }
     if (JSON.stringify(mergedSettings) !== JSON.stringify(currentSettings)) {
-      this.logger.info("updating system settings:", mergedSettings);
       this.systemConfigSubject.next(mergedSettings);
+      this.logger.info("updating system settings:", mergedSettings);
     }
   }
   //Getter
