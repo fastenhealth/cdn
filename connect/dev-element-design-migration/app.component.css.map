@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["projects/fasten-connect-stitch-element/src/app/app.component.css"],
+  "sourcesContent": ["#stitchModal {\n  box-sizing: border-box;\n  width: min(440px, calc(100vw - 2rem));\n  height: min(800px, calc(100dvh - 2rem));\n  min-height: 0;\n  max-height: none;\n  overflow: hidden;\n}\n\n#stitchModal iframe {\n  display: block;\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n}\n\n@media (max-width: 640px) {\n  #stitchModal {\n    width: 100vw;\n    max-width: none;\n    height: 100dvh;\n    min-height: 0;\n    margin: 0;\n    border-radius: 0;\n  }\n}\n"],
+  "mappings": ";AAAA,CAAC;AACC,cAAY;AACZ,SAAO,IAAI,KAAK,EAAE,KAAK,MAAM,EAAE;AAC/B,UAAQ,IAAI,KAAK,EAAE,KAAK,OAAO,EAAE;AACjC,cAAY;AACZ,cAAY;AACZ,YAAU;AACZ;AAEA,CATC,YASY;AACX,WAAS;AACT,SAAO;AACP,UAAQ;AACR,cAAY;AACd;AAEA,OAAO,CAAC,SAAS,EAAE;AACjB,GAjBD;AAkBG,WAAO;AACP,eAAW;AACX,YAAQ;AACR,gBAAY;AACZ,YAAQ;AACR,mBAAe;AACjB;AACF;",
+  "names": []
+}
