@@ -12,6 +12,47 @@
       background-color: green !important;
       margin-left: 180px !important;
     }
+
+    .demo-sidebar {
+      box-sizing: border-box;
+      max-height: calc(100dvh - 2rem);
+      overflow-y: auto;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .demo-branding {
+      width: 9rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font: 12px Arial, sans-serif;
+    }
+
+    .demo-branding legend {
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .demo-branding label {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.25rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+    }
+
+    .demo-branding label:has(input:checked) {
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    .demo-branding p {
+      margin: 0.5rem 0 0;
+      line-height: 1.4;
+      color: #555;
+    }
   </style>
 
   <style>
@@ -116,7 +157,7 @@
 <link rel="stylesheet" href="styles.css"></head>
 <body x-data="pageData()">
 
-<nav class="fhtw-z-100 fhtw-flex fhtw-shrink-0 fhtw-grow-0 fhtw-justify-around fhtw-gap-4 fhtw-border-t fhtw-border-gray-200 fhtw-bg-white/50 fhtw-p-2.5 fhtw-shadow-lg fhtw-backdrop-blur-lg  fhtw-fixed top-2/4 -translate-y-2/4 fhtw-right-6 fhtw-min-h-[auto] fhtw-min-w-[64px] fhtw-flex-col fhtw-rounded-lg border">
+<nav aria-label="Widget demo options" class="demo-sidebar fhtw-z-100 fhtw-flex fhtw-shrink-0 fhtw-grow-0 fhtw-gap-4 fhtw-border-t fhtw-border-gray-200 fhtw-bg-white/50 fhtw-p-2.5 fhtw-shadow-lg fhtw-backdrop-blur-lg  fhtw-fixed top-2/4 -translate-y-2/4 fhtw-right-6 fhtw-min-h-[auto] fhtw-min-w-[64px] fhtw-flex-col fhtw-rounded-lg border">
   <button @click="toggleSearchOnly" :class="{ 'fhtw-bg-indigo-50 fhtw-text-indigo-600': searchOnly, 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': !searchOnly }" class="fhtw-flex fhtw-aspect-square fhtw-min-h-[32px] fhtw-w-16 flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-rounded-md fhtw-p-1.5 ">
     <!-- HeroIcon - Search -->
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="fhtw-w-6 fhtw-h-6 fhtw-shrink-0">
@@ -178,6 +219,17 @@
     <small class="fhtw-text-center fhtw-text-xs fhtw-font-medium"> TEFCA </small>
   </button>
 
+  <fieldset class="demo-branding" aria-describedby="branding-help">
+    <legend>Branding</legend>
+    <template x-for="(preset, key) in brandingPresets" :key="key">
+      <label>
+        <input type="radio" name="branding-preset" :value="key" x-model="brandingPreset">
+        <span x-text="preset.label"></span>
+      </label>
+    </template>
+    <p id="branding-help">Choose a preset, then open the widget.</p>
+  </fieldset>
+
   <hr class=""/>
 
   <button @click="toggleError" :class="{ 'fhtw-bg-fuchsia-50 fhtw-text-fuchsia-900': publicId == 'invalid_config_public_id', 'fhtw-text-gray-700 hover:fhtw-bg-gray-100': publicId != 'invalid_config_public_id' }" class="fhtw-flex fhtw-h-16 fhtw-w-16 fhtw-flex-col fhtw-items-center fhtw-justify-center fhtw-gap-1 fhtw-text-fuchsia-900">
@@ -205,11 +257,11 @@
     </form>
     <p class="fhtw-footer">Your information is handled with the utmost security and in full compliance with HIPAA regulations.</p>
   </div>
-  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId" :search-sort-by="sortBy" :search-sort-by-opts="sortByOpts" event-types="search.query"></fasten-stitch-element>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" :public-id="publicId" :search-only="searchOnly" :tefca-mode="tefcaMode" :static-backdrop="staticBackdrop" :reconnect-org-connection-id="reconnectOrgConnectionId" :search-sort-by="sortBy" :search-sort-by-opts="sortByOpts" :co-branding-theme="branding.theme" :co-branding-accent-color="branding.accentColor" :co-branding-logo-url="branding.logoUrl" :co-branding-company-name="branding.companyName" event-types="search.query"></fasten-stitch-element>
 
 
   <h1>RECONNECT ELEMENT</h1>
-  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" search-only="true" reconnect-org-connection-id="c2f0358c-f330-49ed-b32f-8018296873a2"></fasten-stitch-element>
+  <fasten-stitch-element external-id="1235-123412-123123$^#*@(!" public-id="public_test_rei2un7aagh5pquwikxh2dsyq23bsdyu4l8vm9eq29ftu" search-only="true" reconnect-org-connection-id="c2f0358c-f330-49ed-b32f-8018296873a2" co-branding-theme="light" co-branding-accent-color="#E04E3C" co-branding-company-name="Adams Memorial" co-branding-logo-url="https://adamshospital.org/wp-content/uploads/2021/11/AdamsMemorialHospital-logo.svg"></fasten-stitch-element>
 
 <!--  <fasten-stitch-element-->
 <!--    external-id="1235-123412-123123$^#*@(!"-->
@@ -247,6 +299,41 @@
       sortByLocation: false,
       sortBy: '',
       sortByOpts: '',
+      brandingPreset: 'default-light',
+      brandingPresets: {
+        'default-light': {
+          label: 'Default light',
+          theme: 'light',
+          accentColor: '',
+          logoUrl: '',
+          companyName: '',
+        },
+        'default-dark': {
+          label: 'Default dark',
+          theme: 'dark',
+          accentColor: '',
+          logoUrl: '',
+          companyName: '',
+        },
+        'custom-light': {
+          label: 'Custom light',
+          theme: 'light',
+          accentColor: '#E5243B',
+          logoUrl: 'assets/logos/logored.svg',
+          companyName: 'Your Brand',
+        },
+        'custom-dark': {
+          label: 'Custom dark',
+          theme: 'dark',
+          accentColor: '#22D3C5',
+          logoUrl: 'assets/logos/logoteal.svg',
+          companyName: 'Your Brand',
+        },
+      },
+
+      get branding() {
+        return this.brandingPresets[this.brandingPreset];
+      },
 
       toggleStaticBackdrop() {
         this.staticBackdrop = !this.staticBackdrop;
