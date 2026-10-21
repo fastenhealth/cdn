@@ -21,6 +21,18 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __objRest = (source, exclude) => {
+  var target = {};
+  for (var prop in source)
+    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+      target[prop] = source[prop];
+  if (source != null && __getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(source)) {
+      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
+        target[prop] = source[prop];
+    }
+  return target;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -38451,11 +38463,6 @@ var ApiMode;
   ApiMode2["Live"] = "live";
   ApiMode2["Test"] = "test";
 })(ApiMode || (ApiMode = {}));
-var FdkTheme;
-(function(FdkTheme2) {
-  FdkTheme2["Light"] = "light";
-  FdkTheme2["Dark"] = "dark";
-})(FdkTheme || (FdkTheme = {}));
 var WidgetMode;
 (function(WidgetMode2) {
   WidgetMode2["SearchOnly"] = "search-only";
@@ -39796,8 +39803,7 @@ LoggerModule.\u0275inj = /* @__PURE__ */ \u0275\u0275defineInjector({
 var defaultSystemConfig = {
   publicId: "",
   apiMode: ApiMode.Test,
-  sdkMode: SDKMode.None,
-  theme: FdkTheme.Light
+  sdkMode: SDKMode.None
 };
 var ConfigService = class _ConfigService {
   constructor(logger) {
@@ -39853,7 +39859,7 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at, connectedAccount.tefca_directory_id);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at, connectedAccount.tefca_directory_id, connectedAccount.display_name);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
@@ -39870,15 +39876,6 @@ var ConfigService = class _ConfigService {
   vaultProfileRevokeTefcaDirectConnectedAccount(vaultProfileConnectionId) {
     let updatedVaultProfile = this.vaultProfileConfig$;
     let isUpdated = updatedVaultProfile.revokeTefcaDirectConnectedAccount(vaultProfileConnectionId);
-    if (!isUpdated) {
-      this.logger.warn("Could not find TEFCA Direct account by connection id:", vaultProfileConnectionId);
-      return;
-    }
-    this.vaultProfileConfig = updatedVaultProfile;
-  }
-  vaultProfileDeselectTefcaDirectConnectedAccount(vaultProfileConnectionId) {
-    let updatedVaultProfile = this.vaultProfileConfig$;
-    let isUpdated = updatedVaultProfile.deselectTefcaDirectConnectedAccount(vaultProfileConnectionId);
     if (!isUpdated) {
       this.logger.warn("Could not find TEFCA Direct account by connection id:", vaultProfileConnectionId);
       return;
@@ -39948,7 +39945,15 @@ var MessageBusService = class _MessageBusService {
   }
   //this event is published when the popup window is closed, and the connection is successful or failed.
   publishOrgConnectionComplete(orgConnectionCallbackData) {
-    let eventPayload = new MessageBusEventPayload();
+    const _a = orgConnectionCallbackData, { linked_connections: linkedConnections = [] } = _a, primaryConnection = __objRest(_a, ["linked_connections"]);
+    this.publishSingleOrgConnectionComplete(primaryConnection);
+    linkedConnections.forEach((linkedConnection) => {
+      const _a2 = linkedConnection, { linked_connections: _nestedLinkedConnections } = _a2, linkedConnectionData = __objRest(_a2, ["linked_connections"]);
+      this.publishSingleOrgConnectionComplete(linkedConnectionData);
+    });
+  }
+  publishSingleOrgConnectionComplete(orgConnectionCallbackData) {
+    const eventPayload = new MessageBusEventPayload();
     eventPayload.api_mode = this.configService.systemConfig$.apiMode;
     eventPayload.data = orgConnectionCallbackData;
     if (orgConnectionCallbackData.error) {
@@ -40034,7 +40039,7 @@ var VaultProfileConfig = class {
     }
     this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId, patient_auth_type: patientAuthorizationType };
   }
-  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id, display_name) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
@@ -40077,8 +40082,8 @@ var VaultProfileConfig = class {
         platform_type,
         vault_profile_connection_id,
         patient_auth_type,
-        brand: { id: brand_id, name: "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
-        portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
+        brand: { id: brand_id, name: display_name || "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
+        portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: display_name || "unknown" },
         endpoint: { id: endpoint_id, platform_type },
         scope,
         consent_expires_at,
@@ -40126,19 +40131,6 @@ var VaultProfileConfig = class {
       return false;
     }
     this.connectedPatientAccounts.splice(ndx, 1);
-    return true;
-  }
-  deselectTefcaDirectConnectedAccount(vaultProfileConnectionId) {
-    const accountIndex = this.connectedPatientAccounts?.findIndex((account2) => account2.vault_profile_connection_id === vaultProfileConnectionId);
-    if (accountIndex === void 0 || accountIndex < 0) {
-      return false;
-    }
-    const account = this.connectedPatientAccounts[accountIndex];
-    if (!account.brand || !account.portal || !account.endpoint) {
-      return false;
-    }
-    this.addDiscoveredAccount(account.brand, account.portal, account.endpoint, vaultProfileConnectionId, account.patient_auth_type);
-    this.connectedPatientAccounts.splice(accountIndex, 1);
     return true;
   }
   upsertConnectedAccount(account) {
@@ -40242,10 +40234,6 @@ var AppComponent = class _AppComponent {
     this.externalId = "";
     this.email = "";
     this.staticBackdrop = false;
-    this.coBrandingTheme = FdkTheme.Light;
-    this.coBrandingAccentColor = "";
-    this.coBrandingLogoUrl = "";
-    this.coBrandingCompanyName = "";
     this.reconnectOrgConnectionId = null;
     this.brandId = "";
     this.portalId = "";
@@ -40326,22 +40314,9 @@ var AppComponent = class _AppComponent {
     if (this.staticBackdrop) {
       params = params.set("static-backdrop", this.staticBackdrop.toString());
     }
-    params = params.set("theme", this.normalizedTheme());
-    if (this.coBrandingAccentColor) {
-      params = params.set("accent-color", this.coBrandingAccentColor);
-    }
-    if (this.coBrandingLogoUrl) {
-      params = params.set("logo-url", this.coBrandingLogoUrl);
-    }
-    if (this.coBrandingCompanyName) {
-      params = params.set("company-name", this.coBrandingCompanyName);
-    }
     params = params.set("connect-mode", "websocket");
     this.logger.debug("encodeOptionsAsQueryStringParameters", params.toString());
     return params.toString();
-  }
-  normalizedTheme() {
-    return this.coBrandingTheme === FdkTheme.Dark ? FdkTheme.Dark : FdkTheme.Light;
   }
   showStitchModal() {
     this.logger.debug("showStitchModal", this.encodeOptionsAsQueryStringParameters());
@@ -40410,7 +40385,7 @@ var AppComponent = class _AppComponent {
           return ctx.receivePostMessage($event);
         }, false, \u0275\u0275resolveWindow);
       }
-    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], email: "email", staticBackdrop: [0, "static-backdrop", "staticBackdrop"], coBrandingTheme: [0, "co-branding-theme", "coBrandingTheme"], coBrandingAccentColor: [0, "co-branding-accent-color", "coBrandingAccentColor"], coBrandingLogoUrl: [0, "co-branding-logo-url", "coBrandingLogoUrl"], coBrandingCompanyName: [0, "co-branding-company-name", "coBrandingCompanyName"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchSortBy: [0, "search-sort-by", "searchSortBy"], searchSortByOpts: [0, "search-sort-by-opts", "searchSortByOpts"], searchOnly: [0, "search-only", "searchOnly"], showSplash: [0, "show-splash", "showSplash"], tefcaMode: [0, "tefca-mode", "tefcaMode"], tefcaCspPromptForce: [0, "tefca-csp-prompt-force", "tefcaCspPromptForce"], identityRequestUri: [0, "identity-request-uri", "identityRequestUri"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none"]], template: function AppComponent_Template(rf, ctx) {
+    }, inputs: { publicId: [0, "public-id", "publicId"], externalId: [0, "external-id", "externalId"], email: "email", staticBackdrop: [0, "static-backdrop", "staticBackdrop"], reconnectOrgConnectionId: [0, "reconnect-org-connection-id", "reconnectOrgConnectionId"], brandId: [0, "brand-id", "brandId"], portalId: [0, "portal-id", "portalId"], endpointId: [0, "endpoint-id", "endpointId"], searchQuery: [0, "search-query", "searchQuery"], searchSortBy: [0, "search-sort-by", "searchSortBy"], searchSortByOpts: [0, "search-sort-by-opts", "searchSortByOpts"], searchOnly: [0, "search-only", "searchOnly"], showSplash: [0, "show-splash", "showSplash"], tefcaMode: [0, "tefca-mode", "tefcaMode"], tefcaCspPromptForce: [0, "tefca-csp-prompt-force", "tefcaCspPromptForce"], identityRequestUri: [0, "identity-request-uri", "identityRequestUri"], eventTypes: [0, "event-types", "eventTypes"] }, outputs: { externalEventBus: "eventBus" }, standalone: false, features: [\u0275\u0275NgOnChangesFeature], ngContentSelectors: _c3, decls: 10, vars: 1, consts: [["stitchModalButton", ""], ["ref", ""], ["stitchModal", ""], ["stitchIframeEmbed", ""], ["type", "button", 1, "fhtw-block", "fhtw-text-white", "fhtw-bg-blue-700", "hover:fhtw-bg-blue-800", "focus:fhtw-ring-4", "focus:fhtw-outline-none", "focus:fhtw-ring-blue-300", "fhtw-font-medium", "fhtw-rounded-lg", "fhtw-text-sm", "fhtw-px-5", "fhtw-py-2.5", "fhtw-text-center", "dark:fhtw-bg-blue-600", "dark:hover:fhtw-bg-blue-700", "dark:focus:fhtw-ring-blue-800", 3, "click"], [4, "ngIf"], ["id", "stitchModal", "tabindex", "-1", "aria-hidden", "true", 1, "fhtw-border-none", "fhtw-p-0", "backdrop:fhtw-backdrop-blur", "fhtw-w-full", "fhtw-max-w-[440px]", "fhtw-bg-white", "fhtw-rounded-lg", "fhtw-shadow-lg"], [1, "fhtw-border-none"]], template: function AppComponent_Template(rf, ctx) {
       if (rf & 1) {
         const _r1 = \u0275\u0275getCurrentView();
         \u0275\u0275projectionDef();
