@@ -21,6 +21,18 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __objRest = (source, exclude) => {
+  var target = {};
+  for (var prop in source)
+    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+      target[prop] = source[prop];
+  if (source != null && __getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(source)) {
+      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
+        target[prop] = source[prop];
+    }
+  return target;
+};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
@@ -39853,7 +39865,7 @@ var ConfigService = class _ConfigService {
       return;
     }
     let updatedVaultProfile = this.vaultProfileConfig$;
-    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at, connectedAccount.tefca_directory_id);
+    updatedVaultProfile.addConnectedAccount(connectedAccount.vault_profile_connection_id || connectedAccount.external_state || "", connectedAccount.org_connection_id, connectedAccount.connection_status, connectedAccount.platform_type, connectedAccount.brand_id, connectedAccount.portal_id, connectedAccount.endpoint_id, connectedAccount.vault_profile_connection_id, connectedAccount.patient_auth_type, connectedAccount.scope, connectedAccount.consent_expires_at, connectedAccount.tefca_directory_id, connectedAccount.display_name);
     this.vaultProfileConfig = updatedVaultProfile;
   }
   // this is used when we successfully generated an org_connection_id for a TEFCA Direct account.
@@ -39948,7 +39960,15 @@ var MessageBusService = class _MessageBusService {
   }
   //this event is published when the popup window is closed, and the connection is successful or failed.
   publishOrgConnectionComplete(orgConnectionCallbackData) {
-    let eventPayload = new MessageBusEventPayload();
+    const _a = orgConnectionCallbackData, { linked_connections: linkedConnections = [] } = _a, primaryConnection = __objRest(_a, ["linked_connections"]);
+    this.publishSingleOrgConnectionComplete(primaryConnection);
+    linkedConnections.forEach((linkedConnection) => {
+      const _a2 = linkedConnection, { linked_connections: _nestedLinkedConnections } = _a2, linkedConnectionData = __objRest(_a2, ["linked_connections"]);
+      this.publishSingleOrgConnectionComplete(linkedConnectionData);
+    });
+  }
+  publishSingleOrgConnectionComplete(orgConnectionCallbackData) {
+    const eventPayload = new MessageBusEventPayload();
     eventPayload.api_mode = this.configService.systemConfig$.apiMode;
     eventPayload.data = orgConnectionCallbackData;
     if (orgConnectionCallbackData.error) {
@@ -40034,7 +40054,7 @@ var VaultProfileConfig = class {
     }
     this.discoveredPatientAccounts[vaultProfileConnectionId] = { brand, portal, endpoint, vault_profile_connection_id: vaultProfileConnectionId, patient_auth_type: patientAuthorizationType };
   }
-  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id) {
+  addConnectedAccount(external_state, org_connection_id, connection_status, platform_type, brand_id, portal_id, endpoint_id, vault_profile_connection_id, patient_auth_type, scope, consent_expires_at, tefca_directory_id, display_name) {
     if (!this.connectedPatientAccounts) {
       this.connectedPatientAccounts = [];
     }
@@ -40077,8 +40097,8 @@ var VaultProfileConfig = class {
         platform_type,
         vault_profile_connection_id,
         patient_auth_type,
-        brand: { id: brand_id, name: "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
-        portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: "unknown" },
+        brand: { id: brand_id, name: display_name || "unknown", portals: [], hidden: false, last_updated: "", portal_ids: [portal_id] },
+        portal: { id: portal_id, last_updated: "", endpoint_ids: [endpoint_id], name: display_name || "unknown" },
         endpoint: { id: endpoint_id, platform_type },
         scope,
         consent_expires_at,
