@@ -164,9 +164,6 @@
 .fhtw-justify-center {
   justify-content: center;
 }
-.fhtw-justify-around {
-  justify-content: space-around;
-}
 .fhtw-gap-1 {
   gap: 0.25rem;
 }
